@@ -68,20 +68,13 @@ class AutismAssessmentEngine {
         return {
             rawResults: resultsMap,
             normalizedMetrics: normalizedMetrics,
-            thematicAnalysis: this.evaluateCrossTestThemes(normalizedMetrics),
-            clinicalInvestigationAreas: this.evaluateClinicalInvestigationAreas(resultsMap, normalizedMetrics),
+            thematicAnalysis: [],
+            clinicalInvestigationAreas: [],
             matrix: matrixData
         };
     }
-
-    evaluateCrossTestThemes(metrics) { /* ... (Keep your existing theme logic or use previous) ... */ return []; }
-    evaluateClinicalInvestigationAreas(raw, metrics) { /* ... (Keep existing) ... */ return []; }
 }
 
-/**
- * Multimethod Assessment Profiling Matrix
- * Performs qualitative Confirmatory Factor Analysis (CFA) across the battery.
- */
 class MultimethodProfiler {
     constructor(rawResults, normalizedMetrics) {
         this.raw = rawResults;
@@ -158,4 +151,3 @@ class MultimethodProfiler {
 }
 
 window.AutismAssessmentEngine = AutismAssessmentEngine;
-window.MultimethodProfiler = MultimethodProfiler;
