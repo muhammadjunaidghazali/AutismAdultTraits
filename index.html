@@ -7,13 +7,13 @@
     <!-- Core External Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Standalone Decoupled Scoring Engine -->
+    <!-- Standalone Scoring Engine -->
     <script src="scoring.js"></script>
     <style>
         .choice-card:hover { border-color: #3b82f6; background-color: #f8fafc; }
         .active-radio { border-color: #4f46e5 !important; background-color: #eef2ff !important; box-shadow: 0 0 0 2px #4f46e5; }
         @media print {
-            header, #adminNavActions, #modalPinLock, #viewClientIntake, #viewTesting, #viewClientCompletion, #viewAdminRoster, .no-print { display: none !important; }
+            header, #btnClinicianPortalHeader, #modalPinLock, #viewClientIntake, #viewTesting, #viewClientSummary, #viewAdminRoster, .no-print { display: none !important; }
             body { background-color: #ffffff; }
             main { padding: 0; max-width: 100%; }
             #viewAdminDetail { display: block !important; }
@@ -35,7 +35,7 @@
             <div class="flex items-center gap-3">
                 <div id="clientDisplayID" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hidden"></div>
                 <!-- Clinician Lock Button -->
-                <button onclick="openClinicianModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
+                <button id="btnClinicianPortalHeader" onclick="openClinicianModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -45,7 +45,7 @@
         </div>
     </header>
 
-    <!-- Main Dynamic Application Container -->
+    <!-- Main Container -->
     <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
 
         <!-- VIEW 1: CLIENT INTAKE FORM (Name, Contact, Email, DOB) -->
@@ -100,18 +100,75 @@
             </div>
         </section>
 
-        <!-- VIEW 3: CLIENT SUBMISSION CONFIRMATION -->
-        <section id="viewClientCompletion" class="bg-white border border-slate-200 rounded-2xl shadow-xl p-8 md:p-12 max-w-lg w-full mx-auto text-center hidden">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+        <!-- VIEW 3: CLIENT SUMMARY DASHBOARD (VISIBLE TO CANDIDATE UPON COMPLETION) -->
+        <section id="viewClientSummary" class="w-full hidden space-y-8">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Screening Complete</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-0.5">Your Psychometric Summary</h2>
+                    <p class="text-xs text-slate-500 mt-1">Hello <span id="clientSummaryName" class="font-semibold text-slate-700"></span>, your assessment responses have been recorded and sent to your clinician.</p>
+                </div>
+                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Summary
+                </button>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900">Assessment Submitted</h2>
-            <p class="text-sm text-slate-600 mt-2 leading-relaxed">Thank you, <span id="completedClientName" class="font-semibold text-slate-800"></span>. Your psychometric screening battery has been compiled and securely transmitted to your clinician for diagnostic review.</p>
-            <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500 text-left">
-                <p class="font-semibold text-slate-700 mb-1">What happens next?</p>
-                <p>Your clinician will evaluate the dimensional subscales and convergent trait profiles during your consultation session. You may now safely close this tab.</p>
+
+            <!-- Summary Total Cards for Candidate -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">AQ Total</p>
+                    <p id="clientCardAQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Autism Spectrum Quotient</p>
+                </div>
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">RAADS-R</p>
+                    <p id="clientCardRAADS" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Ritvo Diagnostic Scale</p>
+                </div>
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CAT-Q Total</p>
+                    <p id="clientCardCATQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Social Camouflaging</p>
+                </div>
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CATI Total</p>
+                    <p id="clientCardCATI" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Comprehensive Inventory</p>
+                </div>
+            </div>
+
+            <!-- Client Trait Radar & Thematic Clusters -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Dimensional Trait Match Across Subscales (%)
+                    </h4>
+                    <div class="relative w-full h-[320px]">
+                        <canvas id="clientChartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
+                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                        Identified Trait Clusters
+                    </h4>
+                    <div id="clientThemesContainer" class="space-y-3.5 flex-grow overflow-y-auto max-h-[320px] pr-1"></div>
+                </div>
+            </div>
+
+            <!-- Client Informational Notice -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 shadow-sm text-sm text-slate-700">
+                <p class="font-bold text-slate-900 mb-1">What this summary means for you</p>
+                <p class="text-xs text-slate-600 leading-relaxed">These scores reflect self-reported communication preferences, sensory processing tendencies, and social adaptation strategies. They provide a starting point for discussion with your clinician during your formal diagnostic consultation.</p>
             </div>
         </section>
 
@@ -120,7 +177,7 @@
             <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div>
                     <h3 class="text-xl font-bold text-slate-900">Clinician Assessment Registry</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Secure repository of client intake records and diagnostic profiles</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Secure client database with full test histories and granular response logs</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="refreshAdminData()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all">Refresh Logs</button>
@@ -152,26 +209,26 @@
             </div>
         </section>
 
-        <!-- VIEW 5: CLINICIAN INDIVIDUAL PROFILE INSPECTOR -->
-        <section id="viewAdminDetail" class="w-full hidden space-y-6">
+        <!-- VIEW 5: CLINICIAN IN-DEPTH DIAGNOSTIC PROFILE INSPECTOR -->
+        <section id="viewAdminDetail" class="w-full hidden space-y-8">
             <div class="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-200 shadow-sm no-print">
                 <button onclick="backToAdminRoster()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                     Back to Registry
                 </button>
-                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    Print Clinical Diagnostic Report
+                    Export Comprehensive Clinical Report
                 </button>
             </div>
 
-            <!-- Client Metadata Profile Card -->
+            <!-- Client Profile Metadata Card -->
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Client Name</p>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Patient Name</p>
                         <p id="detClientName" class="font-bold text-slate-900 text-base mt-0.5">-</p>
                     </div>
                     <div>
@@ -189,52 +246,54 @@
                 </div>
             </div>
 
-            <!-- Total Scores Summary -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">AQ Total</p>
-                    <p id="detScoreAQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Cutoff: ≥ 26</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">RAADS-R</p>
-                    <p id="detScoreRAADS" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Cutoff: ≥ 65</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CAT-Q Total</p>
-                    <p id="detScoreCATQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Cutoff: ≥ 100</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CATI Total</p>
-                    <p id="detScoreCATI" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Dimensional Screener</p>
+            <!-- PART 1: INDIVIDUAL TEST ANALYSES -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                    Part 1: Individual Battery Results & Subscale Breakdown
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="individualTestsContainer">
+                    <!-- Cards for AQ, RAADS-R, CAT-Q, CATI are built dynamically here -->
                 </div>
             </div>
 
-            <!-- Visual Charts & Thematic Synthesis -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Subscale Dimensional Expression (%)
-                    </h4>
-                    <div class="relative w-full h-[320px]">
+            <!-- PART 2: COMBINED VISUAL THEMATIC ANALYSIS -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                    Part 2: Combined Visual Trait Convergence Across All Batteries
+                </h3>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="relative w-full h-[360px]">
                         <canvas id="adminSubscaleChartCanvas"></canvas>
                     </div>
                 </div>
+            </div>
 
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
-                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                        </svg>
-                        Identified Trait Clusters
-                    </h4>
-                    <div id="detThematicContainer" class="space-y-3.5 flex-grow overflow-y-auto max-h-[360px] pr-1"></div>
+            <!-- PART 3: COMMON TRAITS & AREAS FOR CLINICAL INVESTIGATION -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                    Part 3: Cross-Test Convergent Traits & Areas for Further Clinical Investigation
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Convergent Thematic Traits Found Across Screeners -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
+                        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Convergent Behavioral Themes
+                        </h4>
+                        <div id="detThematicContainer" class="space-y-3 flex-grow"></div>
+                    </div>
+
+                    <!-- Explicit Investigation Targets For Clinician -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
+                        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            Recommended Focus Areas for Clinical Interview
+                        </h4>
+                        <div id="detInvestigationContainer" class="space-y-3 flex-grow"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -274,6 +333,7 @@
         let adminRecords = [];
         let verifiedAdminPin = "";
         let adminChart = null;
+        let clientChart = null;
 
         const OPTION_LABELS = {
             AQ: ["Definitely Agree", "Slightly Agree", "Slightly Disagree", "Definitely Disagree"],
@@ -306,7 +366,6 @@
             }
         }
 
-        // Intake Form Handler
         function handleStartAssessment(e) {
             e.preventDefault();
             activeClientInfo = {
@@ -377,14 +436,37 @@
         async function finishAssessment() {
             const results = engine.calculateScores(userResponses, testBattery);
 
-            // Hide testing, display patient confirmation card
+            // Populate Candidate Summary View
             document.getElementById("viewTesting").classList.add("hidden");
-            document.getElementById("completedClientName").textContent = activeClientInfo.name;
-            document.getElementById("viewClientCompletion").classList.remove("hidden");
+            document.getElementById("clientSummaryName").textContent = activeClientInfo.name;
+            document.getElementById("clientCardAQ").textContent = results.rawResults.AQ.total;
+            document.getElementById("clientCardRAADS").textContent = results.rawResults.RAADS.total;
+            document.getElementById("clientCardCATQ").textContent = results.rawResults.CATQ.total;
+            document.getElementById("clientCardCATI").textContent = results.rawResults.CATI.total;
+
+            const clientThemes = document.getElementById("clientThemesContainer");
+            clientThemes.innerHTML = "";
+            results.thematicAnalysis.forEach(theme => {
+                const badgeColor = theme.prominence === "High" ? "bg-rose-100 text-rose-800" :
+                                   theme.prominence === "Moderate" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800";
+                const card = document.createElement("div");
+                card.className = "p-3.5 border border-slate-200 rounded-xl bg-slate-50";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <h5 class="font-bold text-slate-900 text-xs">${theme.themeName}</h5>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${badgeColor}">${theme.prominence}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 leading-relaxed">${theme.description}</p>
+                `;
+                clientThemes.appendChild(card);
+            });
+
+            renderClientChart(results.normalizedMetrics);
+            document.getElementById("viewClientSummary").classList.remove("hidden");
             document.getElementById("testProgressBadge").textContent = "Completed";
             document.getElementById("testProgressBadge").className = "text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded";
 
-            // Transmit assessment record to backend
+            // Submit Summary + Granular 197-Item Answers to Backend
             try {
                 const res = await fetch(APPS_SCRIPT_URL, {
                     method: "POST",
@@ -399,17 +481,59 @@
                             CATI: results.rawResults.CATI.total
                         },
                         metrics: results.normalizedMetrics,
-                        themes: results.thematicAnalysis
+                        themes: results.thematicAnalysis,
+                        answers: userResponses
                     })
                 });
                 const confirmation = await res.text();
-                console.log("Assessment successfully recorded:", confirmation);
+                console.log("Recorded to Sheet:", confirmation);
             } catch (err) {
                 console.error("Submission failed:", err);
             }
         }
 
-        // Clinician Modal & PIN Authentication
+        function renderClientChart(metrics) {
+            const ctx = document.getElementById("clientChartCanvas").getContext("2d");
+            const labels = [];
+            const values = [];
+
+            Object.entries(metrics || {}).forEach(([testId, data]) => {
+                Object.entries(data.subscales || {}).forEach(([subName, pct]) => {
+                    const formattedSub = subName.replace(/([A-Z])/g, " $1").toLowerCase();
+                    labels.push(`${testId}: ${formattedSub}`);
+                    values.push(pct);
+                });
+            });
+
+            if (clientChart) clientChart.destroy();
+            clientChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: "rgba(99, 102, 241, 0.75)",
+                        borderColor: "rgba(79, 70, 229, 1)",
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%", stepSize: 25 } },
+                        x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 45, font: { size: 9 } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // ==========================================
+        // CLINICIAN WORKSPACE & VERIFICATION
+        // ==========================================
+
         function openClinicianModal() {
             document.getElementById("modalPinError").classList.add("hidden");
             document.getElementById("modalPinInput").value = "";
@@ -445,8 +569,8 @@
                 try {
                     data = JSON.parse(rawText);
                 } catch (parseErr) {
-                    console.error("Non-JSON Server Output:", rawText);
-                    throw new Error("Server returned HTML instead of JSON. Ensure your Apps Script deployment is set to 'Anyone'.");
+                    console.error("Server output was not JSON:", rawText);
+                    throw new Error("Server returned HTML. Ensure deployment is set to 'Anyone'.");
                 }
 
                 if (data.status === "success") {
@@ -459,8 +583,8 @@
                     errDiv.classList.remove("hidden");
                 }
             } catch (err) {
-                console.error("Verification error details:", err);
-                errDiv.textContent = err.message || "Network error communicating with assessment backend.";
+                console.error("Verification error:", err);
+                errDiv.textContent = err.message || "Failed to communicate with assessment backend.";
                 errDiv.classList.remove("hidden");
             } finally {
                 btn.textContent = "Verify & Unlock";
@@ -471,7 +595,7 @@
         function openAdminDashboard() {
             document.getElementById("viewClientIntake").classList.add("hidden");
             document.getElementById("viewTesting").classList.add("hidden");
-            document.getElementById("viewClientCompletion").classList.add("hidden");
+            document.getElementById("viewClientSummary").classList.add("hidden");
             document.getElementById("viewAdminDetail").classList.add("hidden");
 
             document.getElementById("viewAdminRoster").classList.remove("hidden");
@@ -502,7 +626,7 @@
                     <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.CATQ}</td>
                     <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.CATI}</td>
                     <td class="py-3 px-4 text-right">
-                        <button onclick="inspectClientDetail(${rec.id})" class="px-3 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-all">Inspect Profile</button>
+                        <button onclick="inspectClientDetail(${rec.id})" class="px-3 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-all">Inspect Clinical File</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -521,12 +645,102 @@
             document.getElementById("detClientPhone").textContent = rec.phone;
             document.getElementById("detClientEmail").textContent = rec.email;
 
-            document.getElementById("detScoreAQ").textContent = rec.totals.AQ;
-            document.getElementById("detScoreRAADS").textContent = rec.totals.RAADS;
-            document.getElementById("detScoreCATQ").textContent = rec.totals.CATQ;
-            document.getElementById("detScoreCATI").textContent = rec.totals.CATI;
+            // 1. Build Individual Test Cards with Clinical Cutoffs
+            renderIndividualTestCards(rec);
 
-            // Render thematic clusters
+            // 2. Render Combined Visual Thematic Chart
+            renderAdminChart(rec.metrics);
+
+            // 3. Render Thematic Analysis + Focused Areas for Investigation
+            renderThematicAndInvestigationCards(rec);
+        }
+
+        function renderIndividualTestCards(rec) {
+            const container = document.getElementById("individualTestsContainer");
+            container.innerHTML = "";
+
+            const testsInfo = [
+                {
+                    id: "AQ",
+                    title: "Autism Spectrum Quotient (AQ-50)",
+                    cutoff: "Cutoff: ≥ 26 (Significant Traits), ≥ 32 (Strong Indication)",
+                    score: rec.totals.AQ,
+                    isElevated: rec.totals.AQ >= 26,
+                    subscales: rec.metrics.AQ?.subscales || {}
+                },
+                {
+                    id: "RAADS",
+                    title: "Ritvo Autism Asperger Diagnostic Scale (RAADS-R)",
+                    cutoff: "Cutoff: ≥ 65 (Positive Screener Indication)",
+                    score: rec.totals.RAADS,
+                    isElevated: rec.totals.RAADS >= 65,
+                    subscales: rec.metrics.RAADS?.subscales || {}
+                },
+                {
+                    id: "CATQ",
+                    title: "Camouflaging Autistic Traits (CAT-Q)",
+                    cutoff: "Cutoff: ≥ 100 (Significant Social Camouflaging & Masking)",
+                    score: rec.totals.CATQ,
+                    isElevated: rec.totals.CATQ >= 100,
+                    subscales: rec.metrics.CATQ?.subscales || {}
+                },
+                {
+                    id: "CATI",
+                    title: "Comprehensive Autistic Trait Inventory (CATI)",
+                    cutoff: "Continuous Dimensional Screener (No Single Cutoff)",
+                    score: rec.totals.CATI,
+                    isElevated: false,
+                    subscales: rec.metrics.CATI?.subscales || {}
+                }
+            ];
+
+            testsInfo.forEach(t => {
+                const badgeColor = t.isElevated ? "bg-rose-100 text-rose-800 border-rose-200" : "bg-slate-100 text-slate-700 border-slate-200";
+                const badgeText = t.id === "CATI" ? "Dimensional" : (t.isElevated ? "Above Cutoff" : "Below Cutoff");
+
+                let subscaleBars = "";
+                Object.entries(t.subscales).forEach(([subName, pct]) => {
+                    const formatted = subName.replace(/([A-Z])/g, " $1").toLowerCase();
+                    subscaleBars += `
+                        <div class="mt-2">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="capitalize text-slate-600">${formatted}</span>
+                                <span class="font-bold text-slate-800">${pct}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const card = document.createElement("div");
+                card.className = "bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">${t.title}</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">${t.cutoff}</p>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${badgeColor}">${badgeText}</span>
+                        </div>
+                        <div class="flex items-baseline gap-2 my-3">
+                            <span class="text-3xl font-black text-slate-900">${t.score}</span>
+                            <span class="text-xs text-slate-400">Total Raw Score</span>
+                        </div>
+                        <div class="border-t border-slate-100 pt-3">
+                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Subscale Expressions</p>
+                            ${subscaleBars || "<p class='text-xs text-slate-400'>No subscales available.</p>"}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderThematicAndInvestigationCards(rec) {
+            // Render Convergent Themes
             const themeContainer = document.getElementById("detThematicContainer");
             themeContainer.innerHTML = "";
             (rec.themes || []).forEach(theme => {
@@ -544,8 +758,26 @@
                 themeContainer.appendChild(card);
             });
 
-            // Render subscale chart
-            renderAdminChart(rec.metrics);
+            // Calculate Specific Areas for Clinical Investigation
+            const investigationContainer = document.getElementById("detInvestigationContainer");
+            investigationContainer.innerHTML = "";
+            const areas = engine.evaluateClinicalInvestigationAreas(rec.totals, rec.metrics);
+
+            areas.forEach(item => {
+                const severityClass = item.severity === "Priority Focus" ? "bg-rose-50 border-rose-200 text-rose-900" : "bg-amber-50 border-amber-200 text-amber-900";
+                const badgeClass = item.severity === "Priority Focus" ? "bg-rose-200 text-rose-800" : "bg-amber-200 text-amber-800";
+
+                const block = document.createElement("div");
+                block.className = `p-3.5 border rounded-xl ${severityClass}`;
+                block.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <h5 class="font-bold text-xs">${item.title}</h5>
+                        <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${badgeClass}">${item.severity}</span>
+                    </div>
+                    <p class="text-[11px] opacity-90 leading-relaxed">${item.notes}</p>
+                `;
+                investigationContainer.appendChild(block);
+            });
         }
 
         function renderAdminChart(metrics) {
