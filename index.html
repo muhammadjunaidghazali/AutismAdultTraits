@@ -1,156 +1,3861 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Clinical psychometric screening workspace">
-<title>Clinical Psychometric Workspace V2</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="Scoring_V2.js"></script>
-<style>
-  :focus-visible{outline:3px solid rgba(79,70,229,.35);outline-offset:2px}
-  .choice-card:hover{border-color:#6366f1;background:#f8fafc}
-  .choice-card.selected{border-color:#4f46e5;background:#eef2ff;box-shadow:0 0 0 2px #4f46e5}
-  .spinner{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#4f46e5;border-radius:50%;animation:spin .8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
-  @media print{header,#clientView,#adminToolbar,#adminList,#adminSearch,#adminBack,#noteComposer,.no-print{display:none!important}body{background:#fff}.printable{display:block!important}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Clinical Psychometric Assessment</title>
+
+  <meta
+    name="description"
+    content="Clinical psychometric assessment platform"
+  >
+
+  <meta name="theme-color" content="#0f172a">
+
+  <!--
+    IMPORTANT:
+    These files must exist in the SAME GitHub repository/folder
+    as this Index_V2.html file.
+
+    If your filenames are different, change them here.
+  -->
+  <script src="./Tests_V2.js"></script>
+  <script src="./Scoring_V2.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0f172a;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --success: #15803d;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --radius: 14px;
+      --shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =========================
+       HEADER
+    ========================== */
+
+    .site-header {
+      background: var(--secondary);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #2563eb;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .header-status {
+      font-size: 12px;
+      opacity: 0.75;
+    }
+
+    /* =========================
+       MAIN
+    ========================== */
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 18px 60px;
+    }
+
+    .screen {
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 50px 28px;
+    }
+
+    .hero-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 20px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: #dbeafe;
+      color: var(--primary);
+      font-size: 32px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+      line-height: 1.25;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 25px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    .lead {
+      max-width: 700px;
+      margin: 0 auto 24px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .notice {
+      border-radius: 12px;
+      padding: 15px 17px;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    .notice.info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    .notice.warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    .notice.success {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .notice.danger {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================== */
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 25px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 600;
+      transition: 0.15s ease;
+      min-height: 46px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--secondary);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .btn-success {
+      background: #dcfce7;
+      color: var(--success);
+    }
+
+    .btn-link {
+      background: transparent;
+      color: var(--primary);
+      padding: 8px;
+    }
+
+    /* =========================
+       PROGRESS
+    ========================== */
+
+    .progress-wrapper {
+      margin-bottom: 24px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.25s ease;
+    }
+
+    /* =========================
+       FORM
+    ========================== */
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .required {
+      color: var(--danger);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 9px;
+      padding: 12px 13px;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .help {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* =========================
+       QUESTIONNAIRE
+    ========================== */
+
+    .test-header {
+      margin-bottom: 25px;
+    }
+
+    .test-label {
+      color: var(--primary);
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .question-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+
+    .question-number {
+      display: inline-flex;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #eff6ff;
+      color: var(--primary);
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 17px;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .options {
+      display: grid;
+      gap: 9px;
+    }
+
+    .option {
+      position: relative;
+    }
+
+    .option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .option label {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 12px 14px;
+      border: 1px solid #dbe2ea;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 400;
+      transition: 0.15s ease;
+    }
+
+    .option label:hover {
+      background: #f8fafc;
+      border-color: #93c5fd;
+    }
+
+    .option input:checked + label {
+      background: #eff6ff;
+      border-color: var(--primary);
+      color: #1e40af;
+    }
+
+    .option-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #94a3b8;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .option input:checked + label .option-dot {
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 4px white;
+      background: var(--primary);
+    }
+
+    /* =========================
+       TEST NAVIGATION
+    ========================== */
+
+    .assessment-toolbar {
+      position: sticky;
+      bottom: 15px;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .toolbar-center {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* =========================
+       THANK YOU
+    ========================== */
+
+    .thank-you {
+      text-align: center;
+      padding: 45px 25px;
+    }
+
+    .success-icon {
+      width: 75px;
+      height: 75px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: #15803d;
+      display: grid;
+      place-items: center;
+      font-size: 35px;
+    }
+
+    .contact-grid {
+      max-width: 650px;
+      margin: 30px auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .contact-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      background: #f8fafc;
+    }
+
+    .contact-card strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .contact-card a {
+      color: var(--primary);
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    /* =========================
+       CLINICIAN LOGIN
+    ========================== */
+
+    .lock-screen {
+      max-width: 450px;
+      margin: 50px auto;
+      text-align: center;
+    }
+
+    .lock-icon {
+      width: 65px;
+      height: 65px;
+      border-radius: 15px;
+      background: #f1f5f9;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      font-size: 28px;
+    }
+
+    /* =========================
+       ADMIN DASHBOARD
+    ========================== */
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 17px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-value {
+      font-size: 25px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* =========================
+       MODAL
+    ========================== */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.55);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 3000;
+    }
+
+    .modal-content {
+      width: min(900px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+    }
+
+    /* =========================
+       LOADING
+    ========================== */
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(3px);
+      z-index: 5000;
+      display: grid;
+      place-items: center;
+    }
+
+    .loading-box {
+      background: white;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      padding: 25px 30px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 35px;
+      height: 35px;
+      border: 3px solid #dbeafe;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer {
+      text-align: center;
+      padding: 25px 18px 40px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media (max-width: 700px) {
+
+      main {
+        padding: 20px 12px 45px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .hero {
+        padding: 35px 20px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .toolbar-inner {
+        flex-wrap: wrap;
+      }
+
+      .toolbar-center {
+        order: -1;
+        width: 100%;
+      }
+
+      .btn {
+        flex: 1;
+      }
+
+      .button-row .btn {
+        min-width: 150px;
+      }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
-<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
-  <div class="max-w-6xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
-    <div><h1 class="text-lg font-bold text-slate-900">Clinical Psychometric Workspace</h1><p class="text-[11px] text-slate-500">Screening, documentation and clinician review</p></div>
-    <div class="flex items-center gap-2">
-      <span id="clientIdBadge" class="hidden text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-600"></span>
-      <button id="btnClinician" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200">Clinician Portal</button>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+
+    <div class="brand">
+      <div class="brand-mark">Ψ</div>
+
+      <div class="brand-text">
+        <span class="brand-title">
+          Clinical Assessment
+        </span>
+
+        <span class="brand-subtitle">
+          Secure Psychometric Screening
+        </span>
+      </div>
     </div>
+
+    <div class="header-status" id="connectionStatus">
+      Ready
+    </div>
+
   </div>
 </header>
 
-<main class="max-w-6xl mx-auto w-full px-4 md:px-6 py-6 md:py-8">
-  <div id="statusBanner" class="hidden mb-5 rounded-xl border p-3 text-sm"></div>
 
-  <section id="clientView" class="space-y-6">
-    <section id="intakePanel" class="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-      <div class="mb-6"><span class="text-[11px] font-bold uppercase tracking-widest text-indigo-600">Private screening workspace</span><h2 class="text-2xl font-bold mt-1 text-slate-900">Assessment Intake</h2><p class="text-sm text-slate-500 mt-2">Please complete the information below. Your scores will not be shown on completion. Your responses will be reviewed by your clinician.</p></div>
-      <form id="intakeForm" class="grid md:grid-cols-2 gap-4">
-        <label class="md:col-span-2"><span class="label">Full Name</span><input id="clientName" required maxlength="160" autocomplete="name" class="input" /></label>
-        <label><span class="label">WhatsApp / Contact</span><input id="clientPhone" required maxlength="60" autocomplete="tel" class="input" /></label>
-        <label><span class="label">Email</span><input id="clientEmail" required maxlength="200" type="email" autocomplete="email" class="input" /></label>
-        <label><span class="label">Date of Birth</span><input id="clientDob" required type="date" class="input" /></label>
-        <label><span class="label">Session / Assessment Type</span><select id="sessionType" class="input"><option>Intake</option><option>Baseline</option><option>Follow-up</option><option>Termination</option></select></label>
-        <label class="md:col-span-2 flex gap-3 items-start rounded-xl bg-slate-50 border border-slate-200 p-4"><input id="consentBox" required type="checkbox" class="mt-1 h-4 w-4" /><span class="text-xs leading-5 text-slate-600">I understand that these questionnaires are screening and dimensional measures, not a diagnosis by themselves, and that my responses will be stored for clinician review.</span></label>
-        <div class="md:col-span-2 flex gap-2 justify-between items-center pt-2"><button id="resumeBtn" type="button" class="hidden px-4 py-2.5 rounded-xl border border-indigo-200 text-indigo-700 bg-indigo-50 text-sm font-semibold">Resume saved assessment</button><button class="ml-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm">Begin Assessment</button></div>
+<main>
+
+  <!-- =====================================================
+       WELCOME SCREEN
+  ====================================================== -->
+
+  <section id="welcomeScreen" class="screen">
+
+    <div class="card hero">
+
+      <div class="hero-icon">
+        Ψ
+      </div>
+
+      <h1>
+        Clinical Psychometric Assessment
+      </h1>
+
+      <p class="lead">
+        This assessment helps your clinician understand patterns
+        related to social interaction, communication, attention,
+        sensory experiences, self-regulation and related areas.
+      </p>
+
+      <div class="notice info">
+        <strong>Important:</strong>
+        This assessment is not a diagnosis. Your responses will
+        be reviewed by a qualified clinician as part of a broader
+        clinical assessment.
+      </div>
+
+      <div class="notice warning">
+        Please answer each question based on your usual experiences,
+        rather than trying to select what you think is the expected
+        answer.
+      </div>
+
+      <div class="button-row">
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="showIntake()"
+        >
+          Begin Assessment
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="showClinicianLogin()"
+        >
+          Clinician Access
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       INTAKE
+  ====================================================== -->
+
+  <section id="intakeScreen" class="screen hidden">
+
+    <div class="card">
+
+      <h2>Before We Begin</h2>
+
+      <p class="help">
+        Please provide the information below. Required fields are
+        marked with an asterisk.
+      </p>
+
+      <form id="intakeForm">
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="fullName">
+              Full Name <span class="required">*</span>
+            </label>
+
+            <input
+              id="fullName"
+              name="fullName"
+              type="text"
+              autocomplete="name"
+              required
+            >
+          </div>
+
+
+          <div class="field">
+
+            <label for="email">
+              Email Address <span class="required">*</span>
+            </label>
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="phone">
+              Phone / WhatsApp
+            </label>
+
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              autocomplete="tel"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="dob">
+              Date of Birth
+            </label>
+
+            <input
+              id="dob"
+              name="dob"
+              type="date"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="gender">
+              Gender
+            </label>
+
+            <select id="gender" name="gender">
+
+              <option value="">
+                Prefer not to say
+              </option>
+
+              <option value="female">
+                Female
+              </option>
+
+              <option value="male">
+                Male
+              </option>
+
+              <option value="non_binary">
+                Non-binary
+              </option>
+
+              <option value="other">
+                Other
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="assessmentPurpose">
+              Assessment Context
+            </label>
+
+            <select
+              id="assessmentPurpose"
+              name="assessmentPurpose"
+            >
+
+              <option value="">
+                Select
+              </option>
+
+              <option value="initial_intake">
+                Initial Intake
+              </option>
+
+              <option value="ongoing_counselling">
+                Ongoing Counselling
+              </option>
+
+              <option value="follow_up">
+                Follow-up Assessment
+              </option>
+
+              <option value="post_termination">
+                Post-Termination
+              </option>
+
+              <option value="research">
+                Research
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field full">
+
+            <label for="reason">
+              What brings you for assessment?
+            </label>
+
+            <textarea
+              id="reason"
+              name="reason"
+              placeholder="Briefly describe your concerns or what you would like your clinician to understand."
+            ></textarea>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="medications">
+              Current Medications
+            </label>
+
+            <textarea
+              id="medications"
+              name="medications"
+              placeholder="Optional"
+            ></textarea>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="supportSystem">
+              Support System
+            </label>
+
+            <textarea
+              id="supportSystem"
+              name="supportSystem"
+              placeholder="Optional"
+            ></textarea>
+
+          </div>
+
+        </div>
+
+
+        <div class="notice info">
+
+          <strong>Privacy:</strong>
+          Your responses are submitted to the clinician for
+          assessment and record keeping. Results are not displayed
+          to you automatically after submission.
+
+        </div>
+
+
+        <div class="notice warning">
+
+          <strong>Not an emergency service:</strong>
+          This assessment is not intended for crisis intervention
+          or emergency care.
+
+        </div>
+
+
+        <div class="button-row">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="showWelcome()"
+          >
+            Back
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            Continue
+          </button>
+
+        </div>
+
       </form>
-    </section>
 
-    <section id="testingPanel" class="hidden max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="px-5 md:px-8 pt-5 md:pt-7">
-        <div class="flex justify-between items-center text-xs text-slate-500 mb-2"><span id="sectionLabel" class="font-semibold text-indigo-600"></span><span id="counter"></span></div>
-        <div class="h-2 rounded-full bg-slate-100 overflow-hidden"><div id="progressBar" class="h-full bg-indigo-600 transition-all" style="width:0%"></div></div>
-        <div id="sectionProgress" class="flex gap-1.5 mt-3"></div>
-      </div>
-      <div class="px-5 md:px-8 py-7 md:py-10">
-        <p id="questionHint" class="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2"></p>
-        <h2 id="questionText" class="text-xl md:text-2xl font-bold leading-snug text-slate-900"></h2>
-        <div id="options" class="grid md:grid-cols-2 gap-3 mt-7"></div>
-      </div>
-      <div class="border-t border-slate-100 px-5 md:px-8 py-5 flex items-center justify-between gap-3"><button id="prevBtn" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold disabled:opacity-30">Previous</button><div class="text-xs text-slate-400">Your progress is saved on this device</div><button id="nextBtn" disabled class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold disabled:opacity-40">Next</button></div>
-    </section>
+    </div>
 
-    <section id="completePanel" class="hidden max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-7 md:p-10 text-center">
-      <div class="mx-auto w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">✓</div>
-      <h2 class="text-2xl font-bold text-slate-900 mt-4">Assessment submitted</h2>
-      <p id="completeText" class="text-sm text-slate-600 leading-6 mt-2">Thank you. Your responses have been securely recorded and will be reviewed by your clinician.</p>
-      <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm"><div class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Reference</div><div id="completeRef" class="font-bold text-slate-900 mt-1"></div></div>
-      <div class="mt-6 text-sm text-slate-600">Questions about your assessment or next steps?<div class="mt-2 font-semibold text-slate-900">WhatsApp: <span id="contactWhatsApp">[replace with your WhatsApp]</span></div><div class="font-semibold text-slate-900">Email: <span id="contactEmail">[replace with your email]</span></div></div>
-      <p class="text-[11px] text-slate-400 mt-6">You may now close this window. Screening scores are intentionally not displayed here.</p>
-    </section>
   </section>
 
-  <section id="adminView" class="hidden space-y-5">
-    <div id="adminToolbar" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"><div><div class="text-[11px] font-bold uppercase tracking-widest text-indigo-600">Clinician portal</div><h2 class="text-xl font-bold text-slate-900">Assessment Registry</h2><p class="text-xs text-slate-500">Server-side screening results, longitudinal records and clinician notes</p></div><div class="flex gap-2"><button id="refreshBtn" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold">Refresh</button><button id="lockBtn" class="px-3 py-2 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-semibold">Lock & Exit</button></div></div>
-    <div id="adminSearch" class="bg-white rounded-2xl border border-slate-200 p-4"><input id="searchInput" placeholder="Search client ID, name, email or assessment ID..." class="input" /></div>
-    <div id="adminList" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"><div id="registryBody" class="divide-y divide-slate-100"></div><div id="registryEmpty" class="hidden p-8 text-center text-sm text-slate-400">No assessments found.</div></div>
-    <section id="adminDetail" class="hidden printable space-y-5">
-      <div class="flex justify-between items-center no-print"><button id="adminBack" class="text-xs font-semibold text-indigo-600">← Back to registry</button><button id="printBtn" class="px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold">Print clinical report</button></div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-6"><div class="grid md:grid-cols-4 gap-4"><div><div class="meta">Client ID</div><div id="dClientId" class="value"></div></div><div><div class="meta">Client</div><div id="dName" class="value"></div></div><div><div class="meta">DOB</div><div id="dDob" class="value"></div></div><div><div class="meta">Email</div><div id="dEmail" class="value"></div></div></div></div>
-      <div class="grid md:grid-cols-4 gap-4" id="scoreCards"></div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-6"><div class="flex justify-between items-center mb-4"><div><h3 class="font-bold text-slate-900">Cross-instrument dimensional profile</h3><p class="text-xs text-slate-500">Descriptive percentages derived from each instrument's own item maximums</p></div></div><div class="h-[340px]"><canvas id="adminChart"></canvas></div></div>
-      <div class="grid lg:grid-cols-2 gap-5"><div class="bg-white rounded-2xl border border-slate-200 p-6"><h3 class="font-bold text-slate-900 mb-3">Automated screening patterns</h3><div id="themesBox" class="space-y-3"></div></div><div class="bg-white rounded-2xl border border-slate-200 p-6"><h3 class="font-bold text-slate-900 mb-3">Clinical exploration prompts</h3><div id="areasBox" class="space-y-3"></div></div></div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-6"><h3 class="font-bold text-slate-900">Clinical notes</h3><div id="notesBox" class="space-y-3 mt-4"></div><div id="noteComposer" class="mt-5 border-t border-slate-100 pt-5"><textarea id="noteInput" rows="5" maxlength="10000" class="input" placeholder="Enter clinician interpretation, contextual observations, functional impact, differential considerations, or next steps..."></textarea><div class="flex justify-end mt-2"><button id="saveNoteBtn" class="px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold">Save note</button></div></div></div>
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 text-xs text-slate-500"><strong class="text-slate-700">Clinical use note:</strong> Automated screening output is descriptive and should be considered with interview, developmental history, functional impact, contextual information and other clinical evidence. It is not a diagnosis by itself.</div>
-    </section>
+
+  <!-- =====================================================
+       ASSESSMENT
+  ====================================================== -->
+
+  <section id="assessmentScreen" class="screen hidden">
+
+    <div class="progress-wrapper">
+
+      <div class="progress-meta">
+
+        <span id="testProgressLabel">
+          Assessment
+        </span>
+
+        <span id="completionLabel">
+          0%
+        </span>
+
+      </div>
+
+      <div class="progress-track">
+
+        <div
+          id="progressBar"
+          class="progress-bar"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="test-header">
+
+        <div
+          id="testNumber"
+          class="test-label"
+        >
+          Test 1
+        </div>
+
+        <h2 id="testTitle">
+          Assessment
+        </h2>
+
+        <p
+          id="testDescription"
+          class="help"
+        ></p>
+
+      </div>
+
+
+      <div id="questionsContainer"></div>
+
+    </div>
+
+
+    <div class="assessment-toolbar">
+
+      <div class="toolbar-inner">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="previousButton"
+          onclick="previousTest()"
+        >
+          Previous
+        </button>
+
+
+        <div
+          id="toolbarProgress"
+          class="toolbar-center"
+        >
+          Test 1
+        </div>
+
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="nextButton"
+          onclick="nextTest()"
+        >
+          Next
+        </button>
+
+      </div>
+
+    </div>
+
   </section>
+
+
+  <!-- =====================================================
+       THANK YOU SCREEN
+  ====================================================== -->
+
+  <section id="thankYouScreen" class="screen hidden">
+
+    <div class="card thank-you">
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+      <h1>
+        Thank You
+      </h1>
+
+      <p class="lead">
+        Your assessment has been submitted successfully.
+      </p>
+
+      <div class="notice success">
+
+        Your responses have been securely submitted for
+        clinical review.
+
+        <br><br>
+
+        <strong>
+          Your assessment results are not displayed on this page.
+        </strong>
+
+      </div>
+
+
+      <p>
+        If you have questions about your assessment or would like
+        to discuss your responses, please contact your clinician.
+      </p>
+
+
+      <div class="contact-grid">
+
+        <!-- CHANGE THESE DETAILS -->
+
+        <div class="contact-card">
+
+          <strong>
+            WhatsApp
+          </strong>
+
+          <a
+            id="whatsappLink"
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            Contact via WhatsApp
+          </a>
+
+        </div>
+
+
+        <div class="contact-card">
+
+          <strong>
+            Email
+          </strong>
+
+          <a
+            id="emailLink"
+            href="#"
+          >
+            Contact by Email
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <p class="help">
+        Assessment Reference:
+        <strong id="assessmentReference">
+          -
+        </strong>
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       CLINICIAN LOGIN
+  ====================================================== -->
+
+  <section
+    id="clinicianLoginScreen"
+    class="screen hidden"
+  >
+
+    <div class="card lock-screen">
+
+      <div class="lock-icon">
+        🔒
+      </div>
+
+      <h2>
+        Clinician Access
+      </h2>
+
+      <p class="help">
+        This area is restricted to authorized clinical users.
+      </p>
+
+      <form id="clinicianLoginForm">
+
+        <div class="field">
+
+          <label for="clinicianPin">
+            Clinician PIN
+          </label>
+
+          <input
+            id="clinicianPin"
+            type="password"
+            inputmode="numeric"
+            autocomplete="current-password"
+            required
+          >
+
+        </div>
+
+
+        <div
+          id="loginError"
+          class="notice danger hidden"
+        >
+          Incorrect PIN or access denied.
+        </div>
+
+
+        <div class="button-row">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="showWelcome()"
+          >
+            Back
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            Unlock
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       CLINICIAN DASHBOARD
+  ====================================================== -->
+
+  <section
+    id="clinicianDashboardScreen"
+    class="screen hidden"
+  >
+
+    <div class="dashboard-header">
+
+      <div>
+
+        <h2>
+          Clinician Dashboard
+        </h2>
+
+        <p class="help">
+          Review longitudinal assessment records and clinical
+          summaries.
+        </p>
+
+      </div>
+
+
+      <div class="dashboard-actions">
+
+        <button
+          class="btn btn-secondary"
+          onclick="loadDashboard()"
+        >
+          Refresh
+        </button>
+
+        <button
+          class="btn btn-danger"
+          onclick="clinicianLogout()"
+        >
+          Lock
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Clients
+        </div>
+
+        <div
+          id="statClients"
+          class="stat-value"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Assessments
+        </div>
+
+        <div
+          id="statAssessments"
+          class="stat-value"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Completed
+        </div>
+
+        <div
+          id="statCompleted"
+          class="stat-value"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Follow-ups
+        </div>
+
+        <div
+          id="statFollowups"
+          class="stat-value"
+        >
+          -
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Recent Assessments
+      </h3>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Client
+              </th>
+
+              <th>
+                Assessment
+              </th>
+
+              <th>
+                Context
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Action
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="assessmentTableBody">
+
+            <tr>
+
+              <td
+                colspan="6"
+                style="text-align:center;"
+              >
+                Loading...
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </main>
 
-<div id="loginModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 p-4 items-center justify-center"><div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm"><h3 class="font-bold text-lg text-slate-900">Clinician security check</h3><p class="text-xs text-slate-500 mt-1">Enter the administrative PIN to create a short-lived clinician session.</p><form id="loginForm" class="mt-5 space-y-3"><input id="pinInput" required type="password" inputmode="numeric" autocomplete="current-password" class="input text-center tracking-[.35em]" placeholder="••••••" /><div id="loginError" class="hidden text-xs text-rose-600"></div><div class="flex gap-2"><button type="button" id="cancelLogin" class="w-1/2 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold">Cancel</button><button class="w-1/2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Unlock</button></div></form></div></div>
+
+<footer>
+
+  <div>
+    Clinical Psychometric Assessment Platform
+  </div>
+
+  <div>
+    For clinical assessment purposes only
+  </div>
+
+</footer>
+
+
+<!-- =====================================================
+     LOADING
+====================================================== -->
+
+<div
+  id="loadingOverlay"
+  class="loading-overlay hidden"
+>
+
+  <div class="loading-box">
+
+    <div class="spinner"></div>
+
+    <strong id="loadingMessage">
+      Please wait...
+    </strong>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     RESULT / CLINICAL DETAIL MODAL
+====================================================== -->
+
+<div
+  id="detailModal"
+  class="modal hidden"
+  onclick="closeModal(event)"
+>
+
+  <div
+    class="modal-content"
+    onclick="event.stopPropagation()"
+  >
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        gap:15px;
+        align-items:center;
+        margin-bottom:20px;
+      "
+    >
+
+      <h2>
+        Clinical Assessment Record
+      </h2>
+
+      <button
+        class="btn btn-secondary"
+        onclick="closeDetailModal()"
+      >
+        Close
+      </button>
+
+    </div>
+
+    <div id="detailContent"></div>
+
+  </div>
+
+</div>
+
 
 <script>
-const CONFIG={
-  API_URL:'https://script.google.com/macros/s/REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec',
-  CONSENT_VERSION:'1.0',
-  APP_VERSION:'2.0.0',
-  BATTERY_VERSION:'2.0.0',
-  WHATSAPP:'[replace with your WhatsApp]',
-  EMAIL:'[replace with your email]'
+
+/* ==========================================================
+   CONFIGURATION
+========================================================== */
+
+/*
+ * IMPORTANT:
+ * Replace this with your deployed Google Apps Script
+ * Web App /exec URL.
+ *
+ * Example:
+ *
+ * https://script.google.com/macros/s/XXXXXXXXXXXX/exec
+ */
+
+const CONFIG = {
+
+  API_URL:
+    "PASTE_YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE",
+
+  /*
+   * Clinician contact details shown after submission.
+   * Replace these values with your actual professional details.
+   */
+
+  WHATSAPP_NUMBER:
+    "923XXXXXXXXX",
+
+  EMAIL:
+    "your-email@example.com",
+
+  CLINICIAN_NAME:
+    "Muhammad Junaid Ghazali",
+
+  AUTOSAVE_INTERVAL:
+    30000
+
 };
-const engine=new AutismAssessmentEngine();
-let battery=null,questions=[],index=0,responses={},client=null,assessmentId=null,clientId=null,startTime=null,adminToken='',adminRecords=[],activeAssessment=null,adminChart=null;
-const $=id=>document.getElementById(id);
-const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const keyFor=(t,id)=>`${t}_${id}`;
-function makeId(prefix){const y=new Date().getFullYear();const raw=(crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,''):Math.random().toString(36).slice(2)+Date.now().toString(36);return `${prefix}-${y}-${raw.slice(0,10).toUpperCase()}`;}
-function setStatus(msg,type='info'){const el=$('statusBanner');el.textContent=msg;el.className='mb-5 rounded-xl border p-3 text-sm '+(type==='error'?'border-rose-200 bg-rose-50 text-rose-800':type==='success'?'border-emerald-200 bg-emerald-50 text-emerald-800':'border-slate-200 bg-slate-100 text-slate-700');}
-async function api(action,payload={}){const res=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});const text=await res.text();let data;try{data=JSON.parse(text)}catch{throw new Error('Backend returned an unexpected response.')};if(!res.ok||data.status==='error')throw new Error(data.message||'Request failed.');return data;}
-function saveDraft(){if(!assessmentId)return;localStorage.setItem('clinicalAssessmentDraft',JSON.stringify({assessmentId,clientId,client,responses,index,startTime,sessionType:$('sessionType').value}));}
-function clearDraft(){localStorage.removeItem('clinicalAssessmentDraft');}
-function loadDraft(){try{return JSON.parse(localStorage.getItem('clinicalAssessmentDraft')||'null')}catch{return null}}
-function flattenBattery(){questions=[];Object.entries(battery).forEach(([testId,test])=>{if(testId.startsWith('_'))return;(test.questions||[]).forEach(q=>questions.push({testId,testTitle:test.title,questionId:q.id,text:q.text,subscale:q.subscale,options:(test._meta?.responseOptions||[])}))})}
-function sectionSummary(){const counts={};Object.keys(battery).filter(k=>!k.startsWith('_')).forEach(t=>counts[t]=(battery[t].questions||[]).length);return counts}
-function renderSectionProgress(){const counts=sectionSummary();$('sectionProgress').innerHTML=Object.entries(counts).map(([id,count])=>`<div title="${escapeHtml(id)}: ${count} items" class="h-1.5 rounded-full flex-1 ${questions[index]?.testId===id?'bg-indigo-600':'bg-slate-200'}"></div>`).join('')}
-function currentQuestion(){return questions[index]}
-function renderQuestion(){const q=currentQuestion();if(!q)return;const total=questions.length;const selected=responses[keyFor(q.testId,q.questionId)];$('sectionLabel').textContent=`${q.testTitle} · ${q.subscale}`;$('counter').textContent=`${index+1} of ${total}`;$('progressBar').style.width=`${Math.round(((index+1)/total)*100)}%`;$('questionHint').textContent='Please select the response that best describes you';$('questionText').textContent=q.text;$('prevBtn').disabled=index===0;$('nextBtn').disabled=selected===undefined;$('nextBtn').textContent=index===total-1?'Submit Assessment':'Next';$('options').innerHTML='';q.options.forEach((opt,i)=>{const b=document.createElement('button');b.type='button';b.className='choice-card text-left p-4 rounded-xl border border-slate-200 bg-white text-sm font-medium transition-all';if(selected===i)b.classList.add('selected');b.textContent=opt.label;b.setAttribute('aria-pressed',String(selected===i));b.onclick=()=>{responses[keyFor(q.testId,q.questionId)]=i;saveDraft();renderQuestion()};$('options').appendChild(b)});renderSectionProgress();window.scrollTo({top:0,behavior:'smooth'})}
-async function startAssessment(resume=false){
-  if(resume){const d=loadDraft();if(!d)return;assessmentId=d.assessmentId;clientId=d.clientId;client=d.client;responses=d.responses||{};index=d.index||0;startTime=d.startTime||new Date().toISOString();$('clientName').value=client.name||'';$('clientPhone').value=client.phone||'';$('clientEmail').value=client.email||'';$('clientDob').value=client.dob||'';$('sessionType').value=d.sessionType||'Intake';}
-  else {client={name:$('clientName').value.trim(),phone:$('clientPhone').value.trim(),email:$('clientEmail').value.trim(),dob:$('clientDob').value,clientId:makeId('CL')};clientId=client.clientId;assessmentId=makeId('ASM');responses={};index=0;startTime=new Date().toISOString();saveDraft()}
-  $('clientIdBadge').textContent=clientId;$('clientIdBadge').classList.remove('hidden');$('intakePanel').classList.add('hidden');$('completePanel').classList.add('hidden');$('testingPanel').classList.remove('hidden');renderQuestion();
+
+
+/* ==========================================================
+   APPLICATION STATE
+========================================================== */
+
+const APP = {
+
+  tests: [],
+
+  currentTestIndex: 0,
+
+  responses: {},
+
+  intake: {},
+
+  clientId: null,
+
+  assessmentId: null,
+
+  sessionToken: null,
+
+  clinicianSession: null,
+
+  autosaveTimer: null,
+
+  startedAt: null,
+
+  submitting: false
+
+};
+
+
+/* ==========================================================
+   DOM HELPERS
+========================================================== */
+
+function $(id) {
+
+  return document.getElementById(id);
+
 }
-async function finish(){
-  $('nextBtn').disabled=true;$('prevBtn').disabled=true;const old=$('nextBtn').textContent;$('nextBtn').textContent='Submitting...';
-  try{
-    const result=await api('submitAssessment',{client,assessment:{assessmentId,consent:$('consentBox').checked,consentVersion:CONFIG.CONSENT_VERSION,startedAt:startTime,assessmentType:'Autism Trait Screening Battery',sessionType:$('sessionType').value},answers:responses});
-    clearDraft();$('testingPanel').classList.add('hidden');$('completePanel').classList.remove('hidden');$('completeRef').textContent=result.assessmentId||assessmentId;$('contactWhatsApp').textContent=CONFIG.WHATSAPP;$('contactEmail').textContent=CONFIG.EMAIL;$('clientIdBadge').classList.add('hidden');setStatus('Your assessment was successfully received.','success');
-  }catch(err){setStatus('We could not confirm submission. Your answers are still saved on this device. Please retry submission. '+err.message,'error');$('nextBtn').disabled=false;$('prevBtn').disabled=false;$('nextBtn').textContent=old}
+
+
+function showLoading(message) {
+
+  $("loadingMessage").textContent =
+    message || "Please wait...";
+
+  $("loadingOverlay").classList.remove("hidden");
+
 }
-function next(){if(index===questions.length-1){finish();return}index++;saveDraft();renderQuestion()}
-function prev(){if(index>0){index--;saveDraft();renderQuestion()}}
-function openLogin(){ $('loginModal').classList.remove('hidden');$('loginModal').classList.add('flex');$('pinInput').focus() }
-function closeLogin(){ $('loginModal').classList.add('hidden');$('loginModal').classList.remove('flex');$('pinInput').value='';$('loginError').classList.add('hidden') }
-async function login(e){e.preventDefault();const btn=e.submitter;btn.disabled=true;btn.textContent='Verifying...';try{const d=await api('authenticateClinician',{accessPin:$('pinInput').value.trim()});adminToken=d.sessionToken;closeLogin();$('clientView').classList.add('hidden');$('adminView').classList.remove('hidden');await loadRegistry()}catch(err){$('loginError').textContent=err.message;$('loginError').classList.remove('hidden')}finally{btn.disabled=false;btn.textContent='Unlock'}}
-async function loadRegistry(){const d=await api('getClients',{sessionToken:adminToken,query:$('searchInput').value.trim()});adminRecords=d.records||[];renderRegistry()}
-function renderRegistry(){const body=$('registryBody');body.innerHTML='';$('registryEmpty').classList.toggle('hidden',adminRecords.length>0);adminRecords.forEach(r=>{const row=document.createElement('button');row.type='button';row.className='w-full text-left px-4 py-4 hover:bg-slate-50 grid md:grid-cols-[1.5fr_1fr_1fr_1fr_120px] gap-2 items-center';row.innerHTML=`<div><div class="font-semibold text-sm text-slate-900">${escapeHtml(r.clientId)}</div><div class="text-xs text-slate-400">${escapeHtml(r.assessmentId)}</div></div><div class="text-xs text-slate-600">${escapeHtml(r.completedAt||'')}</div><div class="text-xs text-slate-600">${escapeHtml(r.sessionType)}</div><div class="text-xs text-slate-500">AQ ${r.AQ} · RAADS ${r.RAADS}</div><span class="justify-self-start md:justify-self-end text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-700">Open</span>`;row.onclick=()=>openAssessment(r.assessmentId);body.appendChild(row)})}
-async function openAssessment(id){try{const d=await api('getAssessment',{sessionToken:adminToken,assessmentId:id});activeAssessment=d.assessment;$('adminList').classList.add('hidden');$('adminSearch').classList.add('hidden');$('adminDetail').classList.remove('hidden');renderDetail()}catch(err){setStatus(err.message,'error')}}
-function renderDetail(){const a=activeAssessment,c=a.client||{};$('dClientId').textContent=a.clientId;$('dName').textContent=c.name;$('dDob').textContent=c.dob;$('dEmail').textContent=c.email;$('scoreCards').innerHTML=[['AQ-50',a.totals.AQ,'Screening total'],['RAADS-R',a.totals.RAADS,'Screening total'],['CAT-Q',a.totals.CATQ,'Dimensional total'],['CATI',a.totals.CATI,'Dimensional total']].map(x=>`<div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-[11px] font-bold uppercase tracking-widest text-slate-400">${x[0]}</div><div class="text-3xl font-black mt-2 text-slate-900">${x[1]}</div><div class="text-[11px] text-slate-500 mt-1">${x[2]}</div></div>`).join('');
-  const themeBox=$('themesBox');themeBox.innerHTML=(a.themes||[]).map(t=>`<div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200"><div class="flex justify-between gap-2"><div class="font-bold text-xs text-slate-900">${escapeHtml(t.themeName)}</div><span class="text-[10px] font-semibold px-2 py-1 rounded bg-indigo-100 text-indigo-800">${escapeHtml(t.prominence)}</span></div><div class="text-[11px] text-slate-600 leading-5 mt-1">${escapeHtml(t.description)}</div><div class="text-[10px] text-slate-400 mt-2">Evidence: ${escapeHtml((t.evidence||[]).join(', '))}</div></div>`).join('')||'<div class="text-xs text-slate-400">None.</div>';
-  const areas=[];const m=a.metrics||{};const add=(title,sev,notes,ev)=>areas.push({title,sev,notes,ev});const rs=m.RAADS?.subscales?.sensoryMotor||0,cs=m.CATI?.subscales?.sensorySensitivity||0;if(rs>=50&&cs>=50)add('Sensory load and environmental sensitivity','Priority focus','Explore triggers, functional impact and coping strategies.',['RAADS-R','CATI']);const mk=m.CATQ?.subscales?.masking||0,cp=m.CATQ?.subscales?.compensation||0,cm=m.CATI?.subscales?.socialCamouflage||0;if((mk>=65&&cp>=55)||(cm>=65&&(mk>=55||cp>=55)))add('Social camouflaging and adaptation','Priority focus','Explore effort, context, identity impact and post-social recovery.',['CAT-Q','CATI']);const sw=m.AQ?.subscales?.attentionSwitching||0,ri=m.RAADS?.subscales?.circumscribedInterests||0,ci=m.CATI?.subscales?.cognitiveInflexibility||0;if((ri>=55&&ci>=55)||(sw>=65&&(ri>=55||ci>=55)))add('Flexibility, routines and focused interests','Clinical consideration','Explore transitions, unexpected change, routines and impact across settings.',['AQ','RAADS-R','CATI']);const ac=m.AQ?.subscales?.communication||0,rl=m.RAADS?.subscales?.language||0,cc=m.CATI?.subscales?.communication||0;if((ac>=60&&rl>=50)||(cc>=60&&(ac>=60||rl>=50)))add('Communication and pragmatic-language exploration','Clinical consideration','Explore implied meaning, turn-taking, conversational repair and communication effort.',['AQ','RAADS-R','CATI']);if(!areas.length)add('No automated priority areas','Standard tracking','No cross-instrument priority was generated. Continue broader clinical assessment. ',[]);$('areasBox').innerHTML=areas.map(x=>`<div class="p-3.5 rounded-xl border ${x.sev==='Priority focus'?'border-rose-200 bg-rose-50':'border-amber-200 bg-amber-50'}"><div class="flex justify-between gap-2"><div class="font-bold text-xs text-slate-900">${x.title}</div><span class="text-[10px] font-semibold">${x.sev}</span></div><div class="text-[11px] text-slate-600 leading-5 mt-1">${x.notes}</div><div class="text-[10px] text-slate-400 mt-2">${(x.ev||[]).join(', ')}</div></div>`).join('');
-  $('notesBox').innerHTML=(a.notes||[]).map(n=>`<div class="p-3.5 rounded-xl border border-slate-200 bg-white"><div class="text-[10px] text-slate-400">${escapeHtml(n.createdAt)} · ${escapeHtml(n.noteType)}</div><div class="text-xs text-slate-700 mt-1 whitespace-pre-wrap">${escapeHtml(n.note)}</div></div>`).join('')||'<div class="text-xs text-slate-400">No clinician notes yet.</div>';
-  renderChart(a.metrics||{});
+
+
+function hideLoading() {
+
+  $("loadingOverlay").classList.add("hidden");
+
 }
-function renderChart(metrics){const labels=[],values=[];Object.entries(metrics).forEach(([tid,d])=>Object.entries(d.subscales||{}).forEach(([sub,v])=>{labels.push(`${tid}: ${sub.replace(/([A-Z])/g,' $1')}`);values.push(v)}));const ctx=$('adminChart').getContext('2d');if(adminChart)adminChart.destroy();adminChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data:values,backgroundColor:'rgba(79,70,229,.72)',borderColor:'rgba(67,56,202,1)',borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}},y:{ticks:{font:{size:10}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw}% of instrument-specific subscale maximum`}}}}})}
-async function saveNote(){const note=$('noteInput').value.trim();if(!note)return;const b=$('saveNoteBtn');b.disabled=true;try{await api('saveClinicalNote',{sessionToken:adminToken,clientId:activeAssessment.clientId,assessmentId:activeAssessment.assessmentId,noteType:'Clinical Note',note});$('noteInput').value='';const d=await api('getAssessment',{sessionToken:adminToken,assessmentId:activeAssessment.assessmentId});activeAssessment=d.assessment;renderDetail()}catch(err){setStatus(err.message,'error')}finally{b.disabled=false}}
-function lockExit(){if(adminToken)api('logout',{sessionToken:adminToken}).catch(()=>{});adminToken='';activeAssessment=null;$('adminView').classList.add('hidden');$('clientView').classList.remove('hidden');$('adminDetail').classList.add('hidden');$('adminList').classList.remove('hidden');$('adminSearch').classList.remove('hidden')}
-async function init(){
-  $('contactWhatsApp').textContent=CONFIG.WHATSAPP;$('contactEmail').textContent=CONFIG.EMAIL;
-  try{const r=await fetch('Tests_V2.json');if(!r.ok)throw new Error('Tests_V2.json could not be loaded.');battery=await r.json();flattenBattery();}catch(e){setStatus(e.message,'error');return}
-  const draft=loadDraft();if(draft && draft.responses && Object.keys(draft.responses).length){$('resumeBtn').classList.remove('hidden');$('resumeBtn').onclick=()=>startAssessment(true)}
-  $('intakeForm').addEventListener('submit',e=>{e.preventDefault();if($('consentBox').checked)startAssessment(false)});$('nextBtn').onclick=next;$('prevBtn').onclick=prev;$('btnClinician').onclick=openLogin;$('cancelLogin').onclick=closeLogin;$('loginForm').addEventListener('submit',login);$('refreshBtn').onclick=loadRegistry;$('searchInput').addEventListener('input',()=>loadRegistry());$('lockBtn').onclick=lockExit;$('adminBack').onclick=()=>{$('adminDetail').classList.add('hidden');$('adminList').classList.remove('hidden');$('adminSearch').classList.remove('hidden')};$('saveNoteBtn').onclick=saveNote;$('printBtn').onclick=()=>window.print();
+
+
+function showScreen(id) {
+
+  document
+    .querySelectorAll(".screen")
+    .forEach(screen => {
+      screen.classList.add("hidden");
+    });
+
+  $(id).classList.remove("hidden");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
 }
-document.addEventListener('DOMContentLoaded',init);
+
+
+function setStatus(text) {
+
+  $("connectionStatus").textContent = text;
+
+}
+
+
+/* ==========================================================
+   API
+========================================================== */
+
+async function apiRequest(action, payload = {}) {
+
+  if (
+    !CONFIG.API_URL ||
+    CONFIG.API_URL.includes("PASTE_YOUR")
+  ) {
+
+    throw new Error(
+      "Google Apps Script API URL has not been configured."
+    );
+
+  }
+
+
+  const body = {
+
+    action: action,
+
+    ...payload
+
+  };
+
+
+  const response = await fetch(
+    CONFIG.API_URL,
+    {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+
+      body: JSON.stringify(body)
+
+    }
+  );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Server request failed: " +
+      response.status
+    );
+
+  }
+
+
+  const data = await response.json();
+
+
+  if (
+    data &&
+    data.success === false
+  ) {
+
+    throw new Error(
+      data.message ||
+      "The server rejected the request."
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+/* ==========================================================
+   WELCOME
+========================================================== */
+
+function showWelcome() {
+
+  showScreen("welcomeScreen");
+
+}
+
+
+function showIntake() {
+
+  resetClientState();
+
+  showScreen("intakeScreen");
+
+  $("fullName").focus();
+
+}
+
+
+function resetClientState() {
+
+  APP.tests = [];
+
+  APP.currentTestIndex = 0;
+
+  APP.responses = {};
+
+  APP.intake = {};
+
+  APP.clientId = null;
+
+  APP.assessmentId = null;
+
+  APP.sessionToken = null;
+
+  APP.startedAt = null;
+
+  APP.submitting = false;
+
+}
+
+
+/* ==========================================================
+   LOAD TEST BATTERY
+========================================================== */
+
+function loadTestBattery() {
+
+  /*
+   * Tests_V2.js should expose the test battery.
+   *
+   * The following attempts several common exported names,
+   * making the Index more tolerant of the exact Tests file
+   * structure.
+   */
+
+  let battery = null;
+
+
+  if (
+    window.TEST_BATTERY
+  ) {
+
+    battery =
+      window.TEST_BATTERY;
+
+  }
+
+
+  else if (
+    window.TestsV2
+  ) {
+
+    battery =
+      window.TestsV2;
+
+  }
+
+
+  else if (
+    window.testsV2
+  ) {
+
+    battery =
+      window.testsV2;
+
+  }
+
+
+  else if (
+    window.ASSESSMENT_TESTS
+  ) {
+
+    battery =
+      window.ASSESSMENT_TESTS;
+
+  }
+
+
+  /*
+   * If Scoring_V2 exposes getBatteryEntries(),
+   * use that as a secondary source.
+   */
+
+  if (
+    !battery &&
+    window.assessmentEngine &&
+    typeof window.assessmentEngine
+      .getBatteryEntries === "function"
+  ) {
+
+    battery =
+      window.assessmentEngine
+        .getBatteryEntries();
+
+  }
+
+
+  if (!battery) {
+
+    console.error(
+      "Tests_V2.js did not expose a recognizable test battery."
+    );
+
+    return false;
+
+  }
+
+
+  /*
+   * Convert common object formats into an array.
+   */
+
+  if (
+    !Array.isArray(battery) &&
+    typeof battery === "object"
+  ) {
+
+    battery =
+      Object.entries(battery)
+        .map(([id, value]) => {
+
+          if (
+            value &&
+            typeof value === "object"
+          ) {
+
+            return {
+              testId: value.testId || id,
+              ...value
+            };
+
+          }
+
+          return {
+            testId: id,
+            questions: value
+          };
+
+        });
+
+  }
+
+
+  APP.tests = battery;
+
+  return APP.tests.length > 0;
+
+}
+
+
+/* ==========================================================
+   INTAKE SUBMISSION
+========================================================== */
+
+$("intakeForm")
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const formData =
+        new FormData(this);
+
+
+      APP.intake = {
+
+        fullName:
+          formData.get("fullName")?.trim(),
+
+        email:
+          formData.get("email")?.trim(),
+
+        phone:
+          formData.get("phone")?.trim(),
+
+        dob:
+          formData.get("dob") || "",
+
+        gender:
+          formData.get("gender") || "",
+
+        assessmentPurpose:
+          formData.get("assessmentPurpose") || "",
+
+        reason:
+          formData.get("reason")?.trim() || "",
+
+        medications:
+          formData.get("medications")?.trim() || "",
+
+        supportSystem:
+          formData.get("supportSystem")?.trim() || ""
+
+      };
+
+
+      if (
+        !APP.intake.fullName ||
+        !APP.intake.email
+      ) {
+
+        alert(
+          "Please complete all required fields."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !loadTestBattery()
+      ) {
+
+        alert(
+          "The assessment files could not be loaded. Please check that Tests_V2.js and Scoring_V2.js are present in your GitHub repository."
+        );
+
+        return;
+
+      }
+
+
+      APP.startedAt =
+        new Date().toISOString();
+
+
+      showLoading(
+        "Preparing your assessment..."
+      );
+
+
+      try {
+
+        /*
+         * Create assessment on server.
+         *
+         * This action must be supported by Code_V2.gs.
+         */
+
+        const result =
+          await apiRequest(
+            "startAssessment",
+            {
+              intake: APP.intake
+            }
+          );
+
+
+        if (result.clientId) {
+
+          APP.clientId =
+            result.clientId;
+
+        }
+
+
+        if (result.assessmentId) {
+
+          APP.assessmentId =
+            result.assessmentId;
+
+        }
+
+
+        if (result.sessionToken) {
+
+          APP.sessionToken =
+            result.sessionToken;
+
+        }
+
+
+        hideLoading();
+
+
+        startAssessment();
+
+
+      }
+
+      catch(error) {
+
+        hideLoading();
+
+
+        /*
+         * If the backend is temporarily unavailable,
+         * do not expose sensitive assessment data.
+         */
+
+        console.error(error);
+
+
+        alert(
+          "We could not connect to the assessment server. Please try again or contact your clinician."
+        );
+
+      }
+
+    });
+
+
+/* ==========================================================
+   START ASSESSMENT
+========================================================== */
+
+function startAssessment() {
+
+  APP.currentTestIndex = 0;
+
+  renderCurrentTest();
+
+  showScreen(
+    "assessmentScreen"
+  );
+
+
+  startAutosave();
+
+}
+
+
+/* ==========================================================
+   GET TEST ID
+========================================================== */
+
+function getTestId(test) {
+
+  return (
+    test.testId ||
+    test.id ||
+    test.code ||
+    test.name
+  );
+
+}
+
+
+/* ==========================================================
+   GET QUESTIONS
+========================================================== */
+
+function getQuestions(test) {
+
+  return (
+    test.questions ||
+    test.items ||
+    test.itemsList ||
+    []
+  );
+
+}
+
+
+/* ==========================================================
+   GET TEST TITLE
+========================================================== */
+
+function getTestTitle(test) {
+
+  return (
+    test.title ||
+    test.name ||
+    test.label ||
+    getTestId(test)
+  );
+
+}
+
+
+/* ==========================================================
+   GET TEST DESCRIPTION
+========================================================== */
+
+function getTestDescription(test) {
+
+  return (
+    test.description ||
+    test.instructions ||
+    ""
+  );
+
+}
+
+
+/* ==========================================================
+   RENDER TEST
+========================================================== */
+
+function renderCurrentTest() {
+
+  const test =
+    APP.tests[
+      APP.currentTestIndex
+    ];
+
+
+  if (!test) {
+
+    return;
+
+  }
+
+
+  const testId =
+    getTestId(test);
+
+
+  const questions =
+    getQuestions(test);
+
+
+  $("testNumber").textContent =
+    `Test ${APP.currentTestIndex + 1} of ${APP.tests.length}`;
+
+
+  $("testTitle").textContent =
+    getTestTitle(test);
+
+
+  $("testDescription").textContent =
+    getTestDescription(test);
+
+
+  $("toolbarProgress").textContent =
+    `Test ${APP.currentTestIndex + 1} of ${APP.tests.length}`;
+
+
+  $("previousButton").disabled =
+    APP.currentTestIndex === 0;
+
+
+  $("nextButton").textContent =
+    APP.currentTestIndex ===
+    APP.tests.length - 1
+      ? "Review & Submit"
+      : "Next";
+
+
+  const container =
+    $("questionsContainer");
+
+
+  container.innerHTML = "";
+
+
+  questions.forEach(
+    (question, index) => {
+
+      renderQuestion(
+        container,
+        testId,
+        question,
+        index
+      );
+
+    }
+  );
+
+
+  updateProgress();
+
+}
+
+
+/* ==========================================================
+   RENDER QUESTION
+========================================================== */
+
+function renderQuestion(
+  container,
+  testId,
+  question,
+  index
+) {
+
+  const questionId =
+    question.id ??
+    question.questionId ??
+    question.number ??
+    index + 1;
+
+
+  const questionKey =
+    `${testId}_${questionId}`;
+
+
+  const questionText =
+    question.text ||
+    question.question ||
+    question.prompt ||
+    "";
+
+
+  const options =
+    question.options ||
+    question.responses ||
+    question.choices ||
+    [];
+
+
+  const wrapper =
+    document.createElement("div");
+
+
+  wrapper.className =
+    "question-card";
+
+
+  const questionHeading =
+    document.createElement("div");
+
+
+  questionHeading.className =
+    "question-text";
+
+
+  questionHeading.innerHTML = `
+    <span class="question-number">
+      ${index + 1}
+    </span>
+
+    <span>
+      ${escapeHtml(questionText)}
+    </span>
+  `;
+
+
+  wrapper.appendChild(
+    questionHeading
+  );
+
+
+  const optionsContainer =
+    document.createElement("div");
+
+
+  optionsContainer.className =
+    "options";
+
+
+  options.forEach(
+    (option, optionIndex) => {
+
+      let optionText;
+
+
+      if (
+        typeof option === "string"
+      ) {
+
+        optionText = option;
+
+      }
+
+      else {
+
+        optionText =
+          option.label ??
+          option.text ??
+          option.value ??
+          String(optionIndex + 1);
+
+      }
+
+
+      const optionWrapper =
+        document.createElement("div");
+
+
+      optionWrapper.className =
+        "option";
+
+
+      const inputId =
+        `${questionKey}_${optionIndex}`;
+
+
+      const input =
+        document.createElement("input");
+
+
+      input.type =
+        "radio";
+
+      input.id =
+        inputId;
+
+      input.name =
+        questionKey;
+
+      input.value =
+        optionIndex;
+
+
+      if (
+        APP.responses[questionKey] ===
+        optionIndex
+      ) {
+
+        input.checked = true;
+
+      }
+
+
+      input.addEventListener(
+        "change",
+        function() {
+
+          APP.responses[questionKey] =
+            optionIndex;
+
+          updateProgress();
+
+          scheduleAutosave();
+
+        }
+      );
+
+
+      const label =
+        document.createElement("label");
+
+
+      label.htmlFor =
+        inputId;
+
+
+      label.innerHTML = `
+        <span class="option-dot"></span>
+        <span>${escapeHtml(optionText)}</span>
+      `;
+
+
+      optionWrapper.appendChild(
+        input
+      );
+
+      optionWrapper.appendChild(
+        label
+      );
+
+
+      optionsContainer.appendChild(
+        optionWrapper
+      );
+
+    }
+  );
+
+
+  wrapper.appendChild(
+    optionsContainer
+  );
+
+
+  container.appendChild(
+    wrapper
+  );
+
+}
+
+
+/* ==========================================================
+   ESCAPE HTML
+========================================================== */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+/* ==========================================================
+   COMPLETION
+========================================================== */
+
+function getTotalQuestions() {
+
+  return APP.tests.reduce(
+    (total, test) => {
+
+      return total +
+        getQuestions(test).length;
+
+    },
+    0
+  );
+
+}
+
+
+function getAnsweredQuestions() {
+
+  return Object.keys(
+    APP.responses
+  ).length;
+
+}
+
+
+function updateProgress() {
+
+  const total =
+    getTotalQuestions();
+
+
+  const answered =
+    getAnsweredQuestions();
+
+
+  const percentage =
+    total > 0
+      ? Math.round(
+          (answered / total) * 100
+        )
+      : 0;
+
+
+  $("progressBar").style.width =
+    `${percentage}%`;
+
+
+  $("completionLabel").textContent =
+    `${percentage}% complete`;
+
+
+  $("testProgressLabel").textContent =
+    `${answered} of ${total} questions answered`;
+
+}
+
+
+/* ==========================================================
+   TEST VALIDATION
+========================================================== */
+
+function validateCurrentTest() {
+
+  const test =
+    APP.tests[
+      APP.currentTestIndex
+    ];
+
+
+  if (!test) {
+
+    return false;
+
+  }
+
+
+  const testId =
+    getTestId(test);
+
+
+  const questions =
+    getQuestions(test);
+
+
+  const unanswered = [];
+
+
+  questions.forEach(
+    (question, index) => {
+
+      const questionId =
+        question.id ??
+        question.questionId ??
+        question.number ??
+        index + 1;
+
+
+      const key =
+        `${testId}_${questionId}`;
+
+
+      if (
+        APP.responses[key] ===
+        undefined
+      ) {
+
+        unanswered.push(
+          index + 1
+        );
+
+      }
+
+    }
+  );
+
+
+  if (
+    unanswered.length > 0
+  ) {
+
+    alert(
+      `Please answer all questions before continuing.\n\nUnanswered questions: ${unanswered.join(", ")}`
+    );
+
+
+    const first =
+      unanswered[0];
+
+
+    const questionCards =
+      document.querySelectorAll(
+        ".question-card"
+      );
+
+
+    if (
+      questionCards[first - 1]
+    ) {
+
+      questionCards[
+        first - 1
+      ].scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+    }
+
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* ==========================================================
+   NEXT TEST
+========================================================== */
+
+async function nextTest() {
+
+  if (
+    !validateCurrentTest()
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    APP.currentTestIndex <
+    APP.tests.length - 1
+  ) {
+
+    APP.currentTestIndex++;
+
+    renderCurrentTest();
+
+    return;
+
+  }
+
+
+  await reviewBeforeSubmit();
+
+}
+
+
+/* ==========================================================
+   PREVIOUS TEST
+========================================================== */
+
+function previousTest() {
+
+  if (
+    APP.currentTestIndex <= 0
+  ) {
+
+    return;
+
+  }
+
+
+  APP.currentTestIndex--;
+
+  renderCurrentTest();
+
+}
+
+
+/* ==========================================================
+   REVIEW
+========================================================== */
+
+async function reviewBeforeSubmit() {
+
+  const total =
+    getTotalQuestions();
+
+
+  const answered =
+    getAnsweredQuestions();
+
+
+  if (
+    answered !== total
+  ) {
+
+    alert(
+      "Please answer all questions before submitting."
+    );
+
+    return;
+
+  }
+
+
+  const confirmed =
+    window.confirm(
+      "You have reached the end of the assessment.\n\nOnce submitted, your responses will be sent to your clinician for review.\n\nDo you want to submit your assessment?"
+    );
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+  await submitAssessment();
+
+}
+
+
+/* ==========================================================
+   SUBMIT
+========================================================== */
+
+async function submitAssessment() {
+
+  if (
+    APP.submitting
+  ) {
+
+    return;
+
+  }
+
+
+  APP.submitting = true;
+
+
+  showLoading(
+    "Submitting your assessment securely..."
+  );
+
+
+  stopAutosave();
+
+
+  try {
+
+    /*
+     * IMPORTANT:
+     * The frontend sends raw responses.
+     *
+     * Code_V2.gs should recalculate scores on the server.
+     */
+
+    const payload = {
+
+      clientId:
+        APP.clientId,
+
+      assessmentId:
+        APP.assessmentId,
+
+      sessionToken:
+        APP.sessionToken,
+
+      intake:
+        APP.intake,
+
+      responses:
+        APP.responses,
+
+      startedAt:
+        APP.startedAt,
+
+      submittedAt:
+        new Date().toISOString()
+
+    };
+
+
+    const result =
+      await apiRequest(
+        "submitAssessment",
+        payload
+      );
+
+
+    /*
+     * Never display scoring data to the client.
+     */
+
+    APP.assessmentId =
+      result.assessmentId ||
+      APP.assessmentId;
+
+
+    hideLoading();
+
+
+    showThankYou();
+
+  }
+
+  catch(error) {
+
+    console.error(error);
+
+    hideLoading();
+
+    APP.submitting = false;
+
+    alert(
+      "We could not submit your assessment. Please do not close this page yet. Check your internet connection and try again."
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   THANK YOU
+========================================================== */
+
+function showThankYou() {
+
+  const whatsapp =
+    CONFIG.WHATSAPP_NUMBER
+      .replace(/\D/g, "");
+
+
+  const message =
+    encodeURIComponent(
+      `Hello ${CONFIG.CLINICIAN_NAME}, I have completed my clinical assessment. My assessment reference is ${APP.assessmentId || "not available"}.`
+    );
+
+
+  $("whatsappLink").href =
+    `https://wa.me/${whatsapp}?text=${message}`;
+
+
+  $("emailLink").href =
+    `mailto:${CONFIG.EMAIL}?subject=${encodeURIComponent(
+      "Clinical Assessment Follow-up"
+    )}&body=${encodeURIComponent(
+      `Hello ${CONFIG.CLINICIAN_NAME},\n\nI have completed my clinical assessment.\n\nAssessment Reference: ${APP.assessmentId || "not available"}`
+    )}`;
+
+
+  $("assessmentReference").textContent =
+    APP.assessmentId ||
+    "Submitted";
+
+
+  showScreen(
+    "thankYouScreen"
+  );
+
+}
+
+
+/* ==========================================================
+   AUTOSAVE
+========================================================== */
+
+function startAutosave() {
+
+  stopAutosave();
+
+
+  APP.autosaveTimer =
+    setInterval(
+      autosave,
+      CONFIG.AUTOSAVE_INTERVAL
+    );
+
+}
+
+
+function stopAutosave() {
+
+  if (
+    APP.autosaveTimer
+  ) {
+
+    clearInterval(
+      APP.autosaveTimer
+    );
+
+    APP.autosaveTimer = null;
+
+  }
+
+}
+
+
+let autosaveTimeout = null;
+
+
+function scheduleAutosave() {
+
+  clearTimeout(
+    autosaveTimeout
+  );
+
+
+  autosaveTimeout =
+    setTimeout(
+      autosave,
+      1500
+    );
+
+}
+
+
+async function autosave() {
+
+  if (
+    !APP.assessmentId ||
+    APP.submitting
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    await apiRequest(
+      "autosave",
+      {
+
+        clientId:
+          APP.clientId,
+
+        assessmentId:
+          APP.assessmentId,
+
+        sessionToken:
+          APP.sessionToken,
+
+        responses:
+          APP.responses
+
+      }
+    );
+
+
+    setStatus(
+      "Progress saved"
+    );
+
+  }
+
+  catch(error) {
+
+    console.warn(
+      "Autosave failed:",
+      error
+    );
+
+    setStatus(
+      "Offline / save pending"
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   CLINICIAN LOGIN
+========================================================== */
+
+function showClinicianLogin() {
+
+  $("clinicianPin").value = "";
+
+  $("loginError")
+    .classList
+    .add("hidden");
+
+  showScreen(
+    "clinicianLoginScreen"
+  );
+
+  setTimeout(
+    () => $("clinicianPin").focus(),
+    100
+  );
+
+}
+
+
+$("clinicianLoginForm")
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const pin =
+        $("clinicianPin")
+          .value
+          .trim();
+
+
+      if (!pin) {
+
+        return;
+
+      }
+
+
+      showLoading(
+        "Authenticating..."
+      );
+
+
+      try {
+
+        const result =
+          await apiRequest(
+            "clinicianLogin",
+            {
+              pin: pin
+            }
+          );
+
+
+        if (
+          result.success === false
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Access denied"
+          );
+
+        }
+
+
+        APP.clinicianSession =
+          result.sessionToken ||
+          result.token ||
+          null;
+
+
+        hideLoading();
+
+
+        showScreen(
+          "clinicianDashboardScreen"
+        );
+
+
+        await loadDashboard();
+
+      }
+
+      catch(error) {
+
+        hideLoading();
+
+        console.error(error);
+
+        $("loginError")
+          .classList
+          .remove("hidden");
+
+      }
+
+    });
+
+
+/* ==========================================================
+   DASHBOARD
+========================================================== */
+
+async function loadDashboard() {
+
+  if (
+    !APP.clinicianSession
+  ) {
+
+    showClinicianLogin();
+
+    return;
+
+  }
+
+
+  showLoading(
+    "Loading clinical records..."
+  );
+
+
+  try {
+
+    const result =
+      await apiRequest(
+        "getDashboard",
+        {
+
+          sessionToken:
+            APP.clinicianSession
+
+        }
+      );
+
+
+    hideLoading();
+
+
+    renderDashboard(
+      result
+    );
+
+  }
+
+  catch(error) {
+
+    hideLoading();
+
+    console.error(error);
+
+    alert(
+      "Unable to load the clinician dashboard."
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   RENDER DASHBOARD
+========================================================== */
+
+function renderDashboard(data) {
+
+  const clients =
+    data.clients ||
+    data.clientCount ||
+    0;
+
+
+  const assessments =
+    data.assessments ||
+    data.assessmentCount ||
+    0;
+
+
+  const completed =
+    data.completed ||
+    data.completedCount ||
+    0;
+
+
+  const followups =
+    data.followups ||
+    data.followupCount ||
+    0;
+
+
+  $("statClients").textContent =
+    clients;
+
+
+  $("statAssessments").textContent =
+    assessments;
+
+
+  $("statCompleted").textContent =
+    completed;
+
+
+  $("statFollowups").textContent =
+    followups;
+
+
+  const rows =
+    data.recentAssessments ||
+    data.rows ||
+    [];
+
+
+  const tbody =
+    $("assessmentTableBody");
+
+
+  tbody.innerHTML = "";
+
+
+  if (
+    !rows.length
+  ) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center;">
+          No assessment records found.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  rows.forEach(
+    row => {
+
+      const tr =
+        document.createElement("tr");
+
+
+      const date =
+        row.date ||
+        row.timestamp ||
+        "";
+
+
+      const name =
+        row.fullName ||
+        row.clientName ||
+        "Unknown";
+
+
+      const assessment =
+        row.assessmentId ||
+        row.id ||
+        "";
+
+
+      const context =
+        row.assessmentPurpose ||
+        row.context ||
+        "";
+
+
+      const status =
+        row.status ||
+        "Completed";
+
+
+      const id =
+        row.assessmentId ||
+        row.id ||
+        "";
+
+
+      tr.innerHTML = `
+
+        <td>
+          ${escapeHtml(date)}
+        </td>
+
+        <td>
+          ${escapeHtml(name)}
+        </td>
+
+        <td>
+          ${escapeHtml(assessment)}
+        </td>
+
+        <td>
+          ${escapeHtml(context)}
+        </td>
+
+        <td>
+          ${escapeHtml(status)}
+        </td>
+
+        <td>
+
+          <button
+            class="btn btn-secondary"
+            style="padding:7px 10px; min-height:auto;"
+            onclick="openAssessment('${escapeJs(id)}')"
+          >
+            Review
+          </button>
+
+        </td>
+
+      `;
+
+
+      tbody.appendChild(tr);
+
+    }
+  );
+
+}
+
+
+/* ==========================================================
+   OPEN ASSESSMENT
+========================================================== */
+
+async function openAssessment(
+  assessmentId
+) {
+
+  if (
+    !assessmentId
+  ) {
+
+    return;
+
+  }
+
+
+  showLoading(
+    "Loading assessment..."
+  );
+
+
+  try {
+
+    const result =
+      await apiRequest(
+        "getAssessment",
+        {
+
+          sessionToken:
+            APP.clinicianSession,
+
+          assessmentId:
+            assessmentId
+
+        }
+      );
+
+
+    hideLoading();
+
+
+    renderAssessmentDetail(
+      result
+    );
+
+
+    $("detailModal")
+      .classList
+      .remove("hidden");
+
+  }
+
+  catch(error) {
+
+    hideLoading();
+
+    console.error(error);
+
+    alert(
+      "Unable to load this assessment."
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   CLINICAL DETAIL
+========================================================== */
+
+function renderAssessmentDetail(
+  data
+) {
+
+  const assessment =
+    data.assessment ||
+    data;
+
+
+  const client =
+    data.client ||
+    {};
+
+
+  const scores =
+    data.scores ||
+    data.results ||
+    {};
+
+
+  let html = "";
+
+
+  html += `
+    <div class="notice info">
+      <strong>
+        Clinician-only information
+      </strong>
+      <br>
+      This information is intended for authorized clinical review.
+    </div>
+  `;
+
+
+  html += `
+    <h3>
+      Client Information
+    </h3>
+
+    <div class="form-grid">
+
+      <div>
+        <strong>Name</strong><br>
+        ${escapeHtml(
+          client.fullName ||
+          assessment.fullName ||
+          ""
+        )}
+      </div>
+
+      <div>
+        <strong>Client ID</strong><br>
+        ${escapeHtml(
+          client.clientId ||
+          assessment.clientId ||
+          ""
+        )}
+      </div>
+
+      <div>
+        <strong>Assessment ID</strong><br>
+        ${escapeHtml(
+          assessment.assessmentId ||
+          ""
+        )}
+      </div>
+
+      <div>
+        <strong>Date</strong><br>
+        ${escapeHtml(
+          assessment.timestamp ||
+          assessment.date ||
+          ""
+        )}
+      </div>
+
+    </div>
+  `;
+
+
+  html += `
+    <hr style="border:0;border-top:1px solid #e2e8f0;margin:25px 0;">
+  `;
+
+
+  html += `
+    <h3>
+      Psychometric Results
+    </h3>
+  `;
+
+
+  if (
+    typeof scores === "object" &&
+    Object.keys(scores).length
+  ) {
+
+    html +=
+      renderObject(
+        scores
+      );
+
+  }
+
+  else {
+
+    html += `
+      <div class="notice warning">
+        No scoring information was returned.
+      </div>
+    `;
+
+  }
+
+
+  if (
+    data.themes
+  ) {
+
+    html += `
+      <hr style="border:0;border-top:1px solid #e2e8f0;margin:25px 0;">
+
+      <h3>
+        Cross-Test Themes
+      </h3>
+
+      ${renderObject(data.themes)}
+    `;
+
+  }
+
+
+  if (
+    data.investigationAreas
+  ) {
+
+    html += `
+      <hr style="border:0;border-top:1px solid #e2e8f0;margin:25px 0;">
+
+      <h3>
+        Clinical Investigation Areas
+      </h3>
+
+      ${renderObject(data.investigationAreas)}
+    `;
+
+  }
+
+
+  $("detailContent").innerHTML =
+    html;
+
+}
+
+
+/* ==========================================================
+   GENERIC OBJECT RENDERER
+========================================================== */
+
+function renderObject(
+  object,
+  depth = 0
+) {
+
+  if (
+    object === null ||
+    object === undefined
+  ) {
+
+    return "<span>Not available</span>";
+
+  }
+
+
+  if (
+    typeof object !== "object"
+  ) {
+
+    return escapeHtml(
+      object
+    );
+
+  }
+
+
+  if (
+    Array.isArray(object)
+  ) {
+
+    return `
+      <ul>
+        ${
+          object
+            .map(
+              item =>
+                `<li>${renderObject(item, depth + 1)}</li>`
+            )
+            .join("")
+        }
+      </ul>
+    `;
+
+  }
+
+
+  let html =
+    `<div style="display:grid;gap:10px;">`;
+
+
+  Object.entries(object)
+    .forEach(
+      ([key, value]) => {
+
+        html += `
+
+          <div
+            style="
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:12px;
+            "
+          >
+
+            <strong>
+              ${escapeHtml(
+                formatLabel(key)
+              )}
+            </strong>
+
+            <div
+              style="
+                margin-top:5px;
+                color:#475569;
+              "
+            >
+              ${renderObject(
+                value,
+                depth + 1
+              )}
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+
+  html += "</div>";
+
+
+  return html;
+
+}
+
+
+/* ==========================================================
+   LABEL FORMATTER
+========================================================== */
+
+function formatLabel(
+  value
+) {
+
+  return String(value)
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(
+      /^./,
+      char => char.toUpperCase()
+    );
+
+}
+
+
+/* ==========================================================
+   ESCAPE JAVASCRIPT
+========================================================== */
+
+function escapeJs(value) {
+
+  return String(value ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r");
+
+}
+
+
+/* ==========================================================
+   MODAL
+========================================================== */
+
+function closeDetailModal() {
+
+  $("detailModal")
+    .classList
+    .add("hidden");
+
+}
+
+
+function closeModal(event) {
+
+  if (
+    event.target ===
+    $("detailModal")
+  ) {
+
+    closeDetailModal();
+
+  }
+
+}
+
+
+/* ==========================================================
+   CLINICIAN LOGOUT
+========================================================== */
+
+function clinicianLogout() {
+
+  APP.clinicianSession =
+    null;
+
+  closeDetailModal();
+
+  showWelcome();
+
+  setStatus(
+    "Ready"
+  );
+
+}
+
+
+/* ==========================================================
+   PAGE INITIALIZATION
+========================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    setStatus(
+      "Ready"
+    );
+
+
+    /*
+     * Do not automatically load the assessment battery
+     * until the client chooses Begin Assessment.
+     *
+     * This makes the public landing page lightweight.
+     */
+
+    console.log(
+      "Clinical Assessment Platform initialized."
+    );
+
+  }
+);
+
 </script>
-<style>
-.label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:6px}.input{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;background:#fff;font-size:14px}.input:focus{border-color:#6366f1;outline:none;box-shadow:0 0 0 3px rgba(99,102,241,.15)}.meta{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8}.value{font-size:14px;font-weight:700;color:#0f172a;margin-top:4px}
-</style>
-</body></html>
+
+</body>
+</html>
