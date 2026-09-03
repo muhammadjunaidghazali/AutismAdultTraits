@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinical Psychometric Screening Dashboard</title>
+    <!-- Core External Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Standalone Decoupled Scoring Engine -->
     <script src="scoring.js"></script>
     <style>
         .choice-card:hover { border-color: #3b82f6; background-color: #f8fafc; }
         .active-radio { border-color: #4f46e5 !important; background-color: #eef2ff !important; box-shadow: 0 0 0 2px #4f46e5; }
+        @media print {
+            header, #btnExportReport, .no-print { display: none !important; }
+            body { background-color: #ffffff; }
+            main { padding: 0; max-width: 100%; }
+            .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; }
+            .border { border-color: #cbd5e1 !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
 
+    <!-- Primary Layout Header Space -->
     <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-50 shadow-sm">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
@@ -24,13 +34,16 @@
         </div>
     </header>
 
+    <!-- Main Dynamic Application Container -->
     <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
 
-        <!-- VIEW STATE 1: GATEWAY ACCESS -->
+        <!-- VIEW STATE 1: GATEWAY SECURITY PORTAL -->
         <section id="viewPortal" class="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-10 max-w-md w-full mx-auto">
             <div class="text-center mb-8">
                 <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 text-indigo-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
                 </div>
                 <h2 class="text-2xl font-bold text-slate-900">Secure Client Entry</h2>
                 <p class="text-sm text-slate-500 mt-1">Input authorized diagnostic tracking credentials</p>
@@ -50,18 +63,21 @@
             <div id="portalError" class="hidden mt-4 text-sm bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-center"></div>
         </section>
 
-        <!-- VIEW STATE 2: TESTING RUNGRID -->
+        <!-- VIEW STATE 2: CLINICAL TESTING RUNGRID -->
         <section id="viewTesting" class="bg-white border border-slate-200 rounded-2xl shadow-md p-6 md:p-10 w-full hidden flex-col">
+            <!-- Progress Matrix Indicator -->
             <div class="mb-6 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                 <div id="topProgressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
             </div>
             
+            <!-- Question Content Node Container -->
             <div class="flex-grow flex flex-col justify-center min-h-[300px]">
                 <div id="testMetaDataBlock" class="mb-4 text-sm font-semibold tracking-wide text-indigo-600 uppercase"></div>
                 <h3 id="questionTextDisplay" class="text-xl md:text-2xl font-bold text-slate-900 leading-snug mb-8"></h3>
                 <div id="optionsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
+            <!-- Execution Action Bar Footer -->
             <div class="border-t border-slate-100 pt-6 mt-8 flex justify-between items-center">
                 <button id="btnPrevQuestion" onclick="navigateQuestion(-1)" class="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition-all">Previous Item</button>
                 <div id="counterIndicator" class="text-sm font-semibold text-slate-400 tracking-wider uppercase"></div>
@@ -71,6 +87,21 @@
 
         <!-- VIEW STATE 3: INTERACTIVE EVALUATION DASHBOARD -->
         <section id="viewDashboard" class="w-full hidden space-y-8">
+            <!-- Toolbar and Document Actions -->
+            <div class="flex justify-between items-center pb-1">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Psychometric Battery Summary</h3>
+                    <p class="text-xs text-slate-500">Cross-inventory dimensional convergence profile</p>
+                </div>
+                <button id="btnExportReport" onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print / Save PDF
+                </button>
+            </div>
+
+            <!-- Summary Metric Header Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">AQ Total</p>
@@ -90,40 +121,50 @@
                 </div>
             </div>
 
+            <!-- Visualization Canvas and Results Split -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Chart Layout Block -->
                 <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
                     <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
                         Normalized Subscale Dimensional Tracker (%)
                     </h4>
-                    <div class="relative w-full h-[320px]">
+                    <div class="relative w-full h-[340px]">
                         <canvas id="subscaleChartCanvas"></canvas>
                     </div>
                 </div>
 
+                <!-- Evaluated Convergent Trait Themes Block -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
                     <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
                         Identified Trait Clusters
                     </h4>
-                    <div id="thematicResultsContainer" class="space-y-4 flex-grow overflow-y-auto max-h-[320px] pr-1"></div>
+                    <div id="thematicResultsContainer" class="space-y-4 flex-grow overflow-y-auto max-h-[460px] pr-1"></div>
                 </div>
             </div>
 
+            <!-- Professional Disclaimer Card -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
                 <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                 </div>
                 <div>
                     <h5 class="font-bold text-slate-900">Psychometric Screener Notice</h5>
-                    <p class="text-sm text-slate-600 mt-1">This tool aggregates descriptive behavioral metrics for exploratory evaluation. It is not an official medical diagnosis. Formal diagnostic assessments must be conducted by a qualified healthcare professional.</p>
+                    <p class="text-sm text-slate-600 mt-1">This tool aggregates descriptive behavioral metrics for exploratory evaluation. It is not an official medical diagnosis. Formal clinical evaluations must be conducted by a qualified healthcare professional.</p>
                 </div>
             </div>
         </section>
     </main>
 
     <script>
-        // Replace with your active Google Apps Script web app URL
+        // Update with your actual Google Apps Script web app URL
         const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_DEPLOYMENT_URL";
         const engine = new AutismAssessmentEngine();
 
@@ -233,11 +274,19 @@
         async function finishAssessment() {
             const results = engine.calculateScores(userResponses, testBattery);
 
+            // Mark completion fully in UI
+            const badge = document.getElementById("testProgressBadge");
+            badge.textContent = "100% Complete";
+            badge.className = "text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded";
+            document.getElementById("topProgressBar").style.width = "100%";
+
+            // Populate dashboard score cards
             document.getElementById("cardScoreAQ").textContent = results.rawResults.AQ.total;
             document.getElementById("cardScoreRAADS").textContent = results.rawResults.RAADS.total;
             document.getElementById("cardScoreCATQ").textContent = results.rawResults.CATQ.total;
             document.getElementById("cardScoreCATI").textContent = results.rawResults.CATI.total;
 
+            // Render discovered theme cards
             const themesContainer = document.getElementById("thematicResultsContainer");
             themesContainer.innerHTML = "";
             results.thematicAnalysis.forEach(theme => {
@@ -255,11 +304,13 @@
                 themesContainer.appendChild(card);
             });
 
+            // Transition UI views
             document.getElementById("viewTesting").classList.add("hidden");
             document.getElementById("viewDashboard").classList.remove("hidden");
 
             renderChart(results.normalizedMetrics);
 
+            // Log securely to Google Apps Script
             if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_DEPLOYMENT_URL") {
                 try {
                     await fetch(APPS_SCRIPT_URL, {
@@ -288,12 +339,26 @@
             const ctx = document.getElementById("subscaleChartCanvas").getContext("2d");
             const labels = [];
             const values = [];
+            const backgroundColors = [];
+            const borderColors = [];
+
+            // Color palette by clinical screener
+            const batteryPalette = {
+                AQ:    { bg: "rgba(59, 130, 246, 0.75)", border: "rgb(37, 99, 235)" },
+                RAADS: { bg: "rgba(16, 185, 129, 0.75)", border: "rgb(5, 150, 105)" },
+                CATQ:  { bg: "rgba(245, 158, 11, 0.75)", border: "rgb(217, 119, 6)" },
+                CATI:  { bg: "rgba(139, 92, 246, 0.75)", border: "rgb(124, 58, 237)" }
+            };
 
             Object.entries(metrics).forEach(([testId, data]) => {
                 Object.entries(data.subscales).forEach(([subName, pct]) => {
                     const formattedSubName = subName.replace(/([A-Z])/g, " $1").toLowerCase();
                     labels.push(`${testId}: ${formattedSubName}`);
                     values.push(pct);
+
+                    const color = batteryPalette[testId] || { bg: "rgba(99, 102, 241, 0.75)", border: "rgb(79, 70, 229)" };
+                    backgroundColors.push(color.bg);
+                    borderColors.push(color.border);
                 });
             });
 
@@ -303,23 +368,38 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "Trait Dimension Expression (%)",
                         data: values,
-                        backgroundColor: "rgba(79, 70, 229, 0.75)",
-                        borderColor: "rgba(79, 70, 229, 1)",
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
                         borderWidth: 1,
-                        borderRadius: 6
+                        borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%" } },
-                        x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 45, font: { size: 10 } } }
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100, 
+                            ticks: { callback: v => v + "%", stepSize: 20 } 
+                        },
+                        x: { 
+                            ticks: { 
+                                autoSkip: false, 
+                                maxRotation: 60, 
+                                minRotation: 45, 
+                                font: { size: 9 } 
+                            } 
+                        }
                     },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` Match: ${ctx.raw}%`
+                            }
+                        }
                     }
                 }
             });
