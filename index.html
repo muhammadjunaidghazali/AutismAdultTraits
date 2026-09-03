@@ -1,607 +1,2689 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neurodiversity Screening Workspace</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --bg-primary: #F4F7F6;
-            --bg-card: #FFFFFF;
-            --text-primary: #2D3748;
-            --text-secondary: #718096;
-            --accent: #319795;
-            --accent-light: #E6FFFA;
-            --warning: #DD6B20;
-            --border: #E2E8F0;
-            --radius: 16px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Psychometric Workspace</title>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-size: 16px;
-            min-height: 100vh;
-        }
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 32px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
-        }
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #e5eaf2;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #047857;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --sidebar: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
 
-        h1, h2, h3 { color: var(--text-primary); font-weight: 600; margin-bottom: 16px; }
-        h1 { font-size: 1.8rem; text-align: center; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 32px; }
+    * {
+      box-sizing: border-box;
+    }
 
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            padding: 12px 24px; border-radius: 8px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s ease; border: none; font-size: 1rem;
-        }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: #2C7A7B; }
-        .btn-secondary { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border); }
-        .btn-block { width: 100%; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #f8fafc, var(--bg));
+      color: var(--text);
+    }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-secondary); }
-        input[type="text"], input[type="email"], input[type="date"], input[type="password"] {
-            width: 100%; padding: 12px 16px; border: 1px solid var(--border);
-            border-radius: 8px; font-size: 1rem; background: var(--bg-primary);
-            transition: border 0.2s;
-        }
-        input:focus { outline: none; border-color: var(--accent); background: white; }
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
 
-        /* Progress Bar */
-        .progress-container { margin-bottom: 24px; }
-        .progress-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+    .hidden {
+      display: none !important;
+    }
 
-        /* Question UI */
-        .question-text { font-size: 1.25rem; font-weight: 500; margin-bottom: 24px; line-height: 1.5; }
-        .options-grid { display: grid; gap: 12px; margin-bottom: 24px; }
-        .option-btn {
-            padding: 16px; border: 2px solid var(--border); border-radius: 12px;
-            background: white; cursor: pointer; text-align: left; font-size: 1rem;
-            transition: all 0.2s ease; display: flex; align-items: center;
-        }
-        .option-btn:hover { border-color: var(--accent); background: var(--accent-light); }
-        .option-btn.selected { border-color: var(--accent); background: var(--accent-light); font-weight: 600; }
-        .option-key { 
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 24px; height: 24px; border-radius: 6px; background: var(--bg-primary);
-            font-size: 0.8rem; font-weight: 700; margin-right: 12px; color: var(--text-secondary);
-        }
-        .option-btn.selected .option-key { background: var(--accent); color: white; }
+    .app {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      min-height: 100vh;
+    }
 
-        .nav-buttons { display: flex; gap: 12px; }
-        .nav-buttons .btn { flex: 1; }
+    .sidebar {
+      background: var(--sidebar);
+      color: var(--sidebar-text);
+      padding: 20px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 60;
+    }
 
-        /* Summary & Charts */
-        .chart-container { position: relative; height: 350px; margin: 24px 0; }
-        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .metric-card { background: var(--bg-primary); padding: 16px; border-radius: 12px; text-align: center; }
-        .metric-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
-        .metric-label { font-size: 0.85rem; color: var(--text-secondary); }
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 10px;
+    }
 
-        .theme-card { border-left: 4px solid var(--accent); padding: 16px; background: var(--accent-light); border-radius: 0 8px 8px 0; margin-bottom: 12px; }
-        .theme-title { font-weight: 600; margin-bottom: 4px; }
-        .theme-desc { font-size: 0.95rem; color: var(--text-secondary); }
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+    }
 
-        .disclaimer { background: #FFF5F5; border: 1px solid #FED7D7; color: #C53030; padding: 16px; border-radius: 8px; font-size: 0.9rem; margin-top: 24px; }
+    .brand-title {
+      color: white;
+      font-weight: 900;
+      line-height: 1.1;
+    }
 
-        /* Admin Dashboard */
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;}
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: var(--bg-primary); font-weight: 600; color: var(--text-secondary); }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-        .badge-high { background: #FED7D7; color: #C53030; }
-        .badge-mod { background: #FEFCBF; color: #975A16; }
-        
-        .hidden { display: none !important; }
-        
-        /* Print Styles */
-        @media print {
-            body { background: white; }
-            .no-print { display: none !important; }
-            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-        }
-    </style>
+    .brand-sub {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .nav-item {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--sidebar-text);
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 12px;
+      color: #94a3b8;
+      padding: 10px;
+    }
+
+    .shell {
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .topbar-sub {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .topbar-right {
+      margin-left: auto;
+    }
+
+    .icon-btn {
+      border: 0;
+      background: transparent;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .icon-btn:hover {
+      background: #eef2ff;
+    }
+
+    .content {
+      padding: 24px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .status-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .metric {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      font-size: 30px;
+      font-weight: 900;
+      margin-top: 6px;
+    }
+
+    .metric-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #eef2ff;
+      color: var(--primary-dark);
+      transition: 0.15s ease;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.ghost {
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .btn.danger {
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="password"],
+    input[type="url"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.18);
+      border-color: var(--primary);
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 16px 0;
+    }
+
+    .checkbox-row input {
+      margin-top: 3px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .badge.success {
+      background: #ecfdf5;
+      color: var(--success);
+    }
+
+    .badge.warning {
+      background: #fffbeb;
+      color: var(--warning);
+    }
+
+    .badge.error {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .progress {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.25s ease;
+    }
+
+    .question-meta {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      margin: 0 0 18px;
+      font-size: 24px;
+      line-height: 1.35;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .option {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .option:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .option.selected {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 1px var(--primary) inset;
+    }
+
+    .option-key {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: #475569;
+    }
+
+    .option.selected .option-key {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .assessment-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hint {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chart-wrap {
+      height: 420px;
+      position: relative;
+    }
+
+    .section-title {
+      margin: 26px 0 12px;
+      font-size: 18px;
+    }
+
+    .theme-card {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--primary);
+      background: #f8fbff;
+      padding: 14px 16px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+
+    .theme-title {
+      font-weight: 900;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .theme-desc {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .disclaimer {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      border-radius: 14px;
+      padding: 14px 16px;
+      line-height: 1.5;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      background: white;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .narrow {
+      max-width: 480px;
+      margin: 40px auto;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal {
+      width: min(920px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 220px 1fr 52px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .bar-label {
+      font-size: 13px;
+      color: #334155;
+      font-weight: 700;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .bar-value {
+      font-size: 12px;
+      font-weight: 900;
+      color: #334155;
+      text-align: right;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 200;
+      background: #111827;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.2s ease;
+      pointer-events: none;
+      max-width: 360px;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #toast.success {
+      background: #065f46;
+    }
+
+    #toast.warning {
+      background: #92400e;
+    }
+
+    #toast.error {
+      background: #991b1b;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+    }
+
+    .loading-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 3px solid #dbeafe;
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .trouble {
+      padding-left: 18px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1100px) {
+      .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: -290px;
+        top: 0;
+        bottom: 0;
+        width: 270px;
+        transition: left 0.18s ease;
+      }
+
+      .sidebar.mobile-open {
+        left: 0;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .question-text {
+        font-size: 20px;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-value {
+        text-align: left;
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+
+      .modal,
+      .modal * {
+        visibility: visible !important;
+      }
+
+      .modal-overlay {
+        position: static !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+
+      .modal {
+        width: 100% !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        border: 0 !important;
+      }
+
+      .modal-actions,
+      .sidebar,
+      .topbar {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
-
-<div class="container">
-    <!-- SCREEN 1: INTAKE -->
-    <div id="screen-intake" class="screen">
-        <div class="card">
-            <h1>Neurodiversity Screening Workspace</h1>
-            <p class="subtitle">Comprehensive Trait & Camouflaging Assessment</p>
-            <form id="intake-form">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="client-name" required>
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="client-email" required>
-                </div>
-                <div class="form-group">
-                    <label>Date of Birth</label>
-                    <input type="date" id="client-dob" required>
-                </div>
-                <div class="form-group">
-                    <label>Contact Number</label>
-                    <input type="text" id="client-phone">
-                </div>
-                <div class="disclaimer" style="margin-bottom: 20px;">
-                    <strong>Disclaimer:</strong> This tool is for educational and preliminary screening purposes only. It does not constitute a formal medical diagnosis. By proceeding, you consent to your data being securely transmitted to your clinician.
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Begin Assessment Battery</button>
-                <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px" onclick="showScreen('screen-admin-login')">Clinician Portal</button>
-            </form>
-        </div>
+  <div id="loading-overlay" class="hidden">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <div id="loading-text">Working...</div>
     </div>
+  </div>
 
-    <!-- SCREEN 2: ASSESSMENT -->
-    <div id="screen-assessment" class="screen hidden">
-        <div class="card">
-            <div class="progress-container">
-                <div class="progress-text">
-                    <span id="progress-label">Part 1: AQ</span>
-                    <span id="progress-count">1 / 197</span>
-                </div>
-                <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width: 0%"></div></div>
-            </div>
-            
-            <div id="question-container">
-                <p class="question-text" id="question-text">Loading...</p>
-                <div class="options-grid" id="options-grid"></div>
+  <div id="toast"></div>
+
+  <div class="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">CP</div>
+        <div>
+          <div class="brand-title">Psychometric</div>
+          <div class="brand-sub">Clinical Workspace</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-nav="home">Overview</button>
+        <button class="nav-item" data-nav="intake">Candidate Intake</button>
+        <button class="nav-item" data-nav="assessment">Assessment</button>
+        <button class="nav-item" data-nav="summary">Summary</button>
+        <button class="nav-item" data-nav="clinician">Clinician Registry</button>
+        <button class="nav-item" data-nav="settings">Settings</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        Preliminary screening only. Not a diagnostic instrument.
+      </div>
+    </aside>
+
+    <div class="shell">
+      <header class="topbar">
+        <button id="hamburger" class="icon-btn" aria-label="Menu">☰</button>
+
+        <div>
+          <h1 id="topbar-title">Overview</h1>
+          <p class="topbar-sub">AQ • RAADS-R • CAT-Q • CATI</p>
+        </div>
+
+        <div class="topbar-right">
+          <span id="connection-badge" class="badge">Checking...</span>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- HOME -->
+        <section id="screen-home" class="screen">
+          <div class="hero card">
+            <div>
+              <h2>Comprehensive Neurodivergent Screening Workspace</h2>
+              <p style="color: var(--muted); line-height: 1.6;">
+                A structured clinical screening application combining AQ, RAADS-R,
+                CAT-Q, and CATI. Includes candidate intake, autosaved assessment flow,
+                dimensional scoring, thematic convergence, and clinician registry.
+              </p>
+
+              <div class="hero-actions">
+                <button class="btn primary" onclick="navigate('intake')">
+                  Start Candidate Assessment
+                </button>
+
+                <button id="resume-btn" class="btn ghost hidden" onclick="resumeProgress()">
+                  Resume Saved Assessment
+                </button>
+
+                <button class="btn ghost" onclick="navigate('clinician')">
+                  Clinician Portal
+                </button>
+
+                <button class="btn ghost" onclick="navigate('settings')">
+                  Connection Settings
+                </button>
+              </div>
             </div>
 
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" id="btn-prev" onclick="prevQuestion()">Previous</button>
-                <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">Next</button>
+            <div class="hero-panel">
+              <div class="metric">
+                <div class="metric-label">Application Mode</div>
+                <div class="metric-value" id="mode-indicator" style="font-size: 20px;">Loading</div>
+              </div>
+
+              <div class="disclaimer">
+                This tool is for preliminary screening and clinical discussion only.
+                It does not provide a medical diagnosis.
+              </div>
             </div>
-            <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 16px;">
-                Tip: Press keys <strong>1-5</strong> or <strong>A-E</strong> to select and auto-advance.
+          </div>
+
+          <div class="grid status-grid">
+            <div class="metric">
+              <div class="metric-label">Backend API</div>
+              <div class="metric-value" id="status-api" style="font-size: 18px;">-</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Assessment Battery</div>
+              <div class="metric-value" id="status-battery" style="font-size: 18px;">-</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Saved Progress</div>
+              <div class="metric-value" id="status-progress" style="font-size: 18px;">-</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Local Records</div>
+              <div class="metric-value" id="status-records" style="font-size: 18px;">-</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INTAKE -->
+        <section id="screen-intake" class="screen hidden">
+          <div class="card" style="max-width: 860px; margin: 0 auto;">
+            <h2>Candidate Intake</h2>
+            <p style="color: var(--muted); margin-top: 0;">
+              Enter candidate details before beginning the assessment battery.
             </p>
-        </div>
-    </div>
 
-    <!-- SCREEN 3: SUMMARY -->
-    <div id="screen-summary" class="screen hidden">
-        <div class="card">
-            <h1>Assessment Complete</h1>
-            <p class="subtitle">Your Psychometric Summary</p>
-            
-            <div class="metric-grid" id="metric-grid"></div>
-            
-            <h3>Dimensional Trait Profile</h3>
-            <div class="chart-container">
-                <canvas id="radar-chart"></canvas>
+            <form id="intake-form">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="client-name">Full Name</label>
+                  <input id="client-name" type="text" required />
+                </div>
+
+                <div class="field">
+                  <label for="client-email">Email Address</label>
+                  <input id="client-email" type="email" required />
+                </div>
+
+                <div class="field">
+                  <label for="client-phone">Contact Number / WhatsApp</label>
+                  <input id="client-phone" type="text" />
+                </div>
+
+                <div class="field">
+                  <label for="client-dob">Date of Birth</label>
+                  <input id="client-dob" type="date" required />
+                </div>
+              </div>
+
+              <div class="checkbox-row">
+                <input id="consent" type="checkbox" required />
+                <label for="consent" style="margin: 0; font-weight: 600;">
+                  I understand this is a preliminary screening tool and not a formal
+                  medical diagnosis. I consent to the assessment data being sent to
+                  the configured clinician database.
+                </label>
+              </div>
+
+              <div class="hero-actions">
+                <button type="button" class="btn ghost" onclick="navigate('home')">
+                  Back
+                </button>
+
+                <button type="submit" class="btn primary">
+                  Begin Assessment Battery
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ASSESSMENT -->
+        <section id="screen-assessment" class="screen hidden">
+          <div class="card" style="max-width: 920px; margin: 0 auto;">
+            <div class="progress-top">
+              <span id="progress-label">-</span>
+              <span id="progress-count">-</span>
             </div>
 
-            <h3>Identified Trait Clusters</h3>
+            <div class="progress">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+
+            <div class="question-meta" id="question-meta">-</div>
+            <h2 class="question-text" id="question-text">Loading...</h2>
+
+            <div id="options-grid" class="options-grid"></div>
+
+            <div class="assessment-actions">
+              <button id="btn-prev" class="btn ghost" onclick="prevQuestion()">
+                Previous
+              </button>
+
+              <button class="btn ghost" onclick="saveAndExit()">
+                Save & Exit
+              </button>
+
+              <button id="btn-next" class="btn primary" onclick="nextQuestion()">
+                Next
+              </button>
+            </div>
+
+            <div class="hint">
+              Keyboard: press 1–9 to select an option and advance.
+            </div>
+          </div>
+        </section>
+
+        <!-- SUMMARY -->
+        <section id="screen-summary" class="screen hidden">
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+              <div>
+                <h2 id="summary-name" style="margin:0;">-</h2>
+                <div id="summary-meta" style="color:var(--muted); margin-top:4px;">-</div>
+              </div>
+
+              <span id="summary-sync" class="badge">-</span>
+            </div>
+
+            <div class="grid status-grid" id="metric-grid" style="margin-top:18px;"></div>
+
+            <h3 class="section-title">Dimensional Trait Match Across Subscales</h3>
+
+            <div class="chart-wrap">
+              <canvas id="subscale-chart"></canvas>
+            </div>
+
+            <h3 class="section-title">Identified Trait Clusters</h3>
             <div id="themes-container"></div>
 
-            <h3>What this means for you</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                These scores reflect self-reported communication preferences, sensory processing tendencies, and social adaptation strategies. They provide a starting point for discussion with your clinician.
+            <h3 class="section-title">Recommended Clinical Investigation Areas</h3>
+            <div id="investigation-container"></div>
+
+            <div class="hero-actions">
+              <button class="btn primary" onclick="window.print()">
+                Print Summary
+              </button>
+
+              <button class="btn ghost" onclick="resetApp()">
+                Start New Assessment
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- CLINICIAN -->
+        <section id="screen-clinician" class="screen hidden">
+          <div id="clinician-login" class="card narrow">
+            <h2>Clinician Security Check</h2>
+            <p style="color:var(--muted);">
+              Enter your administrative PIN to access confidential records.
             </p>
 
-            <div class="disclaimer">
-                <strong>Clinical Disclaimer:</strong> This report is a preliminary screening tool and does not replace a comprehensive diagnostic evaluation by a qualified healthcare professional.
-            </div>
+            <form id="pin-form">
+              <div class="field">
+                <label for="admin-pin">Administrative PIN</label>
+                <input id="admin-pin" type="password" required />
+              </div>
 
-            <div class="no-print" style="margin-top: 24px; display: flex; gap: 12px;">
-                <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
-                <button class="btn btn-secondary" onclick="resetApp()">Start New Assessment</button>
-            </div>
-        </div>
-    </div>
+              <div class="hero-actions">
+                <button type="button" class="btn ghost" onclick="navigate('home')">
+                  Cancel
+                </button>
 
-    <!-- SCREEN 4: ADMIN LOGIN -->
-    <div id="screen-admin-login" class="screen hidden">
-        <div class="card" style="max-width: 400px; margin: 50px auto;">
-            <h2 style="text-align: center;">Clinician Security Check</h2>
-            <p class="subtitle">Enter administrative PIN to access records.</p>
-            <div class="form-group">
-                <input type="password" id="admin-pin" placeholder="Enter PIN" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px;">
-            </div>
-            <button class="btn btn-primary btn-block" onclick="verifyPin()">Verify & Unlock</button>
-            <button class="btn btn-secondary btn-block" style="margin-top:10px" onclick="showScreen('screen-intake')">Cancel</button>
-        </div>
-    </div>
+                <button type="submit" class="btn primary">
+                  Verify & Unlock
+                </button>
+              </div>
+            </form>
+          </div>
 
-    <!-- SCREEN 5: ADMIN DASHBOARD -->
-    <div id="screen-admin" class="screen hidden">
-        <div class="card">
-            <div class="admin-header">
-                <h2>Clinician Registry</h2>
-                <div>
-                    <input type="text" id="search-input" placeholder="Search name/email..." onkeyup="renderAdminTable()" style="width: 200px; margin-right: 10px;">
-                    <button class="btn btn-secondary" onclick="loadAdminData()">Refresh</button>
-                    <button class="btn btn-secondary" onclick="showScreen('screen-intake')">Exit</button>
-                </div>
-            </div>
-            <div style="overflow-x: auto;">
+          <div id="clinician-dashboard" class="hidden">
+            <div class="card">
+              <div class="toolbar">
+                <input
+                  id="admin-search"
+                  type="text"
+                  placeholder="Search name or email..."
+                  oninput="onAdminSearch()"
+                  style="max-width:280px;"
+                />
+
+                <button class="btn ghost" onclick="refreshAdmin()">Refresh</button>
+                <button class="btn ghost" onclick="exportCsv()">Export CSV</button>
+                <button class="btn danger" onclick="lockClinician()">Lock & Exit</button>
+              </div>
+
+              <div class="table-wrap">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Client</th>
-                            <th>AQ</th>
-                            <th>RAADS-R</th>
-                            <th>CAT-Q</th>
-                            <th>CATI</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-tbody"></tbody>
+                  <thead>
+                    <tr>
+                      <th>Date / Time</th>
+                      <th>Client</th>
+                      <th>Contact / Email</th>
+                      <th>AQ</th>
+                      <th>RAADS-R</th>
+                      <th>CAT-Q</th>
+                      <th>CATI</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-tbody"></tbody>
                 </table>
+              </div>
+
+              <div class="pagination">
+                <button id="admin-prev" class="btn ghost" onclick="adminPrev()">Prev</button>
+                <span id="admin-page-info">-</span>
+                <button id="admin-next" class="btn ghost" onclick="adminNext()">Next</button>
+              </div>
             </div>
-            <div id="pagination-controls" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;"></div>
-        </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="screen-settings" class="screen hidden">
+          <div class="card" style="max-width: 860px; margin: 0 auto;">
+            <h2>Settings & Connection</h2>
+
+            <form id="settings-form">
+              <div class="field">
+                <label for="settings-api-url">Google Apps Script Web App URL</label>
+                <input
+                  id="settings-api-url"
+                  type="url"
+                  placeholder="https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec"
+                />
+              </div>
+
+              <p style="color:var(--muted);">
+                Current configured URL:
+                <strong id="current-api-url">Not configured</strong>
+              </p>
+
+              <div class="hero-actions">
+                <button type="submit" class="btn primary">Save</button>
+                <button type="button" class="btn ghost" onclick="testConnection()">
+                  Test Connection
+                </button>
+              </div>
+            </form>
+
+            <div id="settings-result" style="margin-top:16px;"></div>
+
+            <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;" />
+
+            <h3>Connection troubleshooting</h3>
+            <div id="troubleshooting-content"></div>
+          </div>
+        </section>
+      </main>
     </div>
-</div>
+  </div>
 
-<script src="tests.json"></script> <!-- Fallback if fetch fails, but we will use fetch -->
-<script src="scoring.js"></script>
-<script>
-    // ==========================================
-    // CONFIGURATION
-    // ==========================================
-    // REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec"; 
-    
-    let testData = {};
-    let flatQuestions = [];
-    let currentQIndex = 0;
-    let userAnswers = {};
-    let clientInfo = {};
-    
-    // Admin State
-    let adminRecords = [];
-    let currentPage = 1;
-    const PAGE_SIZE = 20;
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modal-title" style="margin:0;">Modal</h2>
+        <button class="icon-btn" onclick="closeModal()">✕</button>
+      </div>
 
-    // ==========================================
-    // INITIALIZATION
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const response = await fetch('tests.json');
-            testData = await response.json();
-            flattenQuestions();
-            
-            // Restore auto-save
-            const saved = localStorage.getItem('assessment_progress');
-            if (saved) {
-                const progress = JSON.parse(saved);
-                if (confirm("Resume previous assessment progress?")) {
-                    userAnswers = progress.answers || {};
-                    clientInfo = progress.client || {};
-                    currentQIndex = progress.index || 0;
-                    showScreen('screen-assessment');
-                    renderQuestion();
-                } else {
-                    localStorage.removeItem('assessment_progress');
-                }
-            }
-        } catch (err) {
-            console.error("Failed to load tests.json", err);
-            alert("Error loading assessment data. Please ensure tests.json is in the same directory.");
+      <div id="modal-body" class="modal-body"></div>
+
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="scoring.js"></script>
+
+  <script>
+    /**
+     * ==========================================================
+     * CONFIGURATION
+     * ==========================================================
+     *
+     * Paste your Google Apps Script /exec URL below.
+     * Example:
+     * const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec";
+     *
+     * You can also configure it later inside:
+     * Settings → Google Apps Script Web App URL
+     */
+    const DEFAULT_GAS_URL = "";
+
+    const OPTION_ORDERS = {
+      AQ: [
+        "definitelyAgree",
+        "slightlyAgree",
+        "slightlyDisagree",
+        "definitelyDisagree"
+      ],
+      RAADS: [
+        "trueNowAndYoung",
+        "onlyTrueNow",
+        "trueOnlyYounger16",
+        "neverTrue"
+      ],
+      CATQ: [
+        "stronglyDisagree",
+        "disagree",
+        "somewhatDisagree",
+        "neither",
+        "somewhatAgree",
+        "agree",
+        "stronglyAgree"
+      ],
+      CATI: [
+        "definitelyDisagree",
+        "somewhatDisagree",
+        "neither",
+        "somewhatAgree",
+        "definitelyAgree"
+      ]
+    };
+
+    const OPTION_LABELS = {
+      definitelyAgree: "Definitely agree",
+      slightlyAgree: "Slightly agree",
+      slightlyDisagree: "Slightly disagree",
+      definitelyDisagree: "Definitely disagree",
+
+      trueNowAndYoung: "True now and when younger",
+      onlyTrueNow: "Only true now",
+      trueOnlyYounger16: "True only when younger than 16",
+      neverTrue: "Never true",
+
+      stronglyDisagree: "Strongly disagree",
+      disagree: "Disagree",
+      somewhatDisagree: "Somewhat disagree",
+      neither: "Neither",
+      somewhatAgree: "Somewhat agree",
+      agree: "Agree",
+      stronglyAgree: "Strongly agree",
+
+      definitelyDisagree: "Definitely disagree",
+      somewhatDisagree: "Somewhat disagree",
+      somewhatAgree: "Somewhat agree"
+    };
+
+    const state = {
+      testData: null,
+      flatQuestions: [],
+      current: 0,
+      answers: {},
+      client: {},
+      results: null,
+      lastPayload: null,
+      lastSync: null,
+      chart: null,
+      chartData: null,
+
+      authenticated: false,
+      adminSource: null,
+      adminRecords: [],
+      visibleRecords: [],
+      adminPage: 1,
+      adminPages: 1,
+      adminTotal: 0,
+      adminSearch: ""
+    };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      bindNavigation();
+      bindForms();
+      bindKeyboard();
+
+      document.getElementById("troubleshooting-content").innerHTML = troubleshootingHtml();
+
+      await loadTests();
+      loadHomeStatus();
+      updateConnectionBadge();
+    });
+
+    function bindNavigation() {
+      document.querySelectorAll(".nav-item").forEach(button => {
+        button.addEventListener("click", () => {
+          navigate(button.dataset.nav);
+        });
+      });
+
+      document.getElementById("hamburger").addEventListener("click", () => {
+        document.getElementById("sidebar").classList.toggle("mobile-open");
+      });
+    }
+
+    function bindForms() {
+      document.getElementById("intake-form").addEventListener("submit", startAssessment);
+      document.getElementById("pin-form").addEventListener("submit", verifyPin);
+      document.getElementById("settings-form").addEventListener("submit", saveSettings);
+    }
+
+    function bindKeyboard() {
+      document.addEventListener("keydown", event => {
+        const assessmentVisible = !document
+          .getElementById("screen-assessment")
+          .classList.contains("hidden");
+
+        if (!assessmentVisible) return;
+
+        if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
+
+        const question = state.flatQuestions[state.current];
+        if (!question) return;
+
+        const index = parseInt(event.key, 10) - 1;
+
+        if (
+          Number.isInteger(index) &&
+          index >= 0 &&
+          index < question.options.length
+        ) {
+          selectOption(question, question.options[index]);
+        }
+      });
+    }
+
+    function navigate(target) {
+      if (target === "assessment") {
+        if (!state.flatQuestions.length) {
+          toast("Assessment data is not loaded yet.", "error");
+          return;
         }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', handleKeyboard);
-    });
+        if (!state.client || !state.client.name) {
+          toast("Complete candidate intake first.", "warning");
+          target = "intake";
+        }
+      }
 
-    function flattenQuestions() {
-        flatQuestions = [];
-        const testOrder = ['AQ', 'RAADS', 'CATQ', 'CATI'];
-        testOrder.forEach(testId => {
-            if (testData[testId]) {
-                testData[testId].questions.forEach(q => {
-                    flatQuestions.push({ ...q, testId: testId, options: q.options || Object.keys(q.weights) });
-                });
-            }
+      if (target === "summary" && !state.results) {
+        target = "home";
+      }
+
+      document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.add("hidden");
+      });
+
+      const targetScreen = document.getElementById(`screen-${target}`);
+
+      if (targetScreen) {
+        targetScreen.classList.remove("hidden");
+      }
+
+      document.querySelectorAll(".nav-item").forEach(button => {
+        button.classList.toggle("active", button.dataset.nav === target);
+      });
+
+      const titles = {
+        home: "Overview",
+        intake: "Candidate Intake",
+        assessment: "Assessment Battery",
+        summary: "Psychometric Summary",
+        clinician: "Clinician Registry",
+        settings: "Settings & Connection"
+      };
+
+      document.getElementById("topbar-title").textContent = titles[target] || "Workspace";
+
+      if (target === "home") loadHomeStatus();
+      if (target === "settings") renderSettings();
+      if (target === "clinician") renderClinicianScreen();
+      if (target === "assessment") renderQuestion();
+      if (target === "summary") renderChartFromState();
+
+      document.getElementById("sidebar").classList.remove("mobile-open");
+      window.scrollTo(0, 0);
+    }
+
+    async function loadTests() {
+      try {
+        const response = await fetch("tests.json", {
+          cache: "no-store"
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        let raw = await response.json();
+
+        raw = normalizeTestData(raw);
+
+        state.testData = raw;
+        state.flatQuestions = flattenQuestions(raw);
+
+        loadHomeStatus();
+      } catch (error) {
+        showModal(
+          "Could not load tests.json",
+          `
+            <p>The application could not load <code>tests.json</code>.</p>
+            <p>Error: <strong>${escapeHtml(error.message)}</strong></p>
+            <p>
+              Make sure <code>tests.json</code> is uploaded to the same folder as
+              <code>index.html</code> on GitHub Pages.
+            </p>
+          `,
+          [{ label: "Close", class: "primary" }]
+        );
+      }
     }
 
-    // ==========================================
-    // SCREEN MANAGEMENT
-    // ==========================================
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-        document.getElementById(screenId).classList.remove('hidden');
-    }
+    function normalizeTestData(raw) {
+      const trimmed = deepTrim(raw);
+      const normalized = {};
 
-    // ==========================================
-    // INTAKE & ASSESSMENT FLOW
-    // ==========================================
-    document.getElementById('intake-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        clientInfo = {
-            name: document.getElementById('client-name').value,
-            email: document.getElementById('client-email').value,
-            dob: document.getElementById('client-dob').value,
-            phone: document.getElementById('client-phone').value
+      Object.entries(trimmed).forEach(([testId, testData]) => {
+        const cleanId = String(testId)
+          .replace(/[^a-zA-Z]/g, "")
+          .toUpperCase();
+
+        normalized[cleanId] = {
+          ...testData,
+          title: testData.title || cleanId,
+          questions: Array.isArray(testData.questions)
+            ? testData.questions.map(question => normalizeQuestion(cleanId, question))
+            : []
         };
-        currentQIndex = 0;
-        userAnswers = {};
-        showScreen('screen-assessment');
-        renderQuestion();
-    });
+      });
+
+      return normalized;
+    }
+
+    function deepTrim(value) {
+      if (Array.isArray(value)) {
+        return value.map(deepTrim);
+      }
+
+      if (value && typeof value === "object") {
+        return Object.entries(value).reduce((acc, [key, val]) => {
+          const cleanKey = String(key).trim();
+          acc[cleanKey] = deepTrim(val);
+          return acc;
+        }, {});
+      }
+
+      if (typeof value === "string") {
+        return value.trim();
+      }
+
+      return value;
+    }
+
+    function normalizeQuestion(testId, question) {
+      const clean = { ...question };
+
+      clean.id = String(clean.id || "").replace(/[^0-9]/g, "") || clean.id;
+      clean.text = String(clean.text || "").trim();
+      clean.subscale = String(clean.subscale || "").trim();
+
+      if (clean.weights && typeof clean.weights === "object") {
+        clean.weights = Object.entries(clean.weights).reduce((acc, [key, value]) => {
+          acc[String(key).trim()] = Number(value) || 0;
+          return acc;
+        }, {});
+      }
+
+      const weightKeys = Object.keys(clean.weights || {});
+
+      if (!Array.isArray(clean.options) || clean.options.length === 0) {
+        const preferred = OPTION_ORDERS[testId] || [];
+
+        clean.options = [
+          ...preferred.filter(key => weightKeys.includes(key)),
+          ...weightKeys.filter(key => !preferred.includes(key))
+        ];
+      } else {
+        clean.options = clean.options.map(option => String(option).trim());
+      }
+
+      return clean;
+    }
+
+    function flattenQuestions(data) {
+      const flat = [];
+
+      const preferred = ["AQ", "RAADS", "CATQ", "CATI"];
+
+      const testIds = [
+        ...preferred.filter(id => data[id]),
+        ...Object.keys(data).filter(id => !preferred.includes(id))
+      ];
+
+      testIds.forEach(testId => {
+        const test = data[testId];
+
+        (test.questions || []).forEach(question => {
+          flat.push({
+            ...question,
+            testId,
+            testTitle: test.title || testId,
+            answerKey: `${testId}_${question.id}`
+          });
+        });
+      });
+
+      return flat;
+    }
+
+    function loadHomeStatus() {
+      const url = getApiUrl();
+
+      document.getElementById("status-api").textContent = url
+        ? "Configured"
+        : "Not configured";
+
+      document.getElementById("mode-indicator").textContent = url
+        ? "Google Sheets Sync"
+        : "Local Demo Mode";
+
+      document.getElementById("status-battery").textContent = state.flatQuestions.length
+        ? `${state.flatQuestions.length} items loaded`
+        : "tests.json missing";
+
+      const saved = loadProgress();
+
+      document.getElementById("status-progress").textContent = saved
+        ? `Question ${(saved.currentIndex || 0) + 1}`
+        : "No saved session";
+
+      document.getElementById("status-records").textContent =
+        String(getLocalSubmissions().length);
+
+      document.getElementById("resume-btn").classList.toggle("hidden", !saved);
+    }
+
+    function startAssessment(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("client-name").value.trim();
+      const email = document.getElementById("client-email").value.trim();
+      const phone = document.getElementById("client-phone").value.trim();
+      const dob = document.getElementById("client-dob").value;
+      const consent = document.getElementById("consent").checked;
+
+      if (!consent) {
+        toast("Please confirm consent before starting.", "warning");
+        return;
+      }
+
+      state.client = {
+        name,
+        email,
+        phone,
+        dob
+      };
+
+      state.answers = {};
+      state.current = 0;
+      state.results = null;
+      state.lastPayload = null;
+      state.lastSync = null;
+
+      saveProgress();
+      navigate("assessment");
+    }
 
     function renderQuestion() {
-        if (currentQIndex >= flatQuestions.length) {
-            submitAssessment();
-            return;
-        }
+      const total = state.flatQuestions.length;
 
-        const q = flatQuestions[currentQIndex];
-        const totalQ = flatQuestions.length;
-        
-        // Progress UI
-        document.getElementById('progress-label').innerText = `Part: ${q.testId}`;
-        document.getElementById('progress-count').innerText = `${currentQIndex + 1} / ${totalQ}`;
-        document.getElementById('progress-fill').style.width = `${((currentQIndex + 1) / totalQ) * 100}%`;
+      if (!total) return;
 
-        // Question UI
-        document.getElementById('question-text').innerText = q.text;
-        const grid = document.getElementById('options-grid');
-        grid.innerHTML = '';
+      if (state.current >= total) {
+        submitAssessment();
+        return;
+      }
 
-        q.options.forEach((optKey, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            if (userAnswers[`${q.testId}_${q.id}`] === optKey) btn.classList.add('selected');
-            
-            const keyLabel = idx < 5 ? (idx + 1) : String.fromCharCode(65 + idx); // 1-5, then A, B...
-            btn.innerHTML = `<span class="option-key">${keyLabel}</span> ${formatOptionLabel(optKey)}`;
-            btn.onclick = () => selectOption(q, optKey);
-            grid.appendChild(btn);
+      const question = state.flatQuestions[state.current];
+
+      document.getElementById("progress-label").textContent =
+        `${question.testId} — ${question.testTitle}`;
+
+      document.getElementById("progress-count").textContent =
+        `${state.current + 1} / ${total}`;
+
+      document.getElementById("progress-fill").style.width =
+        `${((state.current + 1) / total) * 100}%`;
+
+      document.getElementById("question-meta").textContent =
+        `Item ${question.id} • ${question.subscale || "General"}`;
+
+      document.getElementById("question-text").textContent = question.text;
+
+      const grid = document.getElementById("options-grid");
+      grid.innerHTML = "";
+
+      question.options.forEach((option, index) => {
+        const selected = state.answers[question.answerKey] === option;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option" + (selected ? " selected" : "");
+
+        button.innerHTML = `
+          <span class="option-key">${index + 1}</span>
+          <span>${escapeHtml(formatLabel(option))}</span>
+        `;
+
+        button.addEventListener("click", () => {
+          selectOption(question, option);
         });
 
-        document.getElementById('btn-prev').disabled = currentQIndex === 0;
-        document.getElementById('btn-next').innerText = currentQIndex === totalQ - 1 ? 'Submit' : 'Next';
+        grid.appendChild(button);
+      });
 
-        // Break prompt every 50 questions
-        if (currentQIndex > 0 && currentQIndex % 50 === 0 && !sessionStorage.getItem(`break_${currentQIndex}`)) {
-            sessionStorage.setItem(`break_${currentQIndex}`, '1');
-            if (confirm("You've done great so far. Would you like to save your progress and take a 5-minute break?")) {
-                saveProgress();
-                showScreen('screen-intake');
-                alert("Progress saved. You can close the tab or continue later.");
-            }
-        }
+      document.getElementById("btn-prev").disabled = state.current === 0;
+
+      document.getElementById("btn-next").textContent =
+        state.current === total - 1
+          ? "Submit Assessment"
+          : "Next";
     }
 
-    function formatOptionLabel(key) {
-        return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+    function formatLabel(key) {
+      return (
+        OPTION_LABELS[key] ||
+        key
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, str => str.toUpperCase())
+          .trim()
+      );
     }
 
-    function selectOption(q, optKey) {
-        userAnswers[`${q.testId}_${q.id}`] = optKey;
-        saveProgress();
-        // Auto-advance after short delay for smooth UX
+    function selectOption(question, option) {
+      state.answers[question.answerKey] = option;
+      saveProgress();
+
+      renderQuestion();
+
+      if (state.current < state.flatQuestions.length - 1) {
         setTimeout(() => {
-            if (currentQIndex < flatQuestions.length - 1) nextQuestion();
-        }, 200);
+          state.current += 1;
+          saveProgress();
+          renderQuestion();
+        }, 130);
+      }
     }
 
     function nextQuestion() {
-        if (currentQIndex < flatQuestions.length - 1) {
-            currentQIndex++;
-            renderQuestion();
-        } else {
-            submitAssessment();
-        }
+      const question = state.flatQuestions[state.current];
+
+      if (question && state.answers[question.answerKey] === undefined) {
+        toast("Please choose an option.", "warning");
+        return;
+      }
+
+      if (state.current >= state.flatQuestions.length - 1) {
+        submitAssessment();
+        return;
+      }
+
+      state.current += 1;
+      saveProgress();
+      renderQuestion();
     }
 
     function prevQuestion() {
-        if (currentQIndex > 0) {
-            currentQIndex--;
-            renderQuestion();
-        }
+      if (state.current <= 0) return;
+
+      state.current -= 1;
+      saveProgress();
+      renderQuestion();
     }
 
-    function handleKeyboard(e) {
-        if (document.getElementById('screen-assessment').classList.contains('hidden')) return;
-        const q = flatQuestions[currentQIndex];
-        if (!q) return;
-        
-        let idx = -1;
-        if (e.key >= '1' && e.key <= '5') idx = parseInt(e.key) - 1;
-        else if (e.key.toLowerCase() >= 'a' && e.key.toLowerCase() <= 'e') idx = e.key.toLowerCase().charCodeAt(0) - 97 + 5;
+    function saveAndExit() {
+      saveProgress();
+      navigate("home");
+      toast("Progress saved.", "success");
+    }
 
-        if (idx !== -1 && idx < q.options.length) {
-            selectOption(q, q.options[idx]);
-        }
+    function resumeProgress() {
+      const saved = loadProgress();
+
+      if (!saved) return;
+
+      state.client = saved.client || {};
+      state.answers = saved.answers || {};
+      state.current = saved.currentIndex || 0;
+
+      navigate("assessment");
     }
 
     function saveProgress() {
-        localStorage.setItem('assessment_progress', JSON.stringify({
-            client: clientInfo,
-            answers: userAnswers,
-            index: currentQIndex
-        }));
+      localStorage.setItem(
+        "assessment_state",
+        JSON.stringify({
+          client: state.client,
+          answers: state.answers,
+          currentIndex: state.current,
+          updatedAt: new Date().toISOString()
+        })
+      );
+
+      loadHomeStatus();
     }
 
-    // ==========================================
-    // SUBMISSION & SCORING
-    // ==========================================
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem("assessment_state");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function clearProgress() {
+      localStorage.removeItem("assessment_state");
+      loadHomeStatus();
+    }
+
     async function submitAssessment() {
-        const btn = document.getElementById('btn-next');
-        btn.disabled = true;
-        btn.innerText = "Processing...";
+      const missing = state.flatQuestions.filter(question => {
+        return state.answers[question.answerKey] === undefined;
+      });
+
+      if (missing.length) {
+        const firstMissing = state.flatQuestions.findIndex(question => {
+          return state.answers[question.answerKey] === undefined;
+        });
+
+        state.current = firstMissing;
+        renderQuestion();
+
+        toast(`${missing.length} question(s) remain unanswered.`, "warning");
+        return;
+      }
+
+      setLoading(true, "Calculating and submitting...");
+
+      try {
+        if (typeof AutismAssessmentEngine === "undefined") {
+          throw new Error("scoring.js is missing or failed to load.");
+        }
 
         const engine = new AutismAssessmentEngine();
-        const results = engine.calculateScores(userAnswers, testData);
+        const results = engine.calculateScores(state.answers, state.testData);
 
-        const payload = {
-            action: "submitAssessment",
-            client: clientInfo,
-            totals: {
-                AQ: results.rawResults.AQ.total,
-                RAADS: results.rawResults.RAADS.total,
-                CATQ: results.rawResults.CATQ.total,
-                CATI: results.rawResults.CATI.total
-            },
-            metrics: results.normalizedMetrics,
-            themes: results.thematicAnalysis,
-            investigation: results.clinicalInvestigationAreas,
-            answers: userAnswers
+        const payload = buildPayload(results);
+
+        state.results = results;
+        state.lastPayload = payload;
+
+        saveLocalSubmission(payload, getApiUrl() ? "pending" : "local");
+
+        if (getApiUrl()) {
+          try {
+            await apiRequest(payload);
+
+            state.lastSync = "synced";
+            saveLocalSubmission({ ...payload, syncStatus: "synced" }, "synced");
+
+            clearProgress();
+            renderSummary(results, payload);
+            navigate("summary");
+
+            toast("Assessment submitted to clinician database.", "success");
+          } catch (remoteError) {
+            state.lastSync = "local";
+
+            renderSummary(results, payload);
+            navigate("summary");
+
+            showModal(
+              "Google Apps Script Connection Error",
+              `
+                <p>The assessment was calculated and saved locally, but remote submission failed.</p>
+                <p><strong>${escapeHtml(remoteError.message)}</strong></p>
+                ${troubleshootingHtml()}
+              `,
+              [
+                {
+                  label: "Continue with local summary",
+                  class: "primary"
+                }
+              ]
+            );
+          }
+        } else {
+          state.lastSync = "local";
+
+          clearProgress();
+          renderSummary(results, payload);
+          navigate("summary");
+
+          toast("No API configured. Saved in local demo mode.", "warning");
+        }
+      } catch (error) {
+        showModal(
+          "Submission Error",
+          `<p>${escapeHtml(error.message)}</p>`,
+          [{ label: "Close", class: "primary" }]
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function buildPayload(results) {
+      return {
+        id: `web_${Date.now()}`,
+        action: "submitAssessment",
+        source: "github-pages",
+        timestamp: new Date().toISOString(),
+        client: state.client,
+        totals: {
+          AQ: results.rawResults.AQ?.total || 0,
+          RAADS: results.rawResults.RAADS?.total || 0,
+          CATQ: results.rawResults.CATQ?.total || 0,
+          CATI: results.rawResults.CATI?.total || 0
+        },
+        metrics: results.normalizedMetrics,
+        themes: results.thematicAnalysis,
+        investigation: results.clinicalInvestigationAreas,
+        answers: state.answers
+      };
+    }
+
+    function renderSummary(results, payload) {
+      state.results = results;
+      state.lastPayload = payload;
+
+      const client = payload.client || state.client;
+
+      document.getElementById("summary-name").textContent =
+        client.name || "Candidate";
+
+      document.getElementById("summary-meta").textContent =
+        `${client.email || ""} • ${client.dob || ""}`;
+
+      const syncBadge = document.getElementById("summary-sync");
+
+      if (state.lastSync === "synced") {
+        syncBadge.className = "badge success";
+        syncBadge.textContent = "Synced to Google Sheets";
+      } else {
+        syncBadge.className = "badge warning";
+        syncBadge.textContent = "Local / unsynced";
+      }
+
+      const raw = results.rawResults;
+      const metrics = results.normalizedMetrics;
+
+      const cards = [
+        ["AQ Total", raw.AQ.total, metrics.AQ?.total],
+        ["RAADS-R Total", raw.RAADS.total, metrics.RAADS?.total],
+        ["CAT-Q Total", raw.CATQ.total, metrics.CATQ?.total],
+        ["CATI Total", raw.CATI.total, metrics.CATI?.total]
+      ];
+
+      document.getElementById("metric-grid").innerHTML = cards
+        .map(([label, value, percent]) => {
+          return `
+            <div class="metric">
+              <div class="metric-label">${escapeHtml(label)}</div>
+              <div class="metric-value">${value ?? 0}</div>
+              <div class="metric-sub">${percent ?? 0}% normalized</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      const labels = [];
+      const data = [];
+
+      Object.entries(metrics).forEach(([testId, metric]) => {
+        Object.entries(metric.subscales || {}).forEach(([subscale, value]) => {
+          labels.push(`${testId} • ${subscale}`);
+          data.push(value);
+        });
+      });
+
+      state.chartData = { labels, data };
+
+      renderChartFromState();
+
+      document.getElementById("themes-container").innerHTML =
+        results.thematicAnalysis
+          .map(theme => {
+            return `
+              <div class="theme-card">
+                <div class="theme-title">
+                  ${escapeHtml(theme.themeName)}
+                  <span class="badge">${escapeHtml(theme.prominence)}</span>
+                </div>
+                <div class="theme-desc">${escapeHtml(theme.description)}</div>
+              </div>
+            `;
+          })
+          .join("");
+
+      document.getElementById("investigation-container").innerHTML =
+        results.clinicalInvestigationAreas
+          .map(area => {
+            const badgeClass =
+              area.severity === "Priority Focus"
+                ? "error"
+                : "warning";
+
+            return `
+              <div class="theme-card">
+                <div class="theme-title">
+                  ${escapeHtml(area.title)}
+                  <span class="badge ${badgeClass}">${escapeHtml(area.severity)}</span>
+                </div>
+                <div class="theme-desc">${escapeHtml(area.notes)}</div>
+              </div>
+            `;
+          })
+          .join("");
+    }
+
+    function renderChartFromState() {
+      if (!state.chartData) return;
+      if (!window.Chart) return;
+
+      const canvas = document.getElementById("subscale-chart");
+      if (!canvas) return;
+
+      const context = canvas.getContext("2d");
+
+      if (state.chart) {
+        state.chart.destroy();
+        state.chart = null;
+      }
+
+      state.chart = new Chart(context, {
+        type: "bar",
+        data: {
+          labels: state.chartData.labels,
+          datasets: [
+            {
+              label: "% Match",
+              data: state.chartData.data,
+              backgroundColor: "rgba(37, 99, 235, 0.72)",
+              borderRadius: 8
+            }
+          ]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              min: 0,
+              max: 100
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+
+    function getApiUrl() {
+      const saved = localStorage.getItem("gas_url");
+      const url = (saved || DEFAULT_GAS_URL || "").trim();
+
+      if (!url || url.includes("PASTE_YOUR")) return "";
+
+      return url;
+    }
+
+    async function apiRequest(payload, method = "POST") {
+      const url = getApiUrl();
+
+      if (!url) {
+        throw new Error(
+          "No Google Apps Script URL configured. Open Settings and paste the /exec Web App URL."
+        );
+      }
+
+      if (!url.startsWith("https://script.google.com/macros/")) {
+        throw new Error(
+          "The API URL should look like https://script.google.com/macros/s/.../exec"
+        );
+      }
+
+      if (url.includes("/dev")) {
+        throw new Error("Use the /exec Web App URL, not /dev.");
+      }
+
+      const controller = new AbortController();
+
+      const timeout = setTimeout(() => {
+        controller.abort();
+      }, 25000);
+
+      try {
+        const options = {
+          method,
+          cache: "no-store",
+          redirect: "follow",
+          signal: controller.signal
         };
 
-        try {
-            await fetch(GAS_URL, {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: { "Content-Type": "text/plain;charset=utf-8" } // GAS requires text/plain for CORS
-            });
-            
-            localStorage.removeItem('assessment_progress');
-            renderSummary(results);
-            showScreen('screen-summary');
-        } catch (err) {
-            alert("Error submitting data. Please check your connection.");
-            console.error(err);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Submit";
+        if (method === "POST") {
+          options.body = JSON.stringify(payload);
         }
+
+        const response = await fetch(url, options);
+        const text = await response.text();
+
+        if (text.trim().startsWith("<")) {
+          throw new Error(
+            `Apps Script returned HTML instead of JSON (HTTP ${response.status}). ` +
+            "This usually means the deployment is not public or the URL is wrong."
+          );
+        }
+
+        let json;
+
+        try {
+          json = JSON.parse(text);
+        } catch {
+          throw new Error(
+            `Apps Script returned invalid JSON (HTTP ${response.status}): ${text.slice(0, 180)}`
+          );
+        }
+
+        if (json.status === "error") {
+          throw new Error(json.message || "API error.");
+        }
+
+        return json.data !== undefined ? json.data : json;
+      } catch (error) {
+        if (error.name === "AbortError") {
+          throw new Error("Apps Script request timed out after 25 seconds.");
+        }
+
+        if (error instanceof TypeError) {
+          throw new Error(
+            "Network/CORS error: could not reach Apps Script. Check that the deployment is public and URL is correct."
+          );
+        }
+
+        throw error;
+      } finally {
+        clearTimeout(timeout);
+      }
     }
 
-    function renderSummary(results) {
-        // Metrics Grid
-        const grid = document.getElementById('metric-grid');
-        grid.innerHTML = `
-            <div class="metric-card"><div class="metric-value">${results.rawResults.AQ.total}</div><div class="metric-label">AQ Total</div></div>
-            <div class="metric-card"><div class="metric-value">${results.rawResults.RAADS.total}</div><div class="metric-label">RAADS-R Total</div></div>
-            <div class="metric-card"><div class="metric-value">${results.rawResults.CATQ.total}</div><div class="metric-label">CAT-Q Total</div></div>
-            <div class="metric-card"><div class="metric-value">${results.rawResults.CATI.total}</div><div class="metric-label">CATI Total</div></div>
-        `;
+    async function updateConnectionBadge() {
+      const badge = document.getElementById("connection-badge");
+      const url = getApiUrl();
 
-        // Radar Chart
-        const ctx = document.getElementById('radar-chart').getContext('2d');
-        const labels = [];
-        const data = [];
-        
-        Object.keys(results.normalizedMetrics).forEach(testId => {
-            Object.keys(results.normalizedMetrics[testId].subscales).forEach(sub => {
-                labels.push(`${testId}: ${sub}`);
-                data.push(results.normalizedMetrics[testId].subscales[sub]);
-            });
-        });
+      if (!url) {
+        badge.className = "badge warning";
+        badge.textContent = "Local Demo Mode";
+        return;
+      }
 
-        new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Normalized Trait %',
-                    data: data,
-                    backgroundColor: 'rgba(49, 151, 149, 0.2)',
-                    borderColor: 'rgba(49, 151, 149, 1)',
-                    pointBackgroundColor: 'rgba(49, 151, 149, 1)'
-                }]
-            },
-            options: {
-                scales: { r: { beginAtZero: true, max: 100 } },
-                plugins: { legend: { display: false } }
-            }
-        });
+      badge.className = "badge";
+      badge.textContent = "Checking...";
 
-        // Themes
-        const themesContainer = document.getElementById('themes-container');
-        themesContainer.innerHTML = '';
-        results.thematicAnalysis.forEach(theme => {
-            themesContainer.innerHTML += `
-                <div class="theme-card">
-                    <div class="theme-title">${theme.themeName} (${theme.prominence} Prominence)</div>
-                    <div class="theme-desc">${theme.description}</div>
-                </div>
-            `;
-        });
+      try {
+        await apiRequest({ action: "ping" }, "POST");
+
+        badge.className = "badge success";
+        badge.textContent = "API Connected";
+      } catch (error) {
+        badge.className = "badge error";
+        badge.textContent = "API Error";
+        badge.title = error.message;
+      }
     }
 
-    // ==========================================
-    // ADMIN DASHBOARD
-    // ==========================================
-    async function verifyPin() {
-        const pin = document.getElementById('admin-pin').value;
-        const payload = { action: "getAdminData", accessPin: pin, page: 1, limit: PAGE_SIZE };
-        
-        try {
-            const res = await fetch(GAS_URL, {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            });
-            const data = await res.json();
-            
-            if (data.status === "success") {
-                adminRecords = data.records;
-                currentPage = 1;
-                renderAdminTable();
-                showScreen('screen-admin');
-            } else {
-                alert(data.message || "Invalid PIN");
-            }
-        } catch (err) {
-            alert("Connection error");
+    function renderSettings() {
+      const url = getApiUrl();
+
+      document.getElementById("settings-api-url").value = url;
+      document.getElementById("current-api-url").textContent =
+        url || "Not configured";
+    }
+
+    function saveSettings(event, silent = false) {
+      if (event) event.preventDefault();
+
+      const url = document.getElementById("settings-api-url").value.trim();
+
+      localStorage.setItem("gas_url", url);
+
+      document.getElementById("current-api-url").textContent =
+        url || "Not configured";
+
+      if (!silent) {
+        toast("Settings saved.", "success");
+      }
+
+      updateConnectionBadge();
+      loadHomeStatus();
+
+      return false;
+    }
+
+    async function testConnection() {
+      saveSettings(new Event("submit"), true);
+
+      const result = document.getElementById("settings-result");
+
+      result.innerHTML = '<span class="badge">Testing...</span>';
+
+      try {
+        await apiRequest({ action: "ping" }, "POST");
+
+        result.innerHTML = '<span class="badge success">Connected</span>';
+
+        updateConnectionBadge();
+        toast("Connected to Apps Script.", "success");
+      } catch (error) {
+        result.innerHTML = `<span class="badge error">${escapeHtml(error.message)}</span>`;
+
+        updateConnectionBadge();
+        toast(error.message, "error");
+      }
+    }
+
+    function getLocalSubmissions() {
+      try {
+        return JSON.parse(localStorage.getItem("local_submissions") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalSubmission(payload, syncStatus) {
+      const record = {
+        ...payload,
+        syncStatus: syncStatus || payload.syncStatus || "local"
+      };
+
+      const all = getLocalSubmissions().filter(item => item.id !== record.id);
+
+      all.unshift(record);
+
+      localStorage.setItem(
+        "local_submissions",
+        JSON.stringify(all.slice(0, 200))
+      );
+
+      loadHomeStatus();
+    }
+
+    function renderClinicianScreen() {
+      document
+        .getElementById("clinician-login")
+        .classList.toggle("hidden", state.authenticated);
+
+      document
+        .getElementById("clinician-dashboard")
+        .classList.toggle("hidden", !state.authenticated);
+
+      if (state.authenticated) {
+        renderAdminTable();
+      }
+    }
+
+    async function verifyPin(event) {
+      event.preventDefault();
+
+      const pin = document.getElementById("admin-pin").value.trim();
+      if (!pin) return;
+
+      sessionStorage.setItem("admin_pin", pin);
+
+      setLoading(true, "Verifying...");
+
+      try {
+        if (getApiUrl()) {
+          const data = await apiRequest({
+            action: "getAdminData",
+            accessPin: pin,
+            page: 1,
+            limit: 20
+          });
+
+          state.adminSource = "remote";
+          state.adminRecords = data.records || [];
+          state.adminPage = data.page || 1;
+          state.adminPages = data.pages || 1;
+          state.adminTotal = data.total || 0;
+        } else {
+          state.adminSource = "local";
+          state.adminRecords = getLocalSubmissions();
+          state.adminPage = 1;
+          state.adminPages = 1;
+          state.adminTotal = state.adminRecords.length;
         }
+
+        state.authenticated = true;
+        document.getElementById("admin-pin").value = "";
+
+        renderClinicianScreen();
+        toast("Clinician registry unlocked.", "success");
+      } catch (error) {
+        if (/invalid administrative pin/i.test(error.message)) {
+          toast("Invalid PIN.", "error");
+        } else {
+          const local = getLocalSubmissions();
+
+          if (local.length) {
+            showModal(
+              "Remote connection failed",
+              `
+                <p>${escapeHtml(error.message)}</p>
+                <p>Local browser records are available.</p>
+              `,
+              [
+                {
+                  label: "Load local records",
+                  class: "primary",
+                  onClick: () => {
+                    state.adminSource = "local";
+                    state.adminRecords = local;
+                    state.authenticated = true;
+                    renderClinicianScreen();
+                  }
+                },
+                {
+                  label: "Cancel"
+                }
+              ]
+            );
+          } else {
+            showModal(
+              "Remote connection failed",
+              `
+                <p>${escapeHtml(error.message)}</p>
+                ${troubleshootingHtml()}
+              `,
+              [{ label: "Close" }]
+            );
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
     }
 
     function renderAdminTable() {
-        const tbody = document.getElementById('admin-tbody');
-        const search = document.getElementById('search-input').value.toLowerCase();
-        tbody.innerHTML = '';
+      const searchInput = document.getElementById("admin-search");
+      const search = (searchInput.value || "").toLowerCase();
 
-        const filtered = adminRecords.filter(r => 
-            r.name.toLowerCase().includes(search) || r.email.toLowerCase().includes(search)
-        );
+      let records = (state.adminRecords || []).map(normalizeRecord);
 
-        filtered.forEach(r => {
-            const catqBadge = r.totals.CATQ >= 100 ? '<span class="badge badge-high">High Masking</span>' : '';
-            tbody.innerHTML += `
-                <tr>
-                    <td>${new Date(r.timestamp).toLocaleDateString()}</td>
-                    <td>${r.name} ${catqBadge}</td>
-                    <td>${r.totals.AQ}</td>
-                    <td>${r.totals.RAADS}</td>
-                    <td>${r.totals.CATQ}</td>
-                    <td>${r.totals.CATI}</td>
-                    <td><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick='viewDetail(${JSON.stringify(r)})'>View</button></td>
-                </tr>
-            `;
+      if (search) {
+        records = records.filter(record => {
+          return (
+            (record.name || "").toLowerCase().includes(search) ||
+            (record.email || "").toLowerCase().includes(search)
+          );
         });
+      }
+
+      const pageSize = 20;
+
+      if (state.adminSource === "local") {
+        state.adminPages = Math.max(1, Math.ceil(records.length / pageSize));
+        state.adminPage = Math.min(state.adminPage || 1, state.adminPages);
+
+        const start = (state.adminPage - 1) * pageSize;
+        state.visibleRecords = records.slice(start, start + pageSize);
+      } else {
+        state.visibleRecords = records;
+        state.adminPages = Math.max(1, state.adminPages || 1);
+        state.adminPage = Math.min(state.adminPage || 1, state.adminPages);
+      }
+
+      const tbody = document.getElementById("admin-tbody");
+
+      if (!state.visibleRecords.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8">No records found.</td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = state.visibleRecords
+          .map((record, index) => {
+            const highMasking = (record.totals?.CATQ || 0) >= 100;
+
+            return `
+              <tr>
+                <td>${escapeHtml(record.timestamp || "")}</td>
+                <td>
+                  ${escapeHtml(record.name || "")}
+                  ${
+                    highMasking
+                      ? '<span class="badge warning">High masking</span>'
+                      : ""
+                  }
+                </td>
+                <td>
+                  ${escapeHtml(record.phone || "")}<br />
+                  ${escapeHtml(record.email || "")}
+                </td>
+                <td>${record.totals?.AQ ?? 0}</td>
+                <td>${record.totals?.RAADS ?? 0}</td>
+                <td>${record.totals?.CATQ ?? 0}</td>
+                <td>${record.totals?.CATI ?? 0}</td>
+                <td>
+                  <button class="btn ghost" onclick="openReport(${index})">
+                    Report
+                  </button>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      document.getElementById("admin-page-info").textContent =
+        `Page ${state.adminPage || 1} / ${state.adminPages || 1} • ` +
+        `${state.adminTotal ?? records.length} records`;
+
+      document.getElementById("admin-prev").disabled =
+        (state.adminPage || 1) <= 1;
+
+      document.getElementById("admin-next").disabled =
+        (state.adminPage || 1) >= (state.adminPages || 1);
     }
 
-    function viewDetail(record) {
-        // In a real app, this would open a detailed modal. For now, an alert or new window.
-        const themes = record.themes.map(t => `- ${t.themeName} (${t.prominence})`).join('\n');
-        alert(`Detailed Report for ${record.name}\n\nTotals:\nAQ: ${record.totals.AQ}\nRAADS: ${record.totals.RAADS}\nCATQ: ${record.totals.CATQ}\nCATI: ${record.totals.CATI}\n\nThemes:\n${themes}`);
+    function normalizeRecord(record) {
+      return {
+        timestamp: record.timestamp || record.Timestamp || "",
+        name:
+          record.name ||
+          record["Full Name"] ||
+          record.client?.name ||
+          "",
+        phone:
+          record.phone ||
+          record.Contact ||
+          record.client?.phone ||
+          "",
+        email:
+          record.email ||
+          record.Email ||
+          record.client?.email ||
+          "",
+        dob:
+          record.dob ||
+          record["Date of Birth"] ||
+          record.client?.dob ||
+          "",
+        totals: record.totals || {},
+        metrics: record.metrics || {},
+        themes: record.themes || [],
+        investigation: record.investigation || []
+      };
+    }
+
+    async function adminPrev() {
+      if ((state.adminPage || 1) <= 1) return;
+
+      if (state.adminSource === "remote") {
+        await loadRemoteAdmin(state.adminPage - 1);
+      } else {
+        state.adminPage -= 1;
+        renderAdminTable();
+      }
+    }
+
+    async function adminNext() {
+      if ((state.adminPage || 1) >= (state.adminPages || 1)) return;
+
+      if (state.adminSource === "remote") {
+        await loadRemoteAdmin(state.adminPage + 1);
+      } else {
+        state.adminPage += 1;
+        renderAdminTable();
+      }
+    }
+
+    async function loadRemoteAdmin(page) {
+      setLoading(true, "Loading records...");
+
+      try {
+        const pin = sessionStorage.getItem("admin_pin") || "";
+
+        const data = await apiRequest({
+          action: "getAdminData",
+          accessPin: pin,
+          page,
+          limit: 20
+        });
+
+        state.adminRecords = data.records || [];
+        state.adminPage = data.page || page;
+        state.adminPages = data.pages || 1;
+        state.adminTotal = data.total || 0;
+
+        renderAdminTable();
+      } catch (error) {
+        toast(error.message, "error");
+
+        if (/invalid administrative pin/i.test(error.message)) {
+          lockClinician();
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function refreshAdmin() {
+      if (state.adminSource === "remote") {
+        await loadRemoteAdmin(1);
+      } else {
+        state.adminRecords = getLocalSubmissions();
+        state.adminPage = 1;
+        renderAdminTable();
+      }
+    }
+
+    function onAdminSearch() {
+      state.adminPage = 1;
+      renderAdminTable();
+    }
+
+    function lockClinician() {
+      state.authenticated = false;
+      state.adminRecords = [];
+      state.visibleRecords = [];
+
+      sessionStorage.removeItem("admin_pin");
+
+      renderClinicianScreen();
+      navigate("home");
+    }
+
+    function openReport(index) {
+      const record = state.visibleRecords[index];
+      if (!record) return;
+
+      showModal(
+        "Comprehensive Clinical Report",
+        reportHtml(record),
+        [
+          {
+            label: "Print / Save PDF",
+            class: "primary",
+            close: false,
+            onClick: () => {
+              window.print();
+            }
+          },
+          {
+            label: "Close"
+          }
+        ]
+      );
+    }
+
+    function reportHtml(record) {
+      const totals = record.totals || {};
+      const metrics = record.metrics || {};
+
+      let html = `
+        <div class="report">
+          <div class="grid status-grid">
+            <div class="metric">
+              <div class="metric-label">Patient Name</div>
+              <div style="font-weight:900; margin-top:6px;">${escapeHtml(record.name || "-")}</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Date of Birth</div>
+              <div style="font-weight:900; margin-top:6px;">${escapeHtml(record.dob || "-")}</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Contact</div>
+              <div style="font-weight:900; margin-top:6px;">${escapeHtml(record.phone || "-")}</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Email</div>
+              <div style="font-weight:900; margin-top:6px;">${escapeHtml(record.email || "-")}</div>
+            </div>
+          </div>
+
+          <h3 class="section-title">Part 1: Individual Battery Results</h3>
+
+          <div class="grid status-grid">
+            <div class="metric">
+              <div class="metric-label">AQ Total</div>
+              <div class="metric-value">${totals.AQ ?? 0}</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">RAADS-R Total</div>
+              <div class="metric-value">${totals.RAADS ?? 0}</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">CAT-Q Total</div>
+              <div class="metric-value">${totals.CATQ ?? 0}</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">CATI Total</div>
+              <div class="metric-value">${totals.CATI ?? 0}</div>
+            </div>
+          </div>
+
+          <h3 class="section-title">Part 2: Subscale Dimensions</h3>
+      `;
+
+      Object.entries(metrics).forEach(([testId, metric]) => {
+        html += `<h4>${escapeHtml(testId)}</h4>`;
+
+        Object.entries(metric.subscales || {}).forEach(([subscale, value]) => {
+          html += barHtml(`${testId} ${subscale}`, value);
+        });
+      });
+
+      html += `
+        <h3 class="section-title">Part 3: Convergent Behavioral Themes</h3>
+      `;
+
+      html += (record.themes || [])
+        .map(theme => {
+          return `
+            <div class="theme-card">
+              <div class="theme-title">
+                ${escapeHtml(theme.themeName)}
+                <span class="badge">${escapeHtml(theme.prominence)}</span>
+              </div>
+              <div class="theme-desc">${escapeHtml(theme.description)}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      html += `
+        <h3 class="section-title">Recommended Focus Areas for Clinical Interview</h3>
+      `;
+
+      html += (record.investigation || [])
+        .map(area => {
+          const badgeClass =
+            area.severity === "Priority Focus"
+              ? "error"
+              : "warning";
+
+          return `
+            <div class="theme-card">
+              <div class="theme-title">
+                ${escapeHtml(area.title)}
+                <span class="badge ${badgeClass}">${escapeHtml(area.severity)}</span>
+              </div>
+              <div class="theme-desc">${escapeHtml(area.notes)}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      html += `</div>`;
+
+      return html;
+    }
+
+    function barHtml(label, value) {
+      const cleanValue = Math.max(0, Math.min(100, Number(value) || 0));
+
+      return `
+        <div class="bar-row">
+          <div class="bar-label">${escapeHtml(label)}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${cleanValue}%"></div>
+          </div>
+          <div class="bar-value">${cleanValue}%</div>
+        </div>
+      `;
+    }
+
+    function exportCsv() {
+      const records = (state.visibleRecords || state.adminRecords || []).map(normalizeRecord);
+
+      const rows = [
+        [
+          "Timestamp",
+          "Name",
+          "Email",
+          "Phone",
+          "DOB",
+          "AQ",
+          "RAADS",
+          "CATQ",
+          "CATI"
+        ]
+      ];
+
+      records.forEach(record => {
+        rows.push([
+          record.timestamp,
+          record.name,
+          record.email,
+          record.phone,
+          record.dob,
+          record.totals?.AQ ?? 0,
+          record.totals?.RAADS ?? 0,
+          record.totals?.CATQ ?? 0,
+          record.totals?.CATI ?? 0
+        ]);
+      });
+
+      const csv = rows
+        .map(row => {
+          return row
+            .map(cell => {
+              const text = String(cell ?? "");
+              return `"${text.replace(/"/g, '""')}"`;
+            })
+            .join(",");
+        })
+        .join("\n");
+
+      const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+      });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "screening_logs.csv";
+      link.click();
     }
 
     function resetApp() {
+      if (confirm("Start a new assessment? This will clear the current summary.")) {
         location.reload();
+      }
     }
-</script>
+
+    function showModal(title, html, actions = []) {
+      document.getElementById("modal-title").textContent = title;
+      document.getElementById("modal-body").innerHTML = html;
+
+      const actionsElement = document.getElementById("modal-actions");
+      actionsElement.innerHTML = "";
+
+      if (!actions.length) {
+        actions = [{ label: "Close", class: "primary" }];
+      }
+
+      actions.forEach(action => {
+        const button = document.createElement("button");
+
+        button.className = `btn ${action.class || "ghost"}`;
+        button.textContent = action.label || "OK";
+
+        button.addEventListener("click", () => {
+          if (action.onClick) action.onClick();
+
+          if (action.close !== false) {
+            closeModal();
+          }
+        });
+
+        actionsElement.appendChild(button);
+      });
+
+      document.getElementById("modal-overlay").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("modal-overlay").classList.add("hidden");
+    }
+
+    function troubleshootingHtml() {
+      return `
+        <ul class="trouble">
+          <li>
+            The Apps Script URL must end with
+            <code>/exec</code>, not <code>/dev</code>.
+          </li>
+          <li>
+            Deployment access must be set to
+            <strong>Anyone</strong>.
+          </li>
+          <li>
+            After editing <code>Code.gs</code>, create a
+            <strong>New version</strong> deployment.
+          </li>
+          <li>
+            Run <code>setup()</code> once inside Apps Script to authorize permissions.
+          </li>
+          <li>
+            Use <strong>Settings → Test Connection</strong> to see the exact error.
+          </li>
+        </ul>
+      `;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function toast(message, type = "info") {
+      const element = document.getElementById("toast");
+
+      element.textContent = message;
+      element.className = `show ${type}`;
+
+      clearTimeout(window.toastTimer);
+
+      window.toastTimer = setTimeout(() => {
+        element.className = "";
+      }, 3800);
+    }
+
+    function setLoading(show, message = "Working...") {
+      document.getElementById("loading-text").textContent = message;
+      document.getElementById("loading-overlay").classList.toggle("hidden", !show);
+    }
+  </script>
 </body>
-</html>
+</html>             
