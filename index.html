@@ -1679,13 +1679,13 @@
  *
  * Example:
  *
- * https://script.google.com/macros/s/XXXXXXXXXXXX/exec
+ * https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec
  */
 
 const CONFIG = {
 
   API_URL:
-    "PASTE_YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE",
+    "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec",
 
   /*
    * Clinician contact details shown after submission.
@@ -1799,7 +1799,7 @@ async function apiRequest(action, payload = {}) {
 
   if (
     !CONFIG.API_URL ||
-    CONFIG.API_URL.includes("PASTE_YOUR")
+    CONFIG.API_URL.includes("https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec")
   ) {
 
     throw new Error(
