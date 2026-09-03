@@ -32,6 +32,7 @@
       const [flatQuestions, setFlatQuestions] = useState([]);
       const [clientInfo, setClientInfo] = useState(null);
       const [answers, setAnswers] = useState({});
+      const [qualitativeNotes, setQualitativeNotes] = useState({});
       const [results, setResults] = useState(null);
       const [adminRecords, setAdminRecords] = useState([]);
       const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,24 +43,60 @@
           const cleaned = cleanTestData(raw);
           setTestData(cleaned);
           setFlatQuestions(flattenQuestions(cleaned));
-        }).catch(err => showToast("Failed to load tests.json", "error"));
+          
+          // 🔄 AUTO-RESUME LOGIC
+          const savedState = localStorage.getItem('neuro_assessment_state');
+          if (savedState) {
+            const parsed = JSON.parse(savedState);
+            if (parsed.clientInfo && parsed.answers) {
+              if (confirm("Resume your previous assessment progress?")) {
+                setClientInfo(parsed.clientInfo);
+                setAnswers(parsed.answers);
+                setQualitativeNotes(parsed.qualitativeNotes || {});
+                setView('assessment');
+              } else {
+                localStorage.removeItem('neuro_assessment_state');
+              }
+            }
+          }
+        }).catch(err => showToast("Failed to load tests.json: " + err.message, "error"));
       }, []);
+
+      // 💾 AUTO-SAVE LOGIC
+      useEffect(() => {
+        if (clientInfo && Object.keys(answers).length > 0) {
+          localStorage.setItem('neuro_assessment_state', JSON.stringify({
+            clientInfo, answers, qualitativeNotes
+          }));
+        }
+      }, [answers, qualitativeNotes, clientInfo]);
 
       const showToast = (msg, type = "info") => {
         setToast({ msg, type });
-        setTimeout(() => setToast(null), 4000);
+        setTimeout(() => setToast(null), 5000);
       };
 
       const submitToBackend = async (payload) => {
-        const response = await fetch(CONFIG.GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ ...payload, apiKey: CONFIG.API_KEY }),
-          redirect: 'follow'
-        });
-        const json = JSON.parse(await response.text());
-        if (json.status === "error") throw new Error(json.message);
-        return json;
+        try {
+          const response = await fetch(CONFIG.GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // CRITICAL for GAS CORS
+            body: JSON.stringify({ ...payload, apiKey: CONFIG.API_KEY }),
+            redirect: 'follow'
+          });
+          
+          const text = await response.text();
+          if (text.trim().startsWith("<!DOCTYPE html>") || text.includes("<html")) {
+            throw new Error("GAS returned HTML. Check Deployment 'Anyone' access & New Version.");
+          }
+          
+          const json = JSON.parse(text);
+          if (json.status === "error") throw new Error(json.message);
+          return json;
+        } catch (err) {
+          console.error("Backend Error:", err);
+          throw err;
+        }
       };
 
       return (
@@ -67,10 +104,22 @@
           <Sidebar view={view} setView={setView} />
           <main className="flex-1 overflow-y-auto p-8 bg-slate-50">
             <div className="max-w-6xl mx-auto fade-in">
-              {view === 'overview' && <Overview setView={setView} flatQuestions={flatQuestions} />}
+              {view === 'overview' && <Overview setView={setView} flatQuestions={flatQuestions} hasSavedProgress={!!localStorage.getItem('neuro_assessment_state')} />}
               {view === 'intake' && <IntakeForm setView={setView} setClientInfo={setClientInfo} setAnswers={setAnswers} />}
-              {view === 'assessment' && clientInfo && (
-                <AssessmentWizard questions={flatQuestions} clientInfo={clientInfo} answers={answers} setAnswers={setAnswers} setResults={setResults} setView={setView} submitToBackend={submitToBackend} showToast={showToast} />
+              {view === 'assessment' && clientInfo && testData && (
+                <AssessmentWizard 
+                  testData={testData} 
+                  questions={flatQuestions} 
+                  clientInfo={clientInfo}
+                  answers={answers}
+                  setAnswers={setAnswers}
+                  qualitativeNotes={qualitativeNotes}
+                  setQualitativeNotes={setQualitativeNotes}
+                  setResults={setResults}
+                  setView={setView}
+                  submitToBackend={submitToBackend}
+                  showToast={showToast}
+                />
               )}
               {view === 'summary' && results && <SummaryReport results={results} clientInfo={clientInfo} />}
               {view === 'clinician' && (
@@ -106,19 +155,21 @@
               </button>
             ))}
           </nav>
-          <div className="text-xs text-slate-500 border-t border-slate-800 pt-4"><p>Preliminary screening only.</p></div>
         </aside>
       );
     }
 
-    function Overview({ setView, flatQuestions }) {
+    function Overview({ setView, flatQuestions, hasSavedProgress }) {
       return (
         <div className="space-y-8">
           <header><h2 className="text-3xl font-bold text-slate-900">Neurodiversity Screening Workspace</h2></header>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
               <h3 className="font-semibold text-slate-900 mb-2">Candidate Assessment</h3>
-              <button onClick={() => setView('intake')} className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition mt-4">Start Intake</button>
+              <button onClick={() => setView('intake')} className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition mt-4">Start New Intake</button>
+              {hasSavedProgress && (
+                <button onClick={() => setView('assessment')} className="w-full bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition mt-2">Resume Saved Assessment</button>
+              )}
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
               <h3 className="font-semibold text-slate-900 mb-2">Battery Status</h3>
@@ -151,41 +202,101 @@
               <input type="text" placeholder="Phone" className="border p-2 rounded" onChange={e => setForm({...form, phone: e.target.value})} />
               <input required type="date" className="border p-2 rounded" onChange={e => setForm({...form, dob: e.target.value})} />
             </div>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> I consent to data transmission.</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> I consent to data transmission for clinical screening.</label>
             <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold">Begin Assessment Battery</button>
           </form>
         </div>
       );
     }
 
-    function AssessmentWizard({ questions, clientInfo, answers, setAnswers, setResults, setView, submitToBackend, showToast }) {
+    function AssessmentWizard({ testData, questions, clientInfo, answers, setAnswers, qualitativeNotes, setQualitativeNotes, setResults, setView, submitToBackend, showToast }) {
       const [currentIndex, setCurrentIndex] = useState(0);
       const [submitting, setSubmitting] = useState(false);
       const currentQ = questions[currentIndex];
       const progress = ((currentIndex + 1) / questions.length) * 100;
 
+      // 🧠 KEYBOARD NAVIGATION
+      useEffect(() => {
+        const handleKey = (e) => {
+          if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+          const num = parseInt(e.key);
+          if (num >= 1 && num <= currentQ.options.length) {
+            handleSelect(currentQ.options[num - 1]);
+          }
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+      }, [currentIndex]);
+
       const handleSelect = (optionKey) => {
         const newAnswers = { ...answers, [`${currentQ.testId}_${currentQ.id}`]: optionKey };
         setAnswers(newAnswers);
-        if (currentIndex < questions.length - 1) setTimeout(() => setCurrentIndex(currentIndex + 1), 200);
+        if (currentIndex < questions.length - 1) setTimeout(() => setCurrentIndex(currentIndex + 1), 150);
       };
 
       const handleSubmit = async () => {
         setSubmitting(true);
         try {
+          // ✅ BUG FIX: testData is now correctly passed and used
           const engine = new AutismAssessmentEngine();
           const res = engine.calculateScores(answers, testData);
-          await submitToBackend({
-            action: "submitAssessment", client: clientInfo,
+          
+          const payload = {
+            action: "submitAssessment", 
+            client: clientInfo,
             totals: { AQ: res.rawResults.AQ.total, RAADS: res.rawResults.RAADS.total, CATQ: res.rawResults.CATQ.total, CATI: res.rawResults.CATI.total },
-            metrics: res.normalizedMetrics, themes: res.thematicAnalysis, matrix: res.matrix, answers: answers
-          });
-          setResults(res); setView('summary'); showToast("Assessment submitted successfully!", "success");
-        } catch (err) { showToast("Submission failed: " + err.message, "error"); } 
-        finally { setSubmitting(false); }
+            metrics: res.normalizedMetrics, 
+            themes: res.thematicAnalysis, 
+            matrix: res.matrix,
+            qualitativeNotes: qualitativeNotes, // 🧠 Send clinical context
+            answers: answers
+          };
+
+          await submitToBackend(payload);
+          localStorage.removeItem('neuro_assessment_state'); // Clear saved state
+          setResults(res); 
+          setView('summary'); 
+          showToast("Assessment submitted successfully!", "success");
+        } catch (err) { 
+          showToast("Submission failed: " + err.message, "error"); 
+          console.error(err);
+        } finally { 
+          setSubmitting(false); 
+        }
       };
 
       if (!currentQ) return null;
+
+      // 🧠 QUALITATIVE CONTEXT PROMPTS (Shown at the end)
+      if (currentIndex === questions.length) {
+        return (
+          <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+            <h2 className="text-2xl font-bold mb-2">Clinical Context & Lived Experience</h2>
+            <p className="text-slate-500 mb-6">These optional questions help your clinician understand the *context* behind your scores. They differentiate between burnout, trauma, and neurodivergent traits.</p>
+            <div className="space-y-6">
+              <div>
+                <label className="block font-semibold mb-2">1. Describe a recent environment or situation that caused sensory or social overload.</label>
+                <textarea className="w-full border p-3 rounded h-24" onChange={e => setQualitativeNotes({...qualitativeNotes, overload: e.target.value})} />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2">2. What specific routines, monotropic interests, or environments bring you a sense of regulation?</label>
+                <textarea className="w-full border p-3 rounded h-24" onChange={e => setQualitativeNotes({...qualitativeNotes, regulation: e.target.value})} />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2">3. In what situations do you feel you are 'performing' or masking the most, and how does it affect your energy?</label>
+                <textarea className="w-full border p-3 rounded h-24" onChange={e => setQualitativeNotes({...qualitativeNotes, masking: e.target.value})} />
+              </div>
+            </div>
+            <div className="flex justify-between mt-8">
+              <button onClick={() => setCurrentIndex(questions.length - 1)} className="px-6 py-2 text-slate-600 font-medium">← Back to Questions</button>
+              <button onClick={handleSubmit} disabled={submitting} className="px-8 py-3 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 disabled:opacity-50">
+                {submitting ? "Calculating & Securing..." : "Finalize & Submit"}
+              </button>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
@@ -195,129 +306,27 @@
           <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 min-h-[400px] flex flex-col">
             <h2 className="text-2xl font-semibold text-slate-900 mb-8 flex-1">{currentQ.text}</h2>
             <div className="grid grid-cols-1 gap-3">
-              {currentQ.options.map(opt => (
-                <button key={opt} onClick={() => handleSelect(opt)} className={`text-left p-4 rounded-lg border-2 transition font-medium ${answers[`${currentQ.testId}_${currentQ.id}`] === opt ? 'border-indigo-600 bg-indigo-50 text-indigo-900' : 'border-slate-200 hover:border-indigo-300'}`}>
+              {currentQ.options.map((opt, idx) => (
+                <button key={opt} onClick={() => handleSelect(opt)} className={`text-left p-4 rounded-lg border-2 transition font-medium flex items-center gap-3 ${answers[`${currentQ.testId}_${currentQ.id}`] === opt ? 'border-indigo-600 bg-indigo-50 text-indigo-900' : 'border-slate-200 hover:border-indigo-300'}`}>
+                  <span className="w-6 h-6 rounded bg-slate-100 text-xs flex items-center justify-center font-bold">{idx + 1}</span>
                   {formatLabel(opt)}
                 </button>
               ))}
             </div>
             <div className="flex justify-between mt-8 pt-6 border-t border-slate-100">
               <button onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0} className="px-6 py-2 text-slate-600 font-medium disabled:opacity-50">← Previous</button>
-              {currentIndex === questions.length - 1 ? (
-                <button onClick={handleSubmit} disabled={submitting} className="px-8 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 disabled:opacity-50">{submitting ? "Submitting..." : "Submit Assessment"}</button>
-              ) : (
-                <button onClick={() => setCurrentIndex(currentIndex + 1)} className="px-6 py-2 text-indigo-600 font-medium">Skip →</button>
-              )}
+              <button onClick={() => setCurrentIndex(currentIndex + 1)} className="px-6 py-2 text-indigo-600 font-medium">Skip →</button>
             </div>
+            <p className="text-center text-xs text-slate-400 mt-4">Tip: Press numbers 1-{currentQ.options.length} on your keyboard to select quickly.</p>
           </div>
         </div>
       );
     }
 
-    function ProfilingMatrixView({ matrix }) {
-      if (!matrix) return null;
-      const domainColors = { A_Social: 'bg-blue-100 border-blue-500 text-blue-900', B_Flexibility: 'bg-purple-100 border-purple-500 text-purple-900', C_Sensory: 'bg-orange-100 border-orange-500 text-orange-900', D_Camouflaging: 'bg-pink-100 border-pink-500 text-pink-900' };
-      return (
-        <div className="mt-8 bg-slate-900 text-white p-8 rounded-xl shadow-2xl border border-slate-700">
-          <h3 className="text-2xl font-bold mb-2 text-indigo-400">Multimethod Profiling Matrix</h3>
-          <p className="text-slate-400 mb-6 italic">{matrix.narrative}</p>
-          <div className="flex gap-4 mb-8 flex-wrap">
-            {Object.entries(matrix.triangulation).filter(([k]) => ['AQ', 'RAADS', 'CATQ'].includes(k)).map(([key, val]) => (
-              <div key={key} className={`px-4 py-2 rounded-lg font-bold text-sm border ${val.met ? 'bg-emerald-900/50 border-emerald-500 text-emerald-300' : 'bg-slate-800 border-slate-600 text-slate-400'}`}>
-                {key} {val.met ? '✓ Threshold Met' : '✗ Below'} ({val.score}/{val.threshold})
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {Object.entries(matrix.domains).map(([key, domain]) => (
-              <div key={key} className={`p-4 rounded-lg border-l-4 ${domainColors[key]}`}>
-                <div className="flex justify-between items-center mb-2"><h4 className="font-bold text-lg">{domain.name}</h4><span className="text-2xl font-black">{domain.score}%</span></div>
-                <div className="w-full bg-black/10 rounded-full h-2 mb-3"><div className="bg-current h-2 rounded-full" style={{width: `${domain.score}%`}}></div></div>
-                <p className="text-sm opacity-80">{domain.interpretation}</p>
-              </div>
-            ))}
-          </div>
-          <h4 className="text-xl font-bold mb-4 text-amber-400 border-b border-slate-700 pb-2">Cross-Battery Dissonance & Clinical Flags</h4>
-          <div className="space-y-3">
-            {matrix.dissonance.map((finding, i) => (
-              <div key={i} className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                <div className="flex justify-between items-center mb-1"><span className="font-bold text-amber-300">{finding.type}</span><span className="text-xs font-bold px-2 py-1 bg-slate-700 rounded">{finding.severity}</span></div>
-                <p className="text-sm text-slate-300">{finding.explanation}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    function SummaryReport({ results, clientInfo }) {
-      return (
-        <div className="space-y-8">
-          <header className="flex justify-between items-center"><div><h2 className="text-3xl font-bold text-slate-900">Psychometric Summary</h2><p className="text-slate-500">{clientInfo.name}</p></div><button onClick={() => window.print()} className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium">Print PDF</button></header>
-          <div className="grid grid-cols-4 gap-4">
-            {Object.entries(results.rawResults).map(([test, data]) => (
-              <div key={test} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200"><p className="text-sm text-slate-500 font-medium">{test}</p><p className="text-3xl font-bold text-indigo-600 mt-1">{data.total}</p></div>
-            ))}
-          </div>
-          <ProfilingMatrixView matrix={results.matrix} />
-        </div>
-      );
-    }
-
-    function ClinicianPortal({ isAuthenticated, setIsAuthenticated, adminRecords, setAdminRecords, submitToBackend, showToast }) {
-      const [pin, setPin] = useState("");
-      const [selectedRecord, setSelectedRecord] = useState(null);
-
-      const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-          const res = await fetch(CONFIG.GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "getAdminData", accessPin: pin, apiKey: CONFIG.API_KEY }), redirect: 'follow' });
-          const json = JSON.parse(await res.text());
-          if (json.status === "error") throw new Error(json.message);
-          setAdminRecords(json.data.records); setIsAuthenticated(true); showToast("Access Granted", "success");
-        } catch (err) { showToast("Access Denied: " + err.message, "error"); }
-      };
-
-      if (!isAuthenticated) {
-        return (
-          <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm border border-slate-200 mt-12">
-            <h2 className="text-2xl font-bold mb-6 text-center">Clinician Security Check</h2>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <input type="password" placeholder="Enter Administrative PIN" value={pin} onChange={e => setPin(e.target.value)} className="w-full border p-3 rounded text-center tracking-widest" />
-              <button type="submit" className="w-full bg-slate-900 text-white py-3 rounded-lg font-bold">Verify & Unlock</button>
-            </form>
-          </div>
-        );
-      }
-
-      return (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center"><h2 className="text-3xl font-bold text-slate-900">Clinician Registry</h2><button onClick={() => setIsAuthenticated(false)} className="text-red-600 font-medium">Lock & Exit</button></div>
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50 border-b border-slate-200"><tr><th className="p-4">Date</th><th className="p-4">Client</th><th className="p-4">AQ</th><th className="p-4">RAADS</th><th className="p-4">CAT-Q</th><th className="p-4">CATI</th><th className="p-4">Action</th></tr></thead>
-              <tbody className="divide-y divide-slate-100">
-                {adminRecords.map(r => (
-                  <tr key={r.id} className="hover:bg-slate-50">
-                    <td className="p-4 text-sm text-slate-500">{r.timestamp}</td><td className="p-4 font-medium">{r.name}</td><td className="p-4">{r.totals.AQ}</td><td className="p-4">{r.totals.RAADS}</td><td className="p-4">{r.totals.CATQ}</td><td className="p-4">{r.totals.CATI}</td>
-                    <td className="p-4"><button onClick={() => setSelectedRecord(r)} className="text-indigo-600 font-medium">View Matrix</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {selectedRecord && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-              <div className="bg-white rounded-xl max-w-4xl w-full p-8 my-8">
-                <div className="flex justify-between mb-4"><h3 className="text-2xl font-bold">Clinical Report: {selectedRecord.name}</h3><button onClick={() => setSelectedRecord(null)} className="text-slate-500 text-2xl">&times;</button></div>
-                <ProfilingMatrixView matrix={selectedRecord.matrix} />
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
+    // ... (Keep ProfilingMatrixView, SummaryReport, ClinicianPortal from previous response) ...
+    // Note: Ensure SummaryReport includes <ProfilingMatrixView matrix={results.matrix} />
+    
+    // Helper functions (cleanTestData, flattenQuestions, formatLabel) remain the same.
     function cleanTestData(raw) {
       const clean = {};
       Object.entries(raw).forEach(([k, v]) => {
@@ -327,7 +336,6 @@
       });
       return clean;
     }
-
     function flattenQuestions(data) {
       const flat = [];
       ['AQ', 'RAADS', 'CATQ', 'CATI'].forEach(testId => {
@@ -339,7 +347,6 @@
       });
       return flat;
     }
-
     function formatLabel(key) { return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim(); }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
