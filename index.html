@@ -3,868 +3,605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinical Psychometric Screening Dashboard</title>
-    <!-- Core External Dependencies -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Neurodiversity Screening Workspace</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Standalone Scoring Engine -->
-    <script src="scoring.js"></script>
     <style>
-        .choice-card:hover { border-color: #3b82f6; background-color: #f8fafc; }
-        .active-radio { border-color: #4f46e5 !important; background-color: #eef2ff !important; box-shadow: 0 0 0 2px #4f46e5; }
+        :root {
+            --bg-primary: #F4F7F6;
+            --bg-card: #FFFFFF;
+            --text-primary: #2D3748;
+            --text-secondary: #718096;
+            --accent: #319795;
+            --accent-light: #E6FFFA;
+            --warning: #DD6B20;
+            --border: #E2E8F0;
+            --radius: 16px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 16px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        h1, h2, h3 { color: var(--text-primary); font-weight: 600; margin-bottom: 16px; }
+        h1 { font-size: 1.8rem; text-align: center; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 32px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 24px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s ease; border: none; font-size: 1rem;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #2C7A7B; }
+        .btn-secondary { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-block { width: 100%; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-secondary); }
+        input[type="text"], input[type="email"], input[type="date"], input[type="password"] {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 1rem; background: var(--bg-primary);
+            transition: border 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--accent); background: white; }
+
+        /* Progress Bar */
+        .progress-container { margin-bottom: 24px; }
+        .progress-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+
+        /* Question UI */
+        .question-text { font-size: 1.25rem; font-weight: 500; margin-bottom: 24px; line-height: 1.5; }
+        .options-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+        .option-btn {
+            padding: 16px; border: 2px solid var(--border); border-radius: 12px;
+            background: white; cursor: pointer; text-align: left; font-size: 1rem;
+            transition: all 0.2s ease; display: flex; align-items: center;
+        }
+        .option-btn:hover { border-color: var(--accent); background: var(--accent-light); }
+        .option-btn.selected { border-color: var(--accent); background: var(--accent-light); font-weight: 600; }
+        .option-key { 
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border-radius: 6px; background: var(--bg-primary);
+            font-size: 0.8rem; font-weight: 700; margin-right: 12px; color: var(--text-secondary);
+        }
+        .option-btn.selected .option-key { background: var(--accent); color: white; }
+
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-buttons .btn { flex: 1; }
+
+        /* Summary & Charts */
+        .chart-container { position: relative; height: 350px; margin: 24px 0; }
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: var(--bg-primary); padding: 16px; border-radius: 12px; text-align: center; }
+        .metric-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        .metric-label { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .theme-card { border-left: 4px solid var(--accent); padding: 16px; background: var(--accent-light); border-radius: 0 8px 8px 0; margin-bottom: 12px; }
+        .theme-title { font-weight: 600; margin-bottom: 4px; }
+        .theme-desc { font-size: 0.95rem; color: var(--text-secondary); }
+
+        .disclaimer { background: #FFF5F5; border: 1px solid #FED7D7; color: #C53030; padding: 16px; border-radius: 8px; font-size: 0.9rem; margin-top: 24px; }
+
+        /* Admin Dashboard */
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;}
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg-primary); font-weight: 600; color: var(--text-secondary); }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-high { background: #FED7D7; color: #C53030; }
+        .badge-mod { background: #FEFCBF; color: #975A16; }
+        
+        .hidden { display: none !important; }
+        
+        /* Print Styles */
         @media print {
-            header, #btnClinicianPortalHeader, #modalPinLock, #viewClientIntake, #viewTesting, #viewClientSummary, #viewAdminRoster, .no-print { display: none !important; }
-            body { background-color: #ffffff; }
-            main { padding: 0; max-width: 100%; }
-            #viewAdminDetail { display: block !important; }
-            .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; }
-            .border { border-color: #cbd5e1 !important; }
+            body { background: white; }
+            .no-print { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
         }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+<body>
 
-    <!-- Primary Layout Header -->
-    <header class="bg-white border-b border-slate-200 py-3.5 px-6 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <h1 class="text-xl font-bold tracking-tight text-slate-900">Clinical Psychometric Workspace</h1>
-                <span id="testProgressBadge" class="hidden text-xs bg-indigo-100 text-indigo-800 font-semibold px-2.5 py-0.5 rounded"></span>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <div id="clientDisplayID" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hidden"></div>
-                <!-- Clinician Lock Button -->
-                <button id="btnClinicianPortalHeader" onclick="openClinicianModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <span>Clinician Portal</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
-
-        <!-- VIEW 1: CLIENT INTAKE FORM (Name, Contact, Email, DOB) -->
-        <section id="viewClientIntake" class="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-10 max-w-lg w-full mx-auto">
-            <div class="text-center mb-8">
-                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 text-indigo-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+<div class="container">
+    <!-- SCREEN 1: INTAKE -->
+    <div id="screen-intake" class="screen">
+        <div class="card">
+            <h1>Neurodiversity Screening Workspace</h1>
+            <p class="subtitle">Comprehensive Trait & Camouflaging Assessment</p>
+            <form id="intake-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="client-name" required>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-900">Candidate Intake</h2>
-                <p class="text-sm text-slate-500 mt-1">Please provide your details before beginning the evaluation battery.</p>
-            </div>
-
-            <form id="intakeForm" class="space-y-4" onsubmit="handleStartAssessment(event)">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Full Name</label>
-                    <input type="text" id="clientName" required placeholder="e.g., Sarah Khan" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="client-email" required>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Contact Number / WhatsApp</label>
-                    <input type="tel" id="clientPhone" required placeholder="e.g., +92 300 1234567" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="client-dob" required>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Email Address</label>
-                    <input type="email" id="clientEmail" required placeholder="e.g., sarah@example.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" id="client-phone">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Date of Birth</label>
-                    <input type="date" id="clientDob" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+                <div class="disclaimer" style="margin-bottom: 20px;">
+                    <strong>Disclaimer:</strong> This tool is for educational and preliminary screening purposes only. It does not constitute a formal medical diagnosis. By proceeding, you consent to your data being securely transmitted to your clinician.
                 </div>
-                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-all shadow-md shadow-indigo-200 mt-4 text-sm">Begin Assessment Battery</button>
-            </form>
-        </section>
-
-        <!-- VIEW 2: TESTING RUNGRID -->
-        <section id="viewTesting" class="bg-white border border-slate-200 rounded-2xl shadow-md p-6 md:p-10 w-full hidden flex-col">
-            <div class="mb-6 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div id="topProgressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
-            </div>
-            
-            <div class="flex-grow flex flex-col justify-center min-h-[300px]">
-                <div id="testMetaDataBlock" class="mb-4 text-xs font-bold tracking-wider text-indigo-600 uppercase"></div>
-                <h3 id="questionTextDisplay" class="text-xl md:text-2xl font-bold text-slate-900 leading-snug mb-8"></h3>
-                <div id="optionsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
-            </div>
-
-            <div class="border-t border-slate-100 pt-6 mt-8 flex justify-between items-center">
-                <button id="btnPrevQuestion" onclick="navigateQuestion(-1)" class="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none text-sm transition-all">Previous Item</button>
-                <div id="counterIndicator" class="text-xs font-semibold text-slate-400 tracking-wider uppercase"></div>
-                <button id="btnNextQuestion" onclick="navigateQuestion(1)" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-indigo-100 text-sm transition-all">Next Item</button>
-            </div>
-        </section>
-
-        <!-- VIEW 3: CLIENT SUMMARY DASHBOARD (VISIBLE TO CANDIDATE UPON COMPLETION) -->
-        <section id="viewClientSummary" class="w-full hidden space-y-8">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Screening Complete</span>
-                    <h2 class="text-2xl font-bold text-slate-900 mt-0.5">Your Psychometric Summary</h2>
-                    <p class="text-xs text-slate-500 mt-1">Hello <span id="clientSummaryName" class="font-semibold text-slate-700"></span>, your assessment responses have been recorded and sent to your clinician.</p>
-                </div>
-                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Print Summary
-                </button>
-            </div>
-
-            <!-- Summary Total Cards for Candidate -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">AQ Total</p>
-                    <p id="clientCardAQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Autism Spectrum Quotient</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">RAADS-R</p>
-                    <p id="clientCardRAADS" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Ritvo Diagnostic Scale</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CAT-Q Total</p>
-                    <p id="clientCardCATQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Social Camouflaging</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CATI Total</p>
-                    <p id="clientCardCATI" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Comprehensive Inventory</p>
-                </div>
-            </div>
-
-            <!-- Client Trait Radar & Thematic Clusters -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Dimensional Trait Match Across Subscales (%)
-                    </h4>
-                    <div class="relative w-full h-[320px]">
-                        <canvas id="clientChartCanvas"></canvas>
-                    </div>
-                </div>
-
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
-                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                        </svg>
-                        Identified Trait Clusters
-                    </h4>
-                    <div id="clientThemesContainer" class="space-y-3.5 flex-grow overflow-y-auto max-h-[320px] pr-1"></div>
-                </div>
-            </div>
-
-            <!-- Client Informational Notice -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 shadow-sm text-sm text-slate-700">
-                <p class="font-bold text-slate-900 mb-1">What this summary means for you</p>
-                <p class="text-xs text-slate-600 leading-relaxed">These scores reflect self-reported communication preferences, sensory processing tendencies, and social adaptation strategies. They provide a starting point for discussion with your clinician during your formal diagnostic consultation.</p>
-            </div>
-        </section>
-
-        <!-- VIEW 4: CLINICIAN ADMIN DASHBOARD (ROSTER) -->
-        <section id="viewAdminRoster" class="w-full hidden space-y-6">
-            <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div>
-                    <h3 class="text-xl font-bold text-slate-900">Clinician Assessment Registry</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Secure client database with full test histories and granular response logs</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="refreshAdminData()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all">Refresh Logs</button>
-                    <button onclick="exitAdminView()" class="px-4 py-2 text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl transition-all">Lock & Exit</button>
-                </div>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="py-3.5 px-4">Date / Time</th>
-                                <th class="py-3.5 px-4">Client Name</th>
-                                <th class="py-3.5 px-4">Contact / Email</th>
-                                <th class="py-3.5 px-4 text-center">AQ</th>
-                                <th class="py-3.5 px-4 text-center">RAADS-R</th>
-                                <th class="py-3.5 px-4 text-center">CAT-Q</th>
-                                <th class="py-3.5 px-4 text-center">CATI</th>
-                                <th class="py-3.5 px-4 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody" class="divide-y divide-slate-100 text-slate-700">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                <div id="adminEmptyNotice" class="hidden p-8 text-center text-sm text-slate-400">No assessment records found in the database.</div>
-            </div>
-        </section>
-
-        <!-- VIEW 5: CLINICIAN IN-DEPTH DIAGNOSTIC PROFILE INSPECTOR -->
-        <section id="viewAdminDetail" class="w-full hidden space-y-8">
-            <div class="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-200 shadow-sm no-print">
-                <button onclick="backToAdminRoster()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                    Back to Registry
-                </button>
-                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Export Comprehensive Clinical Report
-                </button>
-            </div>
-
-            <!-- Client Profile Metadata Card -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Patient Name</p>
-                        <p id="detClientName" class="font-bold text-slate-900 text-base mt-0.5">-</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Date of Birth</p>
-                        <p id="detClientDob" class="font-medium text-slate-700 mt-0.5">-</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Contact Number</p>
-                        <p id="detClientPhone" class="font-medium text-slate-700 mt-0.5">-</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Email Address</p>
-                        <p id="detClientEmail" class="font-medium text-slate-700 mt-0.5">-</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PART 1: INDIVIDUAL TEST ANALYSES -->
-            <div>
-                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-                    Part 1: Individual Battery Results & Subscale Breakdown
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="individualTestsContainer">
-                    <!-- Cards for AQ, RAADS-R, CAT-Q, CATI are built dynamically here -->
-                </div>
-            </div>
-
-            <!-- PART 2: COMBINED VISUAL THEMATIC ANALYSIS -->
-            <div>
-                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                    Part 2: Combined Visual Trait Convergence Across All Batteries
-                </h3>
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div class="relative w-full h-[360px]">
-                        <canvas id="adminSubscaleChartCanvas"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PART 3: COMMON TRAITS & AREAS FOR CLINICAL INVESTIGATION -->
-            <div>
-                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
-                    Part 3: Cross-Test Convergent Traits & Areas for Further Clinical Investigation
-                </h3>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Convergent Thematic Traits Found Across Screeners -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
-                        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            Convergent Behavioral Themes
-                        </h4>
-                        <div id="detThematicContainer" class="space-y-3 flex-grow"></div>
-                    </div>
-
-                    <!-- Explicit Investigation Targets For Clinician -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
-                        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                            Recommended Focus Areas for Clinical Interview
-                        </h4>
-                        <div id="detInvestigationContainer" class="space-y-3 flex-grow"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- CLINICIAN PIN LOCK MODAL -->
-    <div id="modalPinLock" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-sm w-full">
-            <div class="text-center mb-5">
-                <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">Clinician Security Check</h3>
-                <p class="text-xs text-slate-500 mt-1">Enter your administrative PIN to access confidential patient records.</p>
-            </div>
-            <form onsubmit="handleVerifyClinicianPin(event)" class="space-y-4">
-                <input type="password" id="modalPinInput" required placeholder="••••" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center tracking-widest text-lg bg-slate-50">
-                <div id="modalPinError" class="hidden text-xs text-rose-600 font-medium text-center"></div>
-                <div class="flex gap-2">
-                    <button type="button" onclick="closeClinicianModal()" class="w-1/2 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold">Cancel</button>
-                    <button type="submit" id="btnUnlockPortal" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-200">Verify & Unlock</button>
-                </div>
+                <button type="submit" class="btn btn-primary btn-block">Begin Assessment Battery</button>
+                <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px" onclick="showScreen('screen-admin-login')">Clinician Portal</button>
             </form>
         </div>
     </div>
 
-    <script>
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec";
+    <!-- SCREEN 2: ASSESSMENT -->
+    <div id="screen-assessment" class="screen hidden">
+        <div class="card">
+            <div class="progress-container">
+                <div class="progress-text">
+                    <span id="progress-label">Part 1: AQ</span>
+                    <span id="progress-count">1 / 197</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width: 0%"></div></div>
+            </div>
+            
+            <div id="question-container">
+                <p class="question-text" id="question-text">Loading...</p>
+                <div class="options-grid" id="options-grid"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="btn-prev" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">Next</button>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 16px;">
+                Tip: Press keys <strong>1-5</strong> or <strong>A-E</strong> to select and auto-advance.
+            </p>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: SUMMARY -->
+    <div id="screen-summary" class="screen hidden">
+        <div class="card">
+            <h1>Assessment Complete</h1>
+            <p class="subtitle">Your Psychometric Summary</p>
+            
+            <div class="metric-grid" id="metric-grid"></div>
+            
+            <h3>Dimensional Trait Profile</h3>
+            <div class="chart-container">
+                <canvas id="radar-chart"></canvas>
+            </div>
+
+            <h3>Identified Trait Clusters</h3>
+            <div id="themes-container"></div>
+
+            <h3>What this means for you</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                These scores reflect self-reported communication preferences, sensory processing tendencies, and social adaptation strategies. They provide a starting point for discussion with your clinician.
+            </p>
+
+            <div class="disclaimer">
+                <strong>Clinical Disclaimer:</strong> This report is a preliminary screening tool and does not replace a comprehensive diagnostic evaluation by a qualified healthcare professional.
+            </div>
+
+            <div class="no-print" style="margin-top: 24px; display: flex; gap: 12px;">
+                <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+                <button class="btn btn-secondary" onclick="resetApp()">Start New Assessment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: ADMIN LOGIN -->
+    <div id="screen-admin-login" class="screen hidden">
+        <div class="card" style="max-width: 400px; margin: 50px auto;">
+            <h2 style="text-align: center;">Clinician Security Check</h2>
+            <p class="subtitle">Enter administrative PIN to access records.</p>
+            <div class="form-group">
+                <input type="password" id="admin-pin" placeholder="Enter PIN" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px;">
+            </div>
+            <button class="btn btn-primary btn-block" onclick="verifyPin()">Verify & Unlock</button>
+            <button class="btn btn-secondary btn-block" style="margin-top:10px" onclick="showScreen('screen-intake')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: ADMIN DASHBOARD -->
+    <div id="screen-admin" class="screen hidden">
+        <div class="card">
+            <div class="admin-header">
+                <h2>Clinician Registry</h2>
+                <div>
+                    <input type="text" id="search-input" placeholder="Search name/email..." onkeyup="renderAdminTable()" style="width: 200px; margin-right: 10px;">
+                    <button class="btn btn-secondary" onclick="loadAdminData()">Refresh</button>
+                    <button class="btn btn-secondary" onclick="showScreen('screen-intake')">Exit</button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>AQ</th>
+                            <th>RAADS-R</th>
+                            <th>CAT-Q</th>
+                            <th>CATI</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-tbody"></tbody>
+                </table>
+            </div>
+            <div id="pagination-controls" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;"></div>
+        </div>
+    </div>
+</div>
+
+<script src="tests.json"></script> <!-- Fallback if fetch fails, but we will use fetch -->
+<script src="scoring.js"></script>
+<script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    // REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
+    const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"; 
+    
+    let testData = {};
+    let flatQuestions = [];
+    let currentQIndex = 0;
+    let userAnswers = {};
+    let clientInfo = {};
+    
+    // Admin State
+    let adminRecords = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('tests.json');
+            testData = await response.json();
+            flattenQuestions();
+            
+            // Restore auto-save
+            const saved = localStorage.getItem('assessment_progress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                if (confirm("Resume previous assessment progress?")) {
+                    userAnswers = progress.answers || {};
+                    clientInfo = progress.client || {};
+                    currentQIndex = progress.index || 0;
+                    showScreen('screen-assessment');
+                    renderQuestion();
+                } else {
+                    localStorage.removeItem('assessment_progress');
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load tests.json", err);
+            alert("Error loading assessment data. Please ensure tests.json is in the same directory.");
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', handleKeyboard);
+    });
+
+    function flattenQuestions() {
+        flatQuestions = [];
+        const testOrder = ['AQ', 'RAADS', 'CATQ', 'CATI'];
+        testOrder.forEach(testId => {
+            if (testData[testId]) {
+                testData[testId].questions.forEach(q => {
+                    flatQuestions.push({ ...q, testId: testId, options: q.options || Object.keys(q.weights) });
+                });
+            }
+        });
+    }
+
+    // ==========================================
+    // SCREEN MANAGEMENT
+    // ==========================================
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    // ==========================================
+    // INTAKE & ASSESSMENT FLOW
+    // ==========================================
+    document.getElementById('intake-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        clientInfo = {
+            name: document.getElementById('client-name').value,
+            email: document.getElementById('client-email').value,
+            dob: document.getElementById('client-dob').value,
+            phone: document.getElementById('client-phone').value
+        };
+        currentQIndex = 0;
+        userAnswers = {};
+        showScreen('screen-assessment');
+        renderQuestion();
+    });
+
+    function renderQuestion() {
+        if (currentQIndex >= flatQuestions.length) {
+            submitAssessment();
+            return;
+        }
+
+        const q = flatQuestions[currentQIndex];
+        const totalQ = flatQuestions.length;
+        
+        // Progress UI
+        document.getElementById('progress-label').innerText = `Part: ${q.testId}`;
+        document.getElementById('progress-count').innerText = `${currentQIndex + 1} / ${totalQ}`;
+        document.getElementById('progress-fill').style.width = `${((currentQIndex + 1) / totalQ) * 100}%`;
+
+        // Question UI
+        document.getElementById('question-text').innerText = q.text;
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+
+        q.options.forEach((optKey, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            if (userAnswers[`${q.testId}_${q.id}`] === optKey) btn.classList.add('selected');
+            
+            const keyLabel = idx < 5 ? (idx + 1) : String.fromCharCode(65 + idx); // 1-5, then A, B...
+            btn.innerHTML = `<span class="option-key">${keyLabel}</span> ${formatOptionLabel(optKey)}`;
+            btn.onclick = () => selectOption(q, optKey);
+            grid.appendChild(btn);
+        });
+
+        document.getElementById('btn-prev').disabled = currentQIndex === 0;
+        document.getElementById('btn-next').innerText = currentQIndex === totalQ - 1 ? 'Submit' : 'Next';
+
+        // Break prompt every 50 questions
+        if (currentQIndex > 0 && currentQIndex % 50 === 0 && !sessionStorage.getItem(`break_${currentQIndex}`)) {
+            sessionStorage.setItem(`break_${currentQIndex}`, '1');
+            if (confirm("You've done great so far. Would you like to save your progress and take a 5-minute break?")) {
+                saveProgress();
+                showScreen('screen-intake');
+                alert("Progress saved. You can close the tab or continue later.");
+            }
+        }
+    }
+
+    function formatOptionLabel(key) {
+        return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+    }
+
+    function selectOption(q, optKey) {
+        userAnswers[`${q.testId}_${q.id}`] = optKey;
+        saveProgress();
+        // Auto-advance after short delay for smooth UX
+        setTimeout(() => {
+            if (currentQIndex < flatQuestions.length - 1) nextQuestion();
+        }, 200);
+    }
+
+    function nextQuestion() {
+        if (currentQIndex < flatQuestions.length - 1) {
+            currentQIndex++;
+            renderQuestion();
+        } else {
+            submitAssessment();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQIndex > 0) {
+            currentQIndex--;
+            renderQuestion();
+        }
+    }
+
+    function handleKeyboard(e) {
+        if (document.getElementById('screen-assessment').classList.contains('hidden')) return;
+        const q = flatQuestions[currentQIndex];
+        if (!q) return;
+        
+        let idx = -1;
+        if (e.key >= '1' && e.key <= '5') idx = parseInt(e.key) - 1;
+        else if (e.key.toLowerCase() >= 'a' && e.key.toLowerCase() <= 'e') idx = e.key.toLowerCase().charCodeAt(0) - 97 + 5;
+
+        if (idx !== -1 && idx < q.options.length) {
+            selectOption(q, q.options[idx]);
+        }
+    }
+
+    function saveProgress() {
+        localStorage.setItem('assessment_progress', JSON.stringify({
+            client: clientInfo,
+            answers: userAnswers,
+            index: currentQIndex
+        }));
+    }
+
+    // ==========================================
+    // SUBMISSION & SCORING
+    // ==========================================
+    async function submitAssessment() {
+        const btn = document.getElementById('btn-next');
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
         const engine = new AutismAssessmentEngine();
+        const results = engine.calculateScores(userAnswers, testData);
 
-        let testBattery = null;
-        let flattenedQuestions = [];
-        let currentIndex = 0;
-        let userResponses = {};
-        let activeClientInfo = {};
-        let adminRecords = [];
-        let verifiedAdminPin = "";
-        let adminChart = null;
-        let clientChart = null;
-
-        const OPTION_LABELS = {
-            AQ: ["Definitely Agree", "Slightly Agree", "Slightly Disagree", "Definitely Disagree"],
-            RAADS: ["True now and when young", "Only true now", "True only younger than 16", "Never true"],
-            CATQ: ["Strongly Disagree", "Disagree", "Somewhat Disagree", "Neither", "Somewhat Agree", "Agree", "Strongly Agree"],
-            CATI: ["Definitely Disagree", "Somewhat Disagree", "Neither", "Somewhat Agree", "Definitely Agree"]
+        const payload = {
+            action: "submitAssessment",
+            client: clientInfo,
+            totals: {
+                AQ: results.rawResults.AQ.total,
+                RAADS: results.rawResults.RAADS.total,
+                CATQ: results.rawResults.CATQ.total,
+                CATI: results.rawResults.CATI.total
+            },
+            metrics: results.normalizedMetrics,
+            themes: results.thematicAnalysis,
+            investigation: results.clinicalInvestigationAreas,
+            answers: userAnswers
         };
 
-        async function initApp() {
-            try {
-                const res = await fetch("tests.json");
-                testBattery = await res.json();
+        try {
+            await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: { "Content-Type": "text/plain;charset=utf-8" } // GAS requires text/plain for CORS
+            });
+            
+            localStorage.removeItem('assessment_progress');
+            renderSummary(results);
+            showScreen('screen-summary');
+        } catch (err) {
+            alert("Error submitting data. Please check your connection.");
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Submit";
+        }
+    }
 
-                flattenedQuestions = [];
-                Object.entries(testBattery).forEach(([testId, testData]) => {
-                    const questions = testData.questions || [];
-                    questions.forEach(q => {
-                        flattenedQuestions.push({
-                            testId: testId,
-                            testTitle: testData.title,
-                            questionId: q.id,
-                            text: q.text,
-                            subscale: q.subscale,
-                            options: OPTION_LABELS[testId] || Object.keys(q.weights)
-                        });
-                    });
-                });
-            } catch (err) {
-                console.error("Failed to load tests.json:", err);
+    function renderSummary(results) {
+        // Metrics Grid
+        const grid = document.getElementById('metric-grid');
+        grid.innerHTML = `
+            <div class="metric-card"><div class="metric-value">${results.rawResults.AQ.total}</div><div class="metric-label">AQ Total</div></div>
+            <div class="metric-card"><div class="metric-value">${results.rawResults.RAADS.total}</div><div class="metric-label">RAADS-R Total</div></div>
+            <div class="metric-card"><div class="metric-value">${results.rawResults.CATQ.total}</div><div class="metric-label">CAT-Q Total</div></div>
+            <div class="metric-card"><div class="metric-value">${results.rawResults.CATI.total}</div><div class="metric-label">CATI Total</div></div>
+        `;
+
+        // Radar Chart
+        const ctx = document.getElementById('radar-chart').getContext('2d');
+        const labels = [];
+        const data = [];
+        
+        Object.keys(results.normalizedMetrics).forEach(testId => {
+            Object.keys(results.normalizedMetrics[testId].subscales).forEach(sub => {
+                labels.push(`${testId}: ${sub}`);
+                data.push(results.normalizedMetrics[testId].subscales[sub]);
+            });
+        });
+
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Normalized Trait %',
+                    data: data,
+                    backgroundColor: 'rgba(49, 151, 149, 0.2)',
+                    borderColor: 'rgba(49, 151, 149, 1)',
+                    pointBackgroundColor: 'rgba(49, 151, 149, 1)'
+                }]
+            },
+            options: {
+                scales: { r: { beginAtZero: true, max: 100 } },
+                plugins: { legend: { display: false } }
             }
-        }
+        });
 
-        function handleStartAssessment(e) {
-            e.preventDefault();
-            activeClientInfo = {
-                name: document.getElementById("clientName").value.trim(),
-                phone: document.getElementById("clientPhone").value.trim(),
-                email: document.getElementById("clientEmail").value.trim(),
-                dob: document.getElementById("clientDob").value
-            };
+        // Themes
+        const themesContainer = document.getElementById('themes-container');
+        themesContainer.innerHTML = '';
+        results.thematicAnalysis.forEach(theme => {
+            themesContainer.innerHTML += `
+                <div class="theme-card">
+                    <div class="theme-title">${theme.themeName} (${theme.prominence} Prominence)</div>
+                    <div class="theme-desc">${theme.description}</div>
+                </div>
+            `;
+        });
+    }
 
-            document.getElementById("clientDisplayID").textContent = activeClientInfo.name;
-            document.getElementById("clientDisplayID").classList.remove("hidden");
-            document.getElementById("testProgressBadge").classList.remove("hidden");
-
-            document.getElementById("viewClientIntake").classList.add("hidden");
-            document.getElementById("viewTesting").classList.remove("hidden");
-            document.getElementById("viewTesting").classList.add("flex");
-
-            renderCurrentQuestion();
-        }
-
-        function renderCurrentQuestion() {
-            const q = flattenedQuestions[currentIndex];
-            const total = flattenedQuestions.length;
-            const answerKey = `${q.testId}_${q.questionId}`;
-            const selectedIdx = userResponses[answerKey];
-
-            document.getElementById("testMetaDataBlock").textContent = `${q.testTitle} : ${q.subscale}`;
-            document.getElementById("questionTextDisplay").textContent = `${currentIndex + 1}. ${q.text}`;
-            document.getElementById("topProgressBar").style.width = `${((currentIndex) / total) * 100}%`;
-            document.getElementById("counterIndicator").textContent = `${currentIndex + 1} of ${total}`;
-            document.getElementById("testProgressBadge").textContent = `${Math.round((currentIndex / total) * 100)}% Complete`;
-
-            document.getElementById("btnPrevQuestion").disabled = currentIndex === 0;
-            document.getElementById("btnNextQuestion").disabled = selectedIdx === undefined;
-            document.getElementById("btnNextQuestion").textContent = currentIndex === total - 1 ? "Submit Assessment" : "Next Item";
-
-            const container = document.getElementById("optionsGridContainer");
-            container.innerHTML = "";
-
-            q.options.forEach((optText, idx) => {
-                const btn = document.createElement("button");
-                btn.type = "button";
-                const isSelected = selectedIdx === idx;
-                btn.className = `choice-card text-left p-3.5 rounded-xl border text-sm font-medium transition-all ${
-                    isSelected ? "active-radio font-bold text-indigo-950" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
-                }`;
-                btn.textContent = optText;
-                btn.onclick = () => selectOption(idx);
-                container.appendChild(btn);
+    // ==========================================
+    // ADMIN DASHBOARD
+    // ==========================================
+    async function verifyPin() {
+        const pin = document.getElementById('admin-pin').value;
+        const payload = { action: "getAdminData", accessPin: pin, page: 1, limit: PAGE_SIZE };
+        
+        try {
+            const res = await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
             });
-        }
-
-        function selectOption(idx) {
-            const q = flattenedQuestions[currentIndex];
-            userResponses[`${q.testId}_${q.questionId}`] = idx;
-            renderCurrentQuestion();
-        }
-
-        function navigateQuestion(step) {
-            if (step === 1 && currentIndex === flattenedQuestions.length - 1) {
-                finishAssessment();
-                return;
+            const data = await res.json();
+            
+            if (data.status === "success") {
+                adminRecords = data.records;
+                currentPage = 1;
+                renderAdminTable();
+                showScreen('screen-admin');
+            } else {
+                alert(data.message || "Invalid PIN");
             }
-            currentIndex += step;
-            renderCurrentQuestion();
+        } catch (err) {
+            alert("Connection error");
         }
+    }
 
-        async function finishAssessment() {
-            const results = engine.calculateScores(userResponses, testBattery);
+    function renderAdminTable() {
+        const tbody = document.getElementById('admin-tbody');
+        const search = document.getElementById('search-input').value.toLowerCase();
+        tbody.innerHTML = '';
 
-            // Populate Candidate Summary View
-            document.getElementById("viewTesting").classList.add("hidden");
-            document.getElementById("clientSummaryName").textContent = activeClientInfo.name;
-            document.getElementById("clientCardAQ").textContent = results.rawResults.AQ.total;
-            document.getElementById("clientCardRAADS").textContent = results.rawResults.RAADS.total;
-            document.getElementById("clientCardCATQ").textContent = results.rawResults.CATQ.total;
-            document.getElementById("clientCardCATI").textContent = results.rawResults.CATI.total;
+        const filtered = adminRecords.filter(r => 
+            r.name.toLowerCase().includes(search) || r.email.toLowerCase().includes(search)
+        );
 
-            const clientThemes = document.getElementById("clientThemesContainer");
-            clientThemes.innerHTML = "";
-            results.thematicAnalysis.forEach(theme => {
-                const badgeColor = theme.prominence === "High" ? "bg-rose-100 text-rose-800" :
-                                   theme.prominence === "Moderate" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800";
-                const card = document.createElement("div");
-                card.className = "p-3.5 border border-slate-200 rounded-xl bg-slate-50";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <h5 class="font-bold text-slate-900 text-xs">${theme.themeName}</h5>
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${badgeColor}">${theme.prominence}</span>
-                    </div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed">${theme.description}</p>
-                `;
-                clientThemes.appendChild(card);
-            });
+        filtered.forEach(r => {
+            const catqBadge = r.totals.CATQ >= 100 ? '<span class="badge badge-high">High Masking</span>' : '';
+            tbody.innerHTML += `
+                <tr>
+                    <td>${new Date(r.timestamp).toLocaleDateString()}</td>
+                    <td>${r.name} ${catqBadge}</td>
+                    <td>${r.totals.AQ}</td>
+                    <td>${r.totals.RAADS}</td>
+                    <td>${r.totals.CATQ}</td>
+                    <td>${r.totals.CATI}</td>
+                    <td><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick='viewDetail(${JSON.stringify(r)})'>View</button></td>
+                </tr>
+            `;
+        });
+    }
 
-            renderClientChart(results.normalizedMetrics);
-            document.getElementById("viewClientSummary").classList.remove("hidden");
-            document.getElementById("testProgressBadge").textContent = "Completed";
-            document.getElementById("testProgressBadge").className = "text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded";
+    function viewDetail(record) {
+        // In a real app, this would open a detailed modal. For now, an alert or new window.
+        const themes = record.themes.map(t => `- ${t.themeName} (${t.prominence})`).join('\n');
+        alert(`Detailed Report for ${record.name}\n\nTotals:\nAQ: ${record.totals.AQ}\nRAADS: ${record.totals.RAADS}\nCATQ: ${record.totals.CATQ}\nCATI: ${record.totals.CATI}\n\nThemes:\n${themes}`);
+    }
 
-            // Submit Summary + Granular 197-Item Answers to Backend
-            try {
-                const res = await fetch(APPS_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        action: "submitAssessment",
-                        client: activeClientInfo,
-                        totals: {
-                            AQ: results.rawResults.AQ.total,
-                            RAADS: results.rawResults.RAADS.total,
-                            CATQ: results.rawResults.CATQ.total,
-                            CATI: results.rawResults.CATI.total
-                        },
-                        metrics: results.normalizedMetrics,
-                        themes: results.thematicAnalysis,
-                        answers: userResponses
-                    })
-                });
-                const confirmation = await res.text();
-                console.log("Recorded to Sheet:", confirmation);
-            } catch (err) {
-                console.error("Submission failed:", err);
-            }
-        }
-
-        function renderClientChart(metrics) {
-            const ctx = document.getElementById("clientChartCanvas").getContext("2d");
-            const labels = [];
-            const values = [];
-
-            Object.entries(metrics || {}).forEach(([testId, data]) => {
-                Object.entries(data.subscales || {}).forEach(([subName, pct]) => {
-                    const formattedSub = subName.replace(/([A-Z])/g, " $1").toLowerCase();
-                    labels.push(`${testId}: ${formattedSub}`);
-                    values.push(pct);
-                });
-            });
-
-            if (clientChart) clientChart.destroy();
-            clientChart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: "rgba(99, 102, 241, 0.75)",
-                        borderColor: "rgba(79, 70, 229, 1)",
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%", stepSize: 25 } },
-                        x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 45, font: { size: 9 } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        // ==========================================
-        // CLINICIAN WORKSPACE & VERIFICATION
-        // ==========================================
-
-        function openClinicianModal() {
-            document.getElementById("modalPinError").classList.add("hidden");
-            document.getElementById("modalPinInput").value = "";
-            document.getElementById("modalPinLock").classList.remove("hidden");
-        }
-
-        function closeClinicianModal() {
-            document.getElementById("modalPinLock").classList.add("hidden");
-        }
-
-        async function handleVerifyClinicianPin(e) {
-            e.preventDefault();
-            const pin = document.getElementById("modalPinInput").value.trim();
-            const btn = document.getElementById("btnUnlockPortal");
-            const errDiv = document.getElementById("modalPinError");
-
-            btn.textContent = "Verifying...";
-            btn.disabled = true;
-            errDiv.classList.add("hidden");
-
-            try {
-                const res = await fetch(APPS_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        action: "getAdminData",
-                        accessPin: pin
-                    })
-                });
-
-                const rawText = await res.text();
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (parseErr) {
-                    console.error("Server output was not JSON:", rawText);
-                    throw new Error("Server returned HTML. Ensure deployment is set to 'Anyone'.");
-                }
-
-                if (data.status === "success") {
-                    verifiedAdminPin = pin;
-                    adminRecords = data.records;
-                    closeClinicianModal();
-                    openAdminDashboard();
-                } else {
-                    errDiv.textContent = data.message || "Invalid Security PIN.";
-                    errDiv.classList.remove("hidden");
-                }
-            } catch (err) {
-                console.error("Verification error:", err);
-                errDiv.textContent = err.message || "Failed to communicate with assessment backend.";
-                errDiv.classList.remove("hidden");
-            } finally {
-                btn.textContent = "Verify & Unlock";
-                btn.disabled = false;
-            }
-        }
-
-        function openAdminDashboard() {
-            document.getElementById("viewClientIntake").classList.add("hidden");
-            document.getElementById("viewTesting").classList.add("hidden");
-            document.getElementById("viewClientSummary").classList.add("hidden");
-            document.getElementById("viewAdminDetail").classList.add("hidden");
-
-            document.getElementById("viewAdminRoster").classList.remove("hidden");
-            renderAdminRosterTable();
-        }
-
-        function renderAdminRosterTable() {
-            const tbody = document.getElementById("adminTableBody");
-            const emptyNotice = document.getElementById("adminEmptyNotice");
-            tbody.innerHTML = "";
-
-            if (!adminRecords || adminRecords.length === 0) {
-                emptyNotice.classList.remove("hidden");
-                return;
-            }
-            emptyNotice.classList.add("hidden");
-
-            adminRecords.forEach(rec => {
-                const dateFormatted = new Date(rec.timestamp).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
-                const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-100";
-                tr.innerHTML = `
-                    <td class="py-3 px-4 text-xs text-slate-500">${dateFormatted}</td>
-                    <td class="py-3 px-4 font-semibold text-slate-900">${rec.name}</td>
-                    <td class="py-3 px-4 text-xs text-slate-600">${rec.phone}<br><span class="text-slate-400">${rec.email}</span></td>
-                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.AQ}</td>
-                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.RAADS}</td>
-                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.CATQ}</td>
-                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.CATI}</td>
-                    <td class="py-3 px-4 text-right">
-                        <button onclick="inspectClientDetail(${rec.id})" class="px-3 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-all">Inspect Clinical File</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function inspectClientDetail(recordId) {
-            const rec = adminRecords.find(r => r.id === recordId);
-            if (!rec) return;
-
-            document.getElementById("viewAdminRoster").classList.add("hidden");
-            document.getElementById("viewAdminDetail").classList.remove("hidden");
-
-            document.getElementById("detClientName").textContent = rec.name;
-            document.getElementById("detClientDob").textContent = rec.dob;
-            document.getElementById("detClientPhone").textContent = rec.phone;
-            document.getElementById("detClientEmail").textContent = rec.email;
-
-            // 1. Build Individual Test Cards with Clinical Cutoffs
-            renderIndividualTestCards(rec);
-
-            // 2. Render Combined Visual Thematic Chart
-            renderAdminChart(rec.metrics);
-
-            // 3. Render Thematic Analysis + Focused Areas for Investigation
-            renderThematicAndInvestigationCards(rec);
-        }
-
-        function renderIndividualTestCards(rec) {
-            const container = document.getElementById("individualTestsContainer");
-            container.innerHTML = "";
-
-            const testsInfo = [
-                {
-                    id: "AQ",
-                    title: "Autism Spectrum Quotient (AQ-50)",
-                    cutoff: "Cutoff: ≥ 26 (Significant Traits), ≥ 32 (Strong Indication)",
-                    score: rec.totals.AQ,
-                    isElevated: rec.totals.AQ >= 26,
-                    subscales: rec.metrics.AQ?.subscales || {}
-                },
-                {
-                    id: "RAADS",
-                    title: "Ritvo Autism Asperger Diagnostic Scale (RAADS-R)",
-                    cutoff: "Cutoff: ≥ 65 (Positive Screener Indication)",
-                    score: rec.totals.RAADS,
-                    isElevated: rec.totals.RAADS >= 65,
-                    subscales: rec.metrics.RAADS?.subscales || {}
-                },
-                {
-                    id: "CATQ",
-                    title: "Camouflaging Autistic Traits (CAT-Q)",
-                    cutoff: "Cutoff: ≥ 100 (Significant Social Camouflaging & Masking)",
-                    score: rec.totals.CATQ,
-                    isElevated: rec.totals.CATQ >= 100,
-                    subscales: rec.metrics.CATQ?.subscales || {}
-                },
-                {
-                    id: "CATI",
-                    title: "Comprehensive Autistic Trait Inventory (CATI)",
-                    cutoff: "Continuous Dimensional Screener (No Single Cutoff)",
-                    score: rec.totals.CATI,
-                    isElevated: false,
-                    subscales: rec.metrics.CATI?.subscales || {}
-                }
-            ];
-
-            testsInfo.forEach(t => {
-                const badgeColor = t.isElevated ? "bg-rose-100 text-rose-800 border-rose-200" : "bg-slate-100 text-slate-700 border-slate-200";
-                const badgeText = t.id === "CATI" ? "Dimensional" : (t.isElevated ? "Above Cutoff" : "Below Cutoff");
-
-                let subscaleBars = "";
-                Object.entries(t.subscales).forEach(([subName, pct]) => {
-                    const formatted = subName.replace(/([A-Z])/g, " $1").toLowerCase();
-                    subscaleBars += `
-                        <div class="mt-2">
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="capitalize text-slate-600">${formatted}</span>
-                                <span class="font-bold text-slate-800">${pct}%</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${pct}%"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                const card = document.createElement("div");
-                card.className = "bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between";
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h4 class="font-bold text-slate-900 text-sm">${t.title}</h4>
-                                <p class="text-[11px] text-slate-400 mt-0.5">${t.cutoff}</p>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${badgeColor}">${badgeText}</span>
-                        </div>
-                        <div class="flex items-baseline gap-2 my-3">
-                            <span class="text-3xl font-black text-slate-900">${t.score}</span>
-                            <span class="text-xs text-slate-400">Total Raw Score</span>
-                        </div>
-                        <div class="border-t border-slate-100 pt-3">
-                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Subscale Expressions</p>
-                            ${subscaleBars || "<p class='text-xs text-slate-400'>No subscales available.</p>"}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function renderThematicAndInvestigationCards(rec) {
-            // Render Convergent Themes
-            const themeContainer = document.getElementById("detThematicContainer");
-            themeContainer.innerHTML = "";
-            (rec.themes || []).forEach(theme => {
-                const badgeColor = theme.prominence === "High" ? "bg-rose-100 text-rose-800" :
-                                   theme.prominence === "Moderate" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800";
-                const card = document.createElement("div");
-                card.className = "p-3.5 border border-slate-200 rounded-xl bg-slate-50";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <h5 class="font-bold text-slate-900 text-xs">${theme.themeName}</h5>
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${badgeColor}">${theme.prominence}</span>
-                    </div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed">${theme.description}</p>
-                `;
-                themeContainer.appendChild(card);
-            });
-
-            // Calculate Specific Areas for Clinical Investigation
-            const investigationContainer = document.getElementById("detInvestigationContainer");
-            investigationContainer.innerHTML = "";
-            const areas = engine.evaluateClinicalInvestigationAreas(rec.totals, rec.metrics);
-
-            areas.forEach(item => {
-                const severityClass = item.severity === "Priority Focus" ? "bg-rose-50 border-rose-200 text-rose-900" : "bg-amber-50 border-amber-200 text-amber-900";
-                const badgeClass = item.severity === "Priority Focus" ? "bg-rose-200 text-rose-800" : "bg-amber-200 text-amber-800";
-
-                const block = document.createElement("div");
-                block.className = `p-3.5 border rounded-xl ${severityClass}`;
-                block.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <h5 class="font-bold text-xs">${item.title}</h5>
-                        <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${badgeClass}">${item.severity}</span>
-                    </div>
-                    <p class="text-[11px] opacity-90 leading-relaxed">${item.notes}</p>
-                `;
-                investigationContainer.appendChild(block);
-            });
-        }
-
-        function renderAdminChart(metrics) {
-            const ctx = document.getElementById("adminSubscaleChartCanvas").getContext("2d");
-            const labels = [];
-            const values = [];
-            const backgroundColors = [];
-            const borderColors = [];
-
-            const batteryPalette = {
-                AQ:    { bg: "rgba(59, 130, 246, 0.75)", border: "rgb(37, 99, 235)" },
-                RAADS: { bg: "rgba(16, 185, 129, 0.75)", border: "rgb(5, 150, 105)" },
-                CATQ:  { bg: "rgba(245, 158, 11, 0.75)", border: "rgb(217, 119, 6)" },
-                CATI:  { bg: "rgba(139, 92, 246, 0.75)", border: "rgb(124, 58, 237)" }
-            };
-
-            Object.entries(metrics || {}).forEach(([testId, data]) => {
-                Object.entries(data.subscales || {}).forEach(([subName, pct]) => {
-                    const formattedSub = subName.replace(/([A-Z])/g, " $1").toLowerCase();
-                    labels.push(`${testId}: ${formattedSub}`);
-                    values.push(pct);
-
-                    const palette = batteryPalette[testId] || { bg: "rgba(99, 102, 241, 0.75)", border: "rgb(79, 70, 229)" };
-                    backgroundColors.push(palette.bg);
-                    borderColors.push(palette.border);
-                });
-            });
-
-            if (adminChart) adminChart.destroy();
-            adminChart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: backgroundColors,
-                        borderColor: borderColors,
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%", stepSize: 20 } },
-                        x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 45, font: { size: 9 } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function backToAdminRoster() {
-            document.getElementById("viewAdminDetail").classList.add("hidden");
-            document.getElementById("viewAdminRoster").classList.remove("hidden");
-        }
-
-        async function refreshAdminData() {
-            try {
-                const res = await fetch(APPS_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        action: "getAdminData",
-                        accessPin: verifiedAdminPin
-                    })
-                });
-                const data = await res.json();
-                if (data.status === "success") {
-                    adminRecords = data.records;
-                    renderAdminRosterTable();
-                }
-            } catch (err) {
-                console.error("Refresh failed:", err);
-            }
-        }
-
-        function exitAdminView() {
-            verifiedAdminPin = "";
-            adminRecords = [];
-            document.getElementById("viewAdminRoster").classList.add("hidden");
-            document.getElementById("viewAdminDetail").classList.add("hidden");
-            document.getElementById("viewClientIntake").classList.remove("hidden");
-        }
-
-        document.addEventListener("DOMContentLoaded", initApp);
-    </script>
+    function resetApp() {
+        location.reload();
+    }
+</script>
 </body>
 </html>
