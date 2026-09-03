@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinical Psychometric Screening Dashboard</title>
-    <!-- Core External Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Standalone Decoupled Scoring Engine -->
     <script src="scoring.js"></script>
     <style>
         .choice-card:hover { border-color: #3b82f6; background-color: #f8fafc; }
         .active-radio { border-color: #4f46e5 !important; background-color: #eef2ff !important; box-shadow: 0 0 0 2px #4f46e5; }
         @media print {
-            header, #btnExportReport, .no-print { display: none !important; }
+            header, #adminNavActions, #modalPinLock, #viewClientIntake, #viewTesting, #viewClientCompletion, #viewAdminRoster, .no-print { display: none !important; }
             body { background-color: #ffffff; }
             main { padding: 0; max-width: 100%; }
+            #viewAdminDetail { display: block !important; }
             .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; }
             .border { border-color: #cbd5e1 !important; }
         }
@@ -23,120 +22,210 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Primary Layout Header Space -->
-    <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-50 shadow-sm">
+    <!-- Primary Layout Header -->
+    <header class="bg-white border-b border-slate-200 py-3.5 px-6 sticky top-0 z-50 shadow-sm">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                <span>Clinical Screening Workspace</span>
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-bold tracking-tight text-slate-900">Clinical Psychometric Workspace</h1>
                 <span id="testProgressBadge" class="hidden text-xs bg-indigo-100 text-indigo-800 font-semibold px-2.5 py-0.5 rounded"></span>
-            </h1>
-            <div id="clientDisplayID" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-md hidden"></div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div id="clientDisplayID" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hidden"></div>
+                <!-- Clinician Lock Button -->
+                <button onclick="openClinicianModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>Clinician Portal</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Dynamic Application Container -->
-    <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
 
-        <!-- VIEW STATE 1: GATEWAY SECURITY PORTAL -->
-        <section id="viewPortal" class="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-10 max-w-md w-full mx-auto">
+        <!-- VIEW 1: CLIENT INTAKE FORM (Name, Contact, Email, DOB) -->
+        <section id="viewClientIntake" class="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-10 max-w-lg w-full mx-auto">
             <div class="text-center mb-8">
                 <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 text-indigo-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-900">Secure Client Entry</h2>
-                <p class="text-sm text-slate-500 mt-1">Input authorized diagnostic tracking credentials</p>
+                <h2 class="text-2xl font-bold text-slate-900">Candidate Intake</h2>
+                <p class="text-sm text-slate-500 mt-1">Please provide your details before beginning the evaluation battery.</p>
             </div>
-            
-            <form id="portalForm" class="space-y-5" onsubmit="handlePortalAccess(event)">
+
+            <form id="intakeForm" class="space-y-4" onsubmit="handleStartAssessment(event)">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Anonymous Client Identifier</label>
-                    <input type="text" id="clientIdInput" required placeholder="e.g., Client_884A" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-slate-50">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Full Name</label>
+                    <input type="text" id="clientName" required placeholder="e.g., Sarah Khan" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Administrative Security PIN</label>
-                    <input type="password" id="accessPinInput" required placeholder="••••" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-slate-50 tracking-widest text-center text-lg">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Contact Number / WhatsApp</label>
+                    <input type="tel" id="clientPhone" required placeholder="e.g., +92 300 1234567" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
                 </div>
-                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-all shadow-md shadow-indigo-200 mt-2">Initialize Battery</button>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Email Address</label>
+                    <input type="email" id="clientEmail" required placeholder="e.g., sarah@example.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Date of Birth</label>
+                    <input type="date" id="clientDob" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+                </div>
+                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-all shadow-md shadow-indigo-200 mt-4 text-sm">Begin Assessment Battery</button>
             </form>
-            <div id="portalError" class="hidden mt-4 text-sm bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-center"></div>
         </section>
 
-        <!-- VIEW STATE 2: CLINICAL TESTING RUNGRID -->
+        <!-- VIEW 2: TESTING RUNGRID -->
         <section id="viewTesting" class="bg-white border border-slate-200 rounded-2xl shadow-md p-6 md:p-10 w-full hidden flex-col">
-            <!-- Progress Matrix Indicator -->
             <div class="mb-6 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                 <div id="topProgressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
             </div>
             
-            <!-- Question Content Node Container -->
             <div class="flex-grow flex flex-col justify-center min-h-[300px]">
-                <div id="testMetaDataBlock" class="mb-4 text-sm font-semibold tracking-wide text-indigo-600 uppercase"></div>
+                <div id="testMetaDataBlock" class="mb-4 text-xs font-bold tracking-wider text-indigo-600 uppercase"></div>
                 <h3 id="questionTextDisplay" class="text-xl md:text-2xl font-bold text-slate-900 leading-snug mb-8"></h3>
-                <div id="optionsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="optionsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
             </div>
 
-            <!-- Execution Action Bar Footer -->
             <div class="border-t border-slate-100 pt-6 mt-8 flex justify-between items-center">
-                <button id="btnPrevQuestion" onclick="navigateQuestion(-1)" class="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition-all">Previous Item</button>
-                <div id="counterIndicator" class="text-sm font-semibold text-slate-400 tracking-wider uppercase"></div>
-                <button id="btnNextQuestion" onclick="navigateQuestion(1)" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-indigo-100 transition-all">Next Item</button>
+                <button id="btnPrevQuestion" onclick="navigateQuestion(-1)" class="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none text-sm transition-all">Previous Item</button>
+                <div id="counterIndicator" class="text-xs font-semibold text-slate-400 tracking-wider uppercase"></div>
+                <button id="btnNextQuestion" onclick="navigateQuestion(1)" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-indigo-100 text-sm transition-all">Next Item</button>
             </div>
         </section>
 
-        <!-- VIEW STATE 3: INTERACTIVE EVALUATION DASHBOARD -->
-        <section id="viewDashboard" class="w-full hidden space-y-8">
-            <!-- Toolbar and Document Actions -->
-            <div class="flex justify-between items-center pb-1">
+        <!-- VIEW 3: CLIENT SUBMISSION CONFIRMATION -->
+        <section id="viewClientCompletion" class="bg-white border border-slate-200 rounded-2xl shadow-xl p-8 md:p-12 max-w-lg w-full mx-auto text-center hidden">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900">Assessment Submitted</h2>
+            <p class="text-sm text-slate-600 mt-2 leading-relaxed">Thank you, <span id="completedClientName" class="font-semibold text-slate-800"></span>. Your psychometric screening battery has been compiled and securely transmitted to your clinician for diagnostic review.</p>
+            <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500 text-left">
+                <p class="font-semibold text-slate-700 mb-1">What happens next?</p>
+                <p>Your clinician will review the dimensional subscales and convergent trait profiles during your consultation session. You may now close this window.</p>
+            </div>
+        </section>
+
+        <!-- VIEW 4: CLINICIAN ADMIN DASHBOARD (ROSTER) -->
+        <section id="viewAdminRoster" class="w-full hidden space-y-6">
+            <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div>
-                    <h3 class="text-lg font-bold text-slate-900">Psychometric Battery Summary</h3>
-                    <p class="text-xs text-slate-500">Cross-inventory dimensional convergence profile</p>
+                    <h3 class="text-xl font-bold text-slate-900">Clinician Assessment Registry</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Secure client records repository and diagnostic evaluation records</p>
                 </div>
-                <button id="btnExportReport" onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
+                <div class="flex items-center gap-3">
+                    <button onclick="refreshAdminData()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all">Refresh Logs</button>
+                    <button onclick="exitAdminView()" class="px-4 py-2 text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl transition-all">Lock & Exit</button>
+                </div>
+            </div>
+
+            <!-- Client Registry Table -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="py-3.5 px-4">Date / Time</th>
+                                <th class="py-3.5 px-4">Client Name</th>
+                                <th class="py-3.5 px-4">Contact / Email</th>
+                                <th class="py-3.5 px-4 text-center">AQ</th>
+                                <th class="py-3.5 px-4 text-center">RAADS-R</th>
+                                <th class="py-3.5 px-4 text-center">CAT-Q</th>
+                                <th class="py-3.5 px-4 text-center">CATI</th>
+                                <th class="py-3.5 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="adminEmptyNotice" class="hidden p-8 text-center text-sm text-slate-400">No assessment records found in the database.</div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: CLINICIAN INDIVIDUAL PROFILE INSPECTOR -->
+        <section id="viewAdminDetail" class="w-full hidden space-y-6">
+            <div class="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-200 shadow-sm no-print">
+                <button onclick="backToAdminRoster()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Back to Registry
+                </button>
+                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    Print / Save PDF
+                    Print Clinical Diagnostic Report
                 </button>
             </div>
 
-            <!-- Summary Metric Header Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">AQ Total</p>
-                    <p id="cardScoreAQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">RAADS-R</p>
-                    <p id="cardScoreRAADS" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CAT-Q Total</p>
-                    <p id="cardScoreCATQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
-                </div>
-                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CATI Total</p>
-                    <p id="cardScoreCATI" class="text-3xl font-black text-slate-900 mt-1">-</p>
+            <!-- Client Metadata Profile Card -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Client Name</p>
+                        <p id="detClientName" class="font-bold text-slate-900 text-base mt-0.5">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Date of Birth</p>
+                        <p id="detClientDob" class="font-medium text-slate-700 mt-0.5">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Contact Number</p>
+                        <p id="detClientPhone" class="font-medium text-slate-700 mt-0.5">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Email Address</p>
+                        <p id="detClientEmail" class="font-medium text-slate-700 mt-0.5">-</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Visualization Canvas and Results Split -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Chart Layout Block -->
-                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+            <!-- Total Scores Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">AQ Total</p>
+                    <p id="detScoreAQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Cutoff: ≥ 26</p>
+                </div>
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">RAADS-R</p>
+                    <p id="detScoreRAADS" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Cutoff: ≥ 65</p>
+                </div>
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CAT-Q Total</p>
+                    <p id="detScoreCATQ" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Cutoff: ≥ 100</p>
+                </div>
+                <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">CATI Total</p>
+                    <p id="detScoreCATI" class="text-3xl font-black text-slate-900 mt-1">-</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Dimensional Screener</p>
+                </div>
+            </div>
+
+            <!-- Visual Charts & Thematic Synthesis -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        Normalized Subscale Dimensional Tracker (%)
+                        Subscale Dimensional Expression (%)
                     </h4>
-                    <div class="relative w-full h-[340px]">
-                        <canvas id="subscaleChartCanvas"></canvas>
+                    <div class="relative w-full h-[320px]">
+                        <canvas id="adminSubscaleChartCanvas"></canvas>
                     </div>
                 </div>
 
-                <!-- Evaluated Convergent Trait Themes Block -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
                     <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -144,36 +233,46 @@
                         </svg>
                         Identified Trait Clusters
                     </h4>
-                    <div id="thematicResultsContainer" class="space-y-4 flex-grow overflow-y-auto max-h-[460px] pr-1"></div>
-                </div>
-            </div>
-
-            <!-- Professional Disclaimer Card -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-                <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <h5 class="font-bold text-slate-900">Psychometric Screener Notice</h5>
-                    <p class="text-sm text-slate-600 mt-1">This tool aggregates descriptive behavioral metrics for exploratory evaluation. It is not an official medical diagnosis. Formal clinical evaluations must be conducted by a qualified healthcare professional.</p>
+                    <div id="detThematicContainer" class="space-y-3.5 flex-grow overflow-y-auto max-h-[360px] pr-1"></div>
                 </div>
             </div>
         </section>
+
     </main>
 
+    <!-- CLINICIAN PIN LOCK MODAL -->
+    <div id="modalPinLock" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-sm w-full">
+            <div class="text-center mb-5">
+                <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">Clinician Security Check</h3>
+                <p class="text-xs text-slate-500 mt-1">Enter your Administrative PIN to access confidential patient records.</p>
+            </div>
+            <form onsubmit="handleVerifyClinicianPin(event)" class="space-y-4">
+                <input type="password" id="modalPinInput" required placeholder="••••" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center tracking-widest text-lg bg-slate-50">
+                <div id="modalPinError" class="hidden text-xs text-rose-600 font-medium text-center"></div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeClinicianModal()" class="w-1/2 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" id="btnUnlockPortal" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-200">Verify & Unlock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Update with your actual Google Apps Script web app URL
-        const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_DEPLOYMENT_URL";
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/library/d/1PkA07IUsbJj8PQF3ZsuFmQyUwqTTYehq4Dumw21PEwldX1PJS7pgIT_d/2";
         const engine = new AutismAssessmentEngine();
 
         let testBattery = null;
         let flattenedQuestions = [];
         let currentIndex = 0;
         let userResponses = {};
-        let clientCredentials = { id: "", pin: "" };
-        let barChart = null;
+        let activeClientInfo = {};
+        let adminRecords = [];
+        let verifiedAdminPin = "";
+        let adminChart = null;
 
         const OPTION_LABELS = {
             AQ: ["Definitely Agree", "Slightly Agree", "Slightly Disagree", "Definitely Disagree"],
@@ -186,7 +285,7 @@
             try {
                 const res = await fetch("tests.json");
                 testBattery = await res.json();
-                
+
                 flattenedQuestions = [];
                 Object.entries(testBattery).forEach(([testId, testData]) => {
                     const questions = testData.questions || [];
@@ -206,18 +305,21 @@
             }
         }
 
-        function handlePortalAccess(e) {
+        // Intake Form Processing
+        function handleStartAssessment(e) {
             e.preventDefault();
-            clientCredentials.id = document.getElementById("clientIdInput").value.trim();
-            clientCredentials.pin = document.getElementById("accessPinInput").value.trim();
+            activeClientInfo = {
+                name: document.getElementById("clientName").value.trim(),
+                phone: document.getElementById("clientPhone").value.trim(),
+                email: document.getElementById("clientEmail").value.trim(),
+                dob: document.getElementById("clientDob").value
+            };
 
-            if (!clientCredentials.id || !clientCredentials.pin) return;
-
-            document.getElementById("clientDisplayID").textContent = clientCredentials.id;
+            document.getElementById("clientDisplayID").textContent = activeClientInfo.name;
             document.getElementById("clientDisplayID").classList.remove("hidden");
             document.getElementById("testProgressBadge").classList.remove("hidden");
 
-            document.getElementById("viewPortal").classList.add("hidden");
+            document.getElementById("viewClientIntake").classList.add("hidden");
             document.getElementById("viewTesting").classList.remove("hidden");
             document.getElementById("viewTesting").classList.add("flex");
 
@@ -238,7 +340,7 @@
 
             document.getElementById("btnPrevQuestion").disabled = currentIndex === 0;
             document.getElementById("btnNextQuestion").disabled = selectedIdx === undefined;
-            document.getElementById("btnNextQuestion").textContent = currentIndex === total - 1 ? "Submit Battery" : "Next Item";
+            document.getElementById("btnNextQuestion").textContent = currentIndex === total - 1 ? "Submit Assessment" : "Next Item";
 
             const container = document.getElementById("optionsGridContainer");
             container.innerHTML = "";
@@ -247,7 +349,7 @@
                 const btn = document.createElement("button");
                 btn.type = "button";
                 const isSelected = selectedIdx === idx;
-                btn.className = `choice-card text-left p-4 rounded-xl border text-sm font-medium transition-all ${
+                btn.className = `choice-card text-left p-3.5 rounded-xl border text-sm font-medium transition-all ${
                     isSelected ? "active-radio font-bold text-indigo-950" : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
                 }`;
                 btn.textContent = optText;
@@ -274,75 +376,172 @@
         async function finishAssessment() {
             const results = engine.calculateScores(userResponses, testBattery);
 
-            // Mark completion fully in UI
-            const badge = document.getElementById("testProgressBadge");
-            badge.textContent = "100% Complete";
-            badge.className = "text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded";
-            document.getElementById("topProgressBar").style.width = "100%";
-
-            // Populate dashboard score cards
-            document.getElementById("cardScoreAQ").textContent = results.rawResults.AQ.total;
-            document.getElementById("cardScoreRAADS").textContent = results.rawResults.RAADS.total;
-            document.getElementById("cardScoreCATQ").textContent = results.rawResults.CATQ.total;
-            document.getElementById("cardScoreCATI").textContent = results.rawResults.CATI.total;
-
-            // Render discovered theme cards
-            const themesContainer = document.getElementById("thematicResultsContainer");
-            themesContainer.innerHTML = "";
-            results.thematicAnalysis.forEach(theme => {
-                const badgeColor = theme.prominence === "High" ? "bg-rose-100 text-rose-800" :
-                                   theme.prominence === "Moderate" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800";
-                const card = document.createElement("div");
-                card.className = "p-4 border border-slate-200 rounded-xl bg-slate-50";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-1.5">
-                        <h5 class="font-bold text-slate-900 text-sm">${theme.themeName}</h5>
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded ${badgeColor}">${theme.prominence}</span>
-                    </div>
-                    <p class="text-xs text-slate-600 leading-relaxed">${theme.description}</p>
-                `;
-                themesContainer.appendChild(card);
-            });
-
-            // Transition UI views
+            // Hide testing, show client completion panel
             document.getElementById("viewTesting").classList.add("hidden");
-            document.getElementById("viewDashboard").classList.remove("hidden");
+            document.getElementById("completedClientName").textContent = activeClientInfo.name;
+            document.getElementById("viewClientCompletion").classList.remove("hidden");
+            document.getElementById("testProgressBadge").textContent = "Completed";
+            document.getElementById("testProgressBadge").className = "text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded";
 
-            renderChart(results.normalizedMetrics);
-
-            // Log securely to Google Apps Script
-            if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_DEPLOYMENT_URL") {
-                try {
-                    await fetch(APPS_SCRIPT_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({
-                            clientId: clientCredentials.id,
-                            accessPin: clientCredentials.pin,
-                            totals: {
-                                AQ: results.rawResults.AQ.total,
-                                RAADS: results.rawResults.RAADS.total,
-                                CATQ: results.rawResults.CATQ.total,
-                                CATI: results.rawResults.CATI.total
-                            },
-                            metrics: results.normalizedMetrics,
-                            themes: results.thematicAnalysis
-                        })
-                    });
-                } catch (err) {
-                    console.warn("Spreadsheet logging failed:", err);
-                }
+            // Submit payload to Google Apps Script
+            try {
+                await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "submitAssessment",
+                        client: activeClientInfo,
+                        totals: {
+                            AQ: results.rawResults.AQ.total,
+                            RAADS: results.rawResults.RAADS.total,
+                            CATQ: results.rawResults.CATQ.total,
+                            CATI: results.rawResults.CATI.total
+                        },
+                        metrics: results.normalizedMetrics,
+                        themes: results.thematicAnalysis
+                    })
+                });
+            } catch (err) {
+                console.error("Submission failed:", err);
             }
         }
 
-        function renderChart(metrics) {
-            const ctx = document.getElementById("subscaleChartCanvas").getContext("2d");
+        // Clinician Modal & Security PIN
+        function openClinicianModal() {
+            document.getElementById("modalPinError").classList.add("hidden");
+            document.getElementById("modalPinInput").value = "";
+            document.getElementById("modalPinLock").classList.remove("hidden");
+        }
+
+        function closeClinicianModal() {
+            document.getElementById("modalPinLock").classList.add("hidden");
+        }
+
+        async function handleVerifyClinicianPin(e) {
+            e.preventDefault();
+            const pin = document.getElementById("modalPinInput").value.trim();
+            const btn = document.getElementById("btnUnlockPortal");
+            const errDiv = document.getElementById("modalPinError");
+
+            btn.textContent = "Verifying...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "getAdminData",
+                        accessPin: pin
+                    })
+                });
+
+                const data = await res.json();
+                if (data.status === "success") {
+                    verifiedAdminPin = pin;
+                    adminRecords = data.records;
+                    closeClinicianModal();
+                    openAdminDashboard();
+                } else {
+                    errDiv.textContent = data.message || "Invalid Security PIN.";
+                    errDiv.classList.remove("hidden");
+                }
+            } catch (err) {
+                errDiv.textContent = "Network error communicating with assessment backend.";
+                errDiv.classList.remove("hidden");
+            } finally {
+                btn.textContent = "Verify & Unlock";
+                btn.disabled = false;
+            }
+        }
+
+        function openAdminDashboard() {
+            document.getElementById("viewClientIntake").classList.add("hidden");
+            document.getElementById("viewTesting").classList.add("hidden");
+            document.getElementById("viewClientCompletion").classList.add("hidden");
+            document.getElementById("viewAdminDetail").classList.add("hidden");
+
+            document.getElementById("viewAdminRoster").classList.remove("hidden");
+            renderAdminRosterTable();
+        }
+
+        function renderAdminRosterTable() {
+            const tbody = document.getElementById("adminTableBody");
+            const emptyNotice = document.getElementById("adminEmptyNotice");
+            tbody.innerHTML = "";
+
+            if (!adminRecords || adminRecords.length === 0) {
+                emptyNotice.classList.remove("hidden");
+                return;
+            }
+            emptyNotice.classList.add("hidden");
+
+            adminRecords.forEach(rec => {
+                const dateFormatted = new Date(rec.timestamp).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-xs text-slate-500">${dateFormatted}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-900">${rec.name}</td>
+                    <td class="py-3 px-4 text-xs text-slate-600">${rec.phone}<br><span class="text-slate-400">${rec.email}</span></td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.AQ}</td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.RAADS}</td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.CATQ}</td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totals.CATI}</td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="inspectClientDetail(${rec.id})" class="px-3 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-all">Inspect Profile</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function inspectClientDetail(recordId) {
+            const rec = adminRecords.find(r => r.id === recordId);
+            if (!rec) return;
+
+            document.getElementById("viewAdminRoster").classList.add("hidden");
+            document.getElementById("viewAdminDetail").classList.remove("hidden");
+
+            document.getElementById("detClientName").textContent = rec.name;
+            document.getElementById("detClientDob").textContent = rec.dob;
+            document.getElementById("detClientPhone").textContent = rec.phone;
+            document.getElementById("detClientEmail").textContent = rec.email;
+
+            document.getElementById("detScoreAQ").textContent = rec.totals.AQ;
+            document.getElementById("detScoreRAADS").textContent = rec.totals.RAADS;
+            document.getElementById("detScoreCATQ").textContent = rec.totals.CATQ;
+            document.getElementById("detScoreCATI").textContent = rec.totals.CATI;
+
+            // Render thematic clusters
+            const themeContainer = document.getElementById("detThematicContainer");
+            themeContainer.innerHTML = "";
+            (rec.themes || []).forEach(theme => {
+                const badgeColor = theme.prominence === "High" ? "bg-rose-100 text-rose-800" :
+                                   theme.prominence === "Moderate" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800";
+                const card = document.createElement("div");
+                card.className = "p-3.5 border border-slate-200 rounded-xl bg-slate-50";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <h5 class="font-bold text-slate-900 text-xs">${theme.themeName}</h5>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${badgeColor}">${theme.prominence}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 leading-relaxed">${theme.description}</p>
+                `;
+                themeContainer.appendChild(card);
+            });
+
+            // Render subscale chart
+            renderAdminChart(rec.metrics);
+        }
+
+        function renderAdminChart(metrics) {
+            const ctx = document.getElementById("adminSubscaleChartCanvas").getContext("2d");
             const labels = [];
             const values = [];
             const backgroundColors = [];
             const borderColors = [];
 
-            // Color palette by clinical screener
             const batteryPalette = {
                 AQ:    { bg: "rgba(59, 130, 246, 0.75)", border: "rgb(37, 99, 235)" },
                 RAADS: { bg: "rgba(16, 185, 129, 0.75)", border: "rgb(5, 150, 105)" },
@@ -350,20 +549,20 @@
                 CATI:  { bg: "rgba(139, 92, 246, 0.75)", border: "rgb(124, 58, 237)" }
             };
 
-            Object.entries(metrics).forEach(([testId, data]) => {
-                Object.entries(data.subscales).forEach(([subName, pct]) => {
-                    const formattedSubName = subName.replace(/([A-Z])/g, " $1").toLowerCase();
-                    labels.push(`${testId}: ${formattedSubName}`);
+            Object.entries(metrics || {}).forEach(([testId, data]) => {
+                Object.entries(data.subscales || {}).forEach(([subName, pct]) => {
+                    const formattedSub = subName.replace(/([A-Z])/g, " $1").toLowerCase();
+                    labels.push(`${testId}: ${formattedSub}`);
                     values.push(pct);
 
-                    const color = batteryPalette[testId] || { bg: "rgba(99, 102, 241, 0.75)", border: "rgb(79, 70, 229)" };
-                    backgroundColors.push(color.bg);
-                    borderColors.push(color.border);
+                    const palette = batteryPalette[testId] || { bg: "rgba(99, 102, 241, 0.75)", border: "rgb(79, 70, 229)" };
+                    backgroundColors.push(palette.bg);
+                    borderColors.push(palette.border);
                 });
             });
 
-            if (barChart) barChart.destroy();
-            barChart = new Chart(ctx, {
+            if (adminChart) adminChart.destroy();
+            adminChart = new Chart(ctx, {
                 type: "bar",
                 data: {
                     labels: labels,
@@ -379,30 +578,45 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            max: 100, 
-                            ticks: { callback: v => v + "%", stepSize: 20 } 
-                        },
-                        x: { 
-                            ticks: { 
-                                autoSkip: false, 
-                                maxRotation: 60, 
-                                minRotation: 45, 
-                                font: { size: 9 } 
-                            } 
-                        }
+                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%", stepSize: 20 } },
+                        x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 45, font: { size: 9 } } }
                     },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => ` Match: ${ctx.raw}%`
-                            }
-                        }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
+        }
+
+        function backToAdminRoster() {
+            document.getElementById("viewAdminDetail").classList.add("hidden");
+            document.getElementById("viewAdminRoster").classList.remove("hidden");
+        }
+
+        async function refreshAdminData() {
+            try {
+                const res = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "getAdminData",
+                        accessPin: verifiedAdminPin
+                    })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    adminRecords = data.records;
+                    renderAdminRosterTable();
+                }
+            } catch (err) {
+                console.error("Refresh failed:", err);
+            }
+        }
+
+        function exitAdminView() {
+            verifiedAdminPin = "";
+            adminRecords = [];
+            document.getElementById("viewAdminRoster").classList.add("hidden");
+            document.getElementById("viewAdminDetail").classList.add("hidden");
+            document.getElementById("viewClientIntake").classList.remove("hidden");
         }
 
         document.addEventListener("DOMContentLoaded", initApp);
