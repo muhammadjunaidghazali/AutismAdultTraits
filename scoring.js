@@ -107,11 +107,13 @@ class AutismAssessmentEngine {
         });
 
         const prominentThemes = this.evaluateCrossTestThemes(normalizedMetrics);
+        const clinicalInvestigationAreas = this.evaluateClinicalInvestigationAreas(resultsMap, normalizedMetrics);
 
         return {
             rawResults: resultsMap,
             normalizedMetrics: normalizedMetrics,
-            thematicAnalysis: prominentThemes
+            thematicAnalysis: prominentThemes,
+            clinicalInvestigationAreas: clinicalInvestigationAreas
         };
     }
 
@@ -122,7 +124,7 @@ class AutismAssessmentEngine {
         const raadsSocial = metrics.RAADS?.subscales?.socialRelatedness || 0;
         const catiSocial = metrics.CATI?.subscales?.socialInteractions || 0;
 
-        if (aqSocial >= 70 || raadsSocial >= 50 || catiSocial >= 70) {
+        if (aqSocial >= 60 || raadsSocial >= 45 || catiSocial >= 60) {
             let prominence = "Low";
             if (aqSocial >= 80 && raadsSocial >= 65 && catiSocial >= 80) prominence = "High";
             else if (aqSocial >= 60 || raadsSocial >= 45 || catiSocial >= 60) prominence = "Moderate";
@@ -143,7 +145,7 @@ class AutismAssessmentEngine {
             else if (raadsSensory >= 50 || catiSensory >= 50) prominence = "Moderate";
 
             discoveredThemes.push({
-                themeName: "Sensory Processing Profile",
+                themeName: "Sensory Processing Sensitivity",
                 prominence: prominence,
                 description: "Heightened neurological responsiveness to environmental stimulation such as bright lighting, background noise, or tactile friction."
             });
@@ -152,13 +154,13 @@ class AutismAssessmentEngine {
         const catqMasking = ((metrics.CATQ?.subscales?.masking || 0) + (metrics.CATQ?.subscales?.compensation || 0)) / 2;
         const catiCamouflage = metrics.CATI?.subscales?.socialCamouflage || 0;
 
-        if (catqMasking >= 60 || catiCamouflage >= 60) {
+        if (catqMasking >= 55 || catiCamouflage >= 55) {
             let prominence = "Low";
             if (catqMasking >= 75 && catiCamouflage >= 75) prominence = "High";
             else if (catqMasking >= 55 || catiCamouflage >= 55) prominence = "Moderate";
 
             discoveredThemes.push({
-                themeName: "Social Camouflaging & Cognitive Adaptation",
+                themeName: "Social Camouflaging & Adaptation",
                 prominence: prominence,
                 description: "Active deployment of conscious social coping strategies and internal behavioral scripts, requiring sustained mental effort."
             });
@@ -168,13 +170,13 @@ class AutismAssessmentEngine {
         const raadsRoutine = metrics.RAADS?.subscales?.circumscribedInterests || 0;
         const catiFlexibility = metrics.CATI?.subscales?.cognitiveInflexibility || 0;
 
-        if (aqDetail >= 70 || raadsRoutine >= 60 || catiFlexibility >= 70) {
+        if (aqDetail >= 60 || raadsRoutine >= 50 || catiFlexibility >= 60) {
             let prominence = "Low";
             if (aqDetail >= 80 && raadsRoutine >= 70 && catiFlexibility >= 80) prominence = "High";
             else if (aqDetail >= 60 || raadsRoutine >= 50 || catiFlexibility >= 60) prominence = "Moderate";
 
             discoveredThemes.push({
-                themeName: "Cognitive Systemizing & Focus Variations",
+                themeName: "Cognitive Systemizing & Routine Consistency",
                 prominence: prominence,
                 description: "High affinity for rule-based precision, deep-dive interests, and predictable routines, paired with friction around sudden disruptions."
             });
@@ -189,6 +191,67 @@ class AutismAssessmentEngine {
         }
 
         return discoveredThemes;
+    }
+
+    evaluateClinicalInvestigationAreas(raw, metrics) {
+        const areas = [];
+
+        // 1. Sensory Reactivity Convergence
+        const raadsSensory = metrics.RAADS?.subscales?.sensoryMotor || 0;
+        const catiSensory = metrics.CATI?.subscales?.sensorySensitivity || 0;
+        if (raadsSensory >= 50 || catiSensory >= 50) {
+            areas.push({
+                title: "Sensory Load & Environmental Sensitivity",
+                severity: (raadsSensory >= 70 && catiSensory >= 70) ? "Priority Focus" : "Clinical Consideration",
+                notes: "Sensory markers cross-validate across RAADS-R (sensory-motor) and CATI (sensory sensitivity). Investigate auditory, tactile, and visual overload triggers in daily life, as well as the need for physical sensory decompression."
+            });
+        }
+
+        // 2. High Camouflaging Masking Effect
+        const catqTotal = raw.CATQ?.total || 0;
+        const catqMasking = metrics.CATQ?.subscales?.masking || 0;
+        const catiCamouflage = metrics.CATI?.subscales?.socialCamouflage || 0;
+        if (catqTotal >= 100 || catqMasking >= 65 || catiCamouflage >= 65) {
+            areas.push({
+                title: "Masking Compensation & Burnout Vulnerability",
+                severity: "Priority Focus",
+                notes: "Elevated CAT-Q (≥100) or CATI camouflage points to intensive social compensation. This degree of masking can suppress observable markers on standard screening tools like AQ or childhood history tools. Inquire specifically about late-day exhaustion and autistic burnout."
+            });
+        }
+
+        // 3. Cognitive Inflexibility and Monotropic Focus
+        const raadsInterests = metrics.RAADS?.subscales?.circumscribedInterests || 0;
+        const catiInflexibility = metrics.CATI?.subscales?.cognitiveInflexibility || 0;
+        const aqSwitching = metrics.AQ?.subscales?.attentionSwitching || 0;
+        if (raadsInterests >= 55 || catiInflexibility >= 60 || aqSwitching >= 70) {
+            areas.push({
+                title: "Monotropic Attention & Resistance to Disruption",
+                severity: "Clinical Consideration",
+                notes: "Convergence across circumscribed interests and attention-switching indicates strong monotropic flow states. Sudden task-switching or schedule changes are likely primary friction sources in occupational and relational settings."
+            });
+        }
+
+        // 4. Pragmatic & Non-Verbal Communication
+        const aqComm = metrics.AQ?.subscales?.communication || 0;
+        const raadsLang = metrics.RAADS?.subscales?.language || 0;
+        const catiComm = metrics.CATI?.subscales?.communication || 0;
+        if (aqComm >= 60 || raadsLang >= 50 || catiComm >= 60) {
+            areas.push({
+                title: "Pragmatic Language & Literal Interpretation",
+                severity: "Clinical Consideration",
+                notes: "Elevated indicators in linguistic and non-verbal decoding. Explore difficulty with implied expectations, colloquialisms, turn-taking pauses, and the cognitive toll of manually decoding non-verbal facial cues."
+            });
+        }
+
+        if (areas.length === 0) {
+            areas.push({
+                title: "Baseline Trait Harmony",
+                severity: "Standard Tracking",
+                notes: "No acute cross-battery convergent elevations flagged. Dimensional markers fall within normative variance across sensory, cognitive, and social domains."
+            });
+        }
+
+        return areas;
     }
 }
 
