@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinical Psychometric Screening Dashboard</title>
+    <!-- Core External Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Standalone Decoupled Scoring Engine -->
     <script src="scoring.js"></script>
     <style>
         .choice-card:hover { border-color: #3b82f6; background-color: #f8fafc; }
@@ -43,7 +45,7 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Dynamic Application Container -->
     <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
 
         <!-- VIEW 1: CLIENT INTAKE FORM (Name, Contact, Email, DOB) -->
@@ -109,7 +111,7 @@
             <p class="text-sm text-slate-600 mt-2 leading-relaxed">Thank you, <span id="completedClientName" class="font-semibold text-slate-800"></span>. Your psychometric screening battery has been compiled and securely transmitted to your clinician for diagnostic review.</p>
             <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500 text-left">
                 <p class="font-semibold text-slate-700 mb-1">What happens next?</p>
-                <p>Your clinician will review the dimensional subscales and convergent trait profiles during your consultation session. You may now close this window.</p>
+                <p>Your clinician will evaluate the dimensional subscales and convergent trait profiles during your consultation session. You may now safely close this tab.</p>
             </div>
         </section>
 
@@ -118,7 +120,7 @@
             <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div>
                     <h3 class="text-xl font-bold text-slate-900">Clinician Assessment Registry</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Secure client records repository and diagnostic evaluation records</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Secure repository of client intake records and diagnostic profiles</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="refreshAdminData()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all">Refresh Logs</button>
@@ -126,7 +128,6 @@
                 </div>
             </div>
 
-            <!-- Client Registry Table -->
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
@@ -143,7 +144,7 @@
                             </tr>
                         </thead>
                         <tbody id="adminTableBody" class="divide-y divide-slate-100 text-slate-700">
-                            <!-- Injected dynamically -->
+                            <!-- Populated dynamically -->
                         </tbody>
                     </table>
                 </div>
@@ -248,7 +249,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900">Clinician Security Check</h3>
-                <p class="text-xs text-slate-500 mt-1">Enter your Administrative PIN to access confidential patient records.</p>
+                <p class="text-xs text-slate-500 mt-1">Enter your administrative PIN to access confidential patient records.</p>
             </div>
             <form onsubmit="handleVerifyClinicianPin(event)" class="space-y-4">
                 <input type="password" id="modalPinInput" required placeholder="••••" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center tracking-widest text-lg bg-slate-50">
@@ -262,7 +263,7 @@
     </div>
 
     <script>
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/library/d/1PkA07IUsbJj8PQF3ZsuFmQyUwqTTYehq4Dumw21PEwldX1PJS7pgIT_d/2";
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec";
         const engine = new AutismAssessmentEngine();
 
         let testBattery = null;
@@ -305,7 +306,7 @@
             }
         }
 
-        // Intake Form Processing
+        // Intake Form Handler
         function handleStartAssessment(e) {
             e.preventDefault();
             activeClientInfo = {
@@ -376,16 +377,16 @@
         async function finishAssessment() {
             const results = engine.calculateScores(userResponses, testBattery);
 
-            // Hide testing, show client completion panel
+            // Hide testing, display patient confirmation card
             document.getElementById("viewTesting").classList.add("hidden");
             document.getElementById("completedClientName").textContent = activeClientInfo.name;
             document.getElementById("viewClientCompletion").classList.remove("hidden");
             document.getElementById("testProgressBadge").textContent = "Completed";
             document.getElementById("testProgressBadge").className = "text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded";
 
-            // Submit payload to Google Apps Script
+            // Transmit assessment record to backend
             try {
-                await fetch(APPS_SCRIPT_URL, {
+                const res = await fetch(APPS_SCRIPT_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
@@ -401,12 +402,14 @@
                         themes: results.thematicAnalysis
                     })
                 });
+                const confirmation = await res.text();
+                console.log("Assessment successfully recorded:", confirmation);
             } catch (err) {
                 console.error("Submission failed:", err);
             }
         }
 
-        // Clinician Modal & Security PIN
+        // Clinician Modal & PIN Authentication
         function openClinicianModal() {
             document.getElementById("modalPinError").classList.add("hidden");
             document.getElementById("modalPinInput").value = "";
@@ -425,6 +428,7 @@
 
             btn.textContent = "Verifying...";
             btn.disabled = true;
+            errDiv.classList.add("hidden");
 
             try {
                 const res = await fetch(APPS_SCRIPT_URL, {
@@ -436,7 +440,15 @@
                     })
                 });
 
-                const data = await res.json();
+                const rawText = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseErr) {
+                    console.error("Non-JSON Server Output:", rawText);
+                    throw new Error("Server returned HTML instead of JSON. Ensure your Apps Script deployment is set to 'Anyone'.");
+                }
+
                 if (data.status === "success") {
                     verifiedAdminPin = pin;
                     adminRecords = data.records;
@@ -447,7 +459,8 @@
                     errDiv.classList.remove("hidden");
                 }
             } catch (err) {
-                errDiv.textContent = "Network error communicating with assessment backend.";
+                console.error("Verification error details:", err);
+                errDiv.textContent = err.message || "Network error communicating with assessment backend.";
                 errDiv.classList.remove("hidden");
             } finally {
                 btn.textContent = "Verify & Unlock";
