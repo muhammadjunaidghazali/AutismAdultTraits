@@ -7,7 +7,6 @@
   <meta name="description" content="Clinical psychometric assessment platform">
   <meta name="theme-color" content="#0f172a">
 
-  <script src="./Tests_V2.js"></script>
   <script src="./Scoring_V2.js"></script>
 
   <style>
@@ -413,7 +412,7 @@
 <script>
 const CONFIG = {
   // Replace with your Google Apps Script Web App exec URL
-  API_URL: "[https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec](https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec)",
+  API_URL: "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec",
   AUTOSAVE_INTERVAL: 25000
 };
 
@@ -476,13 +475,31 @@ function showIntake() {
   $("fullName").focus();
 }
 
-function loadTestBattery() {
-  const battery = window.TEST_BATTERY || window.TestsV2;
-  if (!battery) return false;
-  APP.tests = Object.entries(battery).filter(function(p) { return p[0] !== "_meta"; }).map(function(p) {
-    return Object.assign({ id: p[0] }, p[1]);
-  });
-  return APP.tests.length > 0;
+async function loadTestBattery() {
+  if (APP.tests && APP.tests.length > 0) return true;
+
+  try {
+    const res = await fetch("./Tests_V2.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Could not fetch Tests_V2.json (HTTP " + res.status + ")");
+    const battery = await res.json();
+    window.TEST_BATTERY = battery;
+
+    APP.tests = Object.entries(battery)
+      .filter(([key]) => key !== "_meta")
+      .map(([id, test]) => Object.assign({ id: id, testId: id }, test));
+
+    return APP.tests.length > 0;
+  } catch (err) {
+    console.warn("Direct fetch for Tests_V2.json failed, checking window globals:", err);
+    if (window.TEST_BATTERY || window.TestsV2) {
+      const battery = window.TEST_BATTERY || window.TestsV2;
+      APP.tests = Object.entries(battery)
+        .filter(([key]) => key !== "_meta")
+        .map(([id, test]) => Object.assign({ id: id, testId: id }, test));
+      return APP.tests.length > 0;
+    }
+    return false;
+  }
 }
 
 $("intakeForm").addEventListener("submit", async function (e) {
@@ -497,8 +514,11 @@ $("intakeForm").addEventListener("submit", async function (e) {
     assessmentPurpose: formData.get("assessmentPurpose") || "Intake Screening"
   };
 
-  if (!loadTestBattery()) {
-    alert("Could not load questionnaire battery. Verify Tests_V2.js is in the same folder.");
+  showLoading("Loading questionnaire battery...");
+  const loaded = await loadTestBattery();
+  if (!loaded) {
+    hideLoading();
+    alert("Could not load Tests_V2.json.\n\nMake sure Tests_V2.json is in the same folder and served via a local or remote web server (such as GitHub Pages or python -m http.server).");
     return;
   }
 
@@ -512,7 +532,6 @@ $("intakeForm").addEventListener("submit", async function (e) {
     startAssessment();
   } catch (err) {
     hideLoading();
-    alert("Connection note: Starting session in local fallback mode.");
     APP.clientId = "CLI-" + Date.now();
     APP.assessmentId = "ASM-" + Date.now();
     APP.startedAt = new Date().toISOString();
@@ -657,7 +676,7 @@ async function submitFinalAssessment() {
   } catch (err) {
     hideLoading();
     APP.submitting = false;
-    alert("Submission could not be completed. Please check your internet connection and try again.");
+    alert("Submission could not be completed. Please check your connection and try again.");
   }
 }
 
@@ -836,7 +855,8 @@ function escapeHtml(str) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  setStatus("Online");
+  setStatus("Ready");
+  loadTestBattery();
 });
 </script>
 </body>
