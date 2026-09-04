@@ -4,13 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adult Neurodiversity & Autistic Trait Screening | Muhammad Junaid Ghazali</title>
-  <meta name="description" content="Visual, empathetic adult autistic traits screening suite with English and Roman Urdu support.">
+  <meta name="description" content="Friendly, gamified, and clinician-reviewed psychometric battery for adult neurodivergence.">
   <meta name="theme-color" content="#0d9488">
 
-  <!-- Core Psychometric Engines -->
   <script src="./Scoring_V2.js"></script>
 
-  <!-- Clean Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,14 +24,26 @@
       --slate-200: #e2e8f0;
       --slate-600: #475569;
       --slate-800: #0f172a;
-      --accent: #6366f1;
       --amber: #d97706;
       --rose: #e11d48;
       --emerald: #059669;
-      --radius-lg: 18px;
+      --radius-lg: 16px;
       --radius-md: 12px;
-      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-      --shadow-md: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      --anim-speed: 0.25s;
+    }
+
+    /* Sensory Friendly / Calm Mode */
+    body.calm-mode {
+      --primary: #475569;
+      --primary-dark: #334155;
+      --primary-light: #f1f5f9;
+      --anim-speed: 0s;
+      background: #fdfbf7;
+    }
+    body.calm-mode * {
+      animation: none !important;
+      transition: none !important;
     }
 
     * { box-sizing: border-box; }
@@ -41,28 +51,27 @@
     body {
       margin: 0;
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background: #f8fafc;
+      background: var(--slate-50);
       color: var(--slate-800);
-      line-height: 1.65;
+      line-height: 1.6;
     }
 
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
     .hidden { display: none !important; }
 
-    /* Header & Branding */
+    /* Header */
     .site-header {
       background: #ffffff;
       border-bottom: 1px solid var(--slate-200);
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: var(--shadow-sm);
     }
     .header-inner {
       max-width: 1040px;
       margin: auto;
-      padding: 14px 20px;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -76,27 +85,22 @@
       color: inherit;
     }
     .brand-mark {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
       background: linear-gradient(135deg, #0d9488, #0284c7);
       display: grid;
       place-items: center;
       color: white;
       font-weight: 800;
-      font-size: 20px;
-      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+      font-size: 19px;
     }
     .brand-text { display: flex; flex-direction: column; }
-    .brand-title { font-size: 15px; font-weight: 700; color: var(--slate-800); }
-    .brand-subtitle { font-size: 12px; color: var(--slate-600); }
+    .brand-title { font-size: 14px; font-weight: 700; }
+    .brand-subtitle { font-size: 11px; color: var(--slate-600); }
 
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .lang-btn {
+    .header-controls { display: flex; align-items: center; gap: 8px; }
+    .pill-btn {
       background: var(--slate-100);
       border: 1px solid var(--slate-200);
       padding: 6px 12px;
@@ -104,119 +108,95 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--slate-800);
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
-    .lang-btn:hover {
-      background: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary-dark);
-    }
+    .pill-btn:hover { background: var(--primary-light); color: var(--primary-dark); }
 
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 32px 18px 80px;
-    }
+    main { max-width: 900px; margin: 0 auto; padding: 28px 16px 80px; }
 
     .card {
       background: #ffffff;
       border: 1px solid var(--slate-200);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-md);
-      padding: 32px;
-      margin-bottom: 24px;
+      padding: 30px;
+      margin-bottom: 20px;
     }
 
-    /* Hero & Trust Badges */
-    .hero-badge {
+    /* Gamified Journey Track */
+    .journey-bar {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .journey-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .track-outer {
+      height: 9px;
+      background: var(--slate-200);
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+    .track-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0d9488, #0284c7);
+      border-radius: 99px;
+      transition: width var(--anim-speed) ease;
+    }
+    .quest-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      background: var(--primary-light);
-      color: var(--primary-dark);
+      gap: 6px;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      padding: 4px 10px;
       border-radius: 99px;
       font-size: 12px;
       font-weight: 700;
-      margin-bottom: 16px;
-    }
-    h1 {
-      font-size: clamp(26px, 4vw, 36px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin: 0 0 12px;
-      color: var(--slate-800);
-    }
-    .lead {
-      font-size: 16px;
-      color: var(--slate-600);
-      margin-bottom: 24px;
-    }
-    .meta-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin: 20px 0;
-    }
-    .meta-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--slate-50);
-      border: 1px solid var(--slate-200);
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--slate-600);
     }
 
     /* Buttons */
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 24px;
-    }
     .btn {
       border: 0;
       border-radius: 10px;
-      padding: 12px 22px;
+      padding: 12px 20px;
       font-weight: 600;
       font-size: 14px;
-      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25); }
+    .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-secondary { background: var(--slate-100); color: var(--slate-800); border: 1px solid var(--slate-200); }
     .btn-secondary:hover { background: var(--slate-200); }
-    .btn-whatsapp { background: #25d366; color: white; font-weight: 700; text-decoration: none; }
-    .btn-whatsapp:hover { background: #1ebd58; }
+    .btn-whatsapp { background: #25d366; color: white; text-decoration: none; }
 
-    /* Question Cards & Responsive Options */
+    /* Questions */
     .question-card {
       background: #ffffff;
       border: 1px solid var(--slate-200);
       border-radius: var(--radius-md);
-      padding: 22px;
-      margin-bottom: 18px;
-      transition: border-color 0.2s;
+      padding: 20px;
+      margin-bottom: 16px;
     }
     .question-header {
       display: flex;
-      align-items: flex-start;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    .question-number {
+    .q-num {
       width: 28px;
       height: 28px;
       border-radius: 8px;
@@ -225,192 +205,101 @@
       display: grid;
       place-items: center;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       flex-shrink: 0;
     }
-    .question-text {
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.45;
-    }
-    .options-grid {
-      display: grid;
-      gap: 10px;
-    }
-    .option-chip {
-      position: relative;
-    }
-    .option-chip input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .option-chip label {
+    .q-text { font-size: 15px; font-weight: 600; }
+    .options-grid { display: grid; gap: 8px; }
+    .opt-chip { position: relative; }
+    .opt-chip input { position: absolute; opacity: 0; }
+    .opt-chip label {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
+      gap: 10px;
+      padding: 11px 14px;
       border: 1.5px solid var(--slate-200);
       border-radius: 10px;
       cursor: pointer;
       font-size: 14px;
-      font-weight: 500;
-      background: #ffffff;
-      transition: all 0.15s ease;
     }
-    .option-chip label:hover {
-      background: var(--slate-50);
-      border-color: #99f6e4;
-    }
-    .option-chip input:checked + label {
+    .opt-chip label:hover { background: var(--slate-50); }
+    .opt-chip input:checked + label {
       background: var(--primary-light);
       border-color: var(--primary);
       color: var(--primary-dark);
-      font-weight: 700;
-    }
-    .chip-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid #94a3b8;
-      flex-shrink: 0;
-    }
-    .option-chip input:checked + label .chip-dot {
-      border-color: var(--primary);
-      background: var(--primary);
-      box-shadow: inset 0 0 0 3px white;
+      font-weight: 600;
     }
 
-    /* Visual Reports & Layman Gauges */
-    .report-badge {
-      display: inline-block;
-      padding: 4px 12px;
+    /* Visual Reports */
+    .priority-badge {
+      padding: 4px 10px;
       border-radius: 99px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
     }
-    .badge-moderate { background: #fef3c7; color: #b45309; }
-    .badge-elevated { background: #fee2e2; color: #b91c1c; }
-    .badge-typical { background: #ecfdf5; color: #047857; }
+    .priority-high { background: #fee2e2; color: #991b1b; }
+    .priority-mod { background: #fef3c7; color: #92400e; }
+    .priority-low { background: #ecfdf5; color: #065f46; }
 
-    .spectrum-panel {
-      display: grid;
-      gap: 18px;
-      margin: 24px 0;
-    }
-    .trait-row {
+    .triage-card {
       background: var(--slate-50);
       border: 1px solid var(--slate-200);
       border-radius: 14px;
-      padding: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
     }
-    .trait-top {
+
+    /* Clinician Detail Modal */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: grid; place-items: center;
+      padding: 16px; z-index: 3000;
+    }
+    .modal-content {
+      width: min(920px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 26px;
+    }
+    .tab-bar {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+      gap: 8px;
+      border-bottom: 1px solid var(--slate-200);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
     }
-    .trait-title {
-      font-weight: 700;
-      font-size: 15px;
-    }
-    .trait-bar-track {
-      height: 10px;
-      background: var(--slate-200);
-      border-radius: 99px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    .trait-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .trait-desc {
+    .tab-btn {
+      background: transparent;
+      border: 0;
+      font-weight: 600;
       font-size: 13px;
       color: var(--slate-600);
-      line-height: 1.5;
+      padding: 8px 14px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
     }
 
-    /* Clinician Card Footer */
-    .clinician-card {
-      background: linear-gradient(135deg, #f0fdfa, #f8fafc);
-      border: 1px solid #ccfbf1;
-      border-radius: 14px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-top: 25px;
-    }
-    .clinician-avatar {
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-size: 22px;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-
-    /* Floating Navigation Toolbar */
-    .assessment-toolbar {
-      position: sticky;
-      bottom: 16px;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--slate-200);
-      border-radius: var(--radius-md);
-      padding: 12px 18px;
-      box-shadow: var(--shadow-md);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Loading Overlay */
-    .loading-overlay {
-      position: fixed; inset: 0;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(4px);
-      z-index: 5000;
-      display: grid;
-      place-items: center;
-    }
-    .spinner {
-      width: 38px;
-      height: 38px;
-      border: 3.5px solid var(--primary-light);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.75s linear infinite;
-      margin-bottom: 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Form Fields */
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field.full { grid-column: 1 / -1; }
     input, select, textarea {
       width: 100%; border: 1px solid #cbd5e1; background: white;
-      border-radius: 8px; padding: 11px 13px; font-size: 14px; outline: none;
+      border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none;
     }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
-    }
-    .required { color: var(--rose); }
 
-    @media (max-width: 680px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .clinician-card { flex-direction: column; text-align: center; }
-      .meta-pills { justify-content: center; }
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: rgba(255, 255, 255, 0.88);
+      z-index: 5000; display: grid; place-items: center;
     }
   </style>
 </head>
@@ -422,14 +311,17 @@
       <div class="brand-mark">Ψ</div>
       <div class="brand-text">
         <span class="brand-title">Muhammad Junaid Ghazali</span>
-        <span class="brand-subtitle">Counselor & Psychologist Pakistan</span>
+        <span class="brand-subtitle">Counselor & Clinical Psychologist</span>
       </div>
     </a>
     <div class="header-controls">
-      <button type="button" class="lang-btn" onclick="toggleLanguage()">
-        <span id="langIcon">🌐</span> <span id="langLabel">Roman Urdu</span>
+      <button type="button" class="pill-btn" onclick="toggleCalmMode()" title="Reduces animations and color saturation">
+        🍃 <span id="calmModeLabel">Sensory Calm: Off</span>
       </button>
-      <button type="button" class="btn btn-secondary" style="padding:7px 12px;font-size:12px;" onclick="showClinicianLogin()">Portal</button>
+      <button type="button" class="pill-btn" onclick="toggleLanguage()">
+        🌐 <span id="langLabel">Roman Urdu</span>
+      </button>
+      <button type="button" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showClinicianLogin()">Portal</button>
     </div>
   </div>
 </header>
@@ -438,77 +330,75 @@
   <!-- Welcome Screen -->
   <section id="welcomeScreen">
     <div class="card">
-      <span class="hero-badge" data-i18n="badge">EVIDENCE-BASED ADULT SCREENING</span>
-      <h1 data-i18n="heroTitle">Understanding Your Neurodivergent & Autistic Traits</h1>
-      <p class="lead" data-i18n="heroLead">
-        Explore how your mind interacts with the world. This assessment evaluates communication preferences, deep focus, social camouflaging, and sensory perception through four internationally established psychometric instruments.
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <span class="quest-badge">🌱 Neuro-Affirmative Assessment</span>
+        <span class="quest-badge" style="background:#eff6ff;color:#1e40af;border-color:#bfdbfe;">4 Comprehensive Instruments</span>
+      </div>
+
+      <h1 style="font-size:clamp(24px, 3.5vw, 32px);margin:0 0 10px;" data-i18n="heroTitle">
+        Exploring Your Personal Cognitive Profile
+      </h1>
+
+      <p style="color:var(--slate-600);margin-bottom:20px;" data-i18n="heroLead">
+        This assessment is an exploratory space designed to map your natural traits: from communication preferences and deep passions to sensory sensitivities and social masking. There are no right or wrong answers.
       </p>
 
-      <div class="meta-pills">
-        <div class="meta-pill">⏱ <span data-i18n="metaTime">Takes ~12-15 minutes</span></div>
-        <div class="meta-pill">🔒 <span data-i18n="metaPrivacy">Confidential & Clinician-Reviewed</span></div>
-        <div class="meta-pill">🧠 <span data-i18n="metaAffirmative">Neuro-Affirmative & Non-Judgemental</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0;">
+        <div style="background:var(--slate-50);border:1px solid var(--slate-200);padding:14px;border-radius:12px;">
+          <div style="font-weight:700;font-size:14px;">⏱ Predictable Pacing</div>
+          <div style="font-size:12px;color:var(--slate-600);">Takes 12 to 15 minutes. You can take mindful pauses whenever needed.</div>
+        </div>
+        <div style="background:var(--slate-50);border:1px solid var(--slate-200);padding:14px;border-radius:12px;">
+          <div style="font-weight:700;font-size:14px;">🛡 Clinician Guided</div>
+          <div style="font-size:12px;color:var(--slate-600);">Directly reviewed by Licensed Clinical Psychologist Muhammad Junaid Ghazali.</div>
+        </div>
       </div>
 
-      <div style="background:#f0fdfa;border:1px solid #ccfbf1;border-radius:12px;padding:16px;margin:20px 0;font-size:14px;color:#0f766e;" data-i18n="heroNotice">
-        <strong>Important Notice:</strong> This questionnaire provides dimensional screening insights and is not an automated medical diagnosis. It acts as an informed starting point for discussion with a qualified psychologist.
+      <div style="background:#f0fdfa;border:1px solid #ccfbf1;border-radius:12px;padding:14px;font-size:13px;color:#0f766e;margin-bottom:24px;" data-i18n="heroNotice">
+        <strong>Friendly Reminder:</strong> Neurodivergence is not a deficit. This questionnaire illuminates your unique cognitive wiring to help guide supportive clinical discussions.
       </div>
 
-      <div class="button-row">
-        <button type="button" class="btn btn-primary" onclick="showIntake()" data-i18n="startBtn">Begin Assessment →</button>
-      </div>
+      <button type="button" class="btn btn-primary" onclick="showIntake()" data-i18n="startBtn">Begin Assessment Journey →</button>
     </div>
   </section>
 
   <!-- Intake Screen -->
   <section id="intakeScreen" class="hidden">
     <div class="card">
-      <h2 data-i18n="intakeTitle">Participant Details</h2>
-      <p style="color:var(--slate-600);font-size:14px;" data-i18n="intakeDesc">
-        Please share your basic details before we begin the questions. Required fields are marked with an asterisk (*).
+      <h2 style="margin-top:0;" data-i18n="intakeTitle">Welcome. Tell us a bit about you</h2>
+      <p style="font-size:13px;color:var(--slate-600);" data-i18n="intakeDesc">
+        Your information is kept confidential and shared only with your clinician.
       </p>
-
       <form id="intakeForm">
         <div class="form-grid">
           <div class="field">
-            <label for="fullName"><span data-i18n="fullName">Full Name</span> <span class="required">*</span></label>
-            <input id="fullName" name="fullName" type="text" autocomplete="name" required placeholder="e.g. Ahmad Khan">
+            <label for="fullName"><span data-i18n="fullName">Full Name</span> *</label>
+            <input id="fullName" name="fullName" type="text" required placeholder="e.g. Usman Ali">
           </div>
           <div class="field">
-            <label for="email"><span data-i18n="email">Email Address</span> <span class="required">*</span></label>
-            <input id="email" name="email" type="email" autocomplete="email" required placeholder="name@example.com">
+            <label for="email"><span data-i18n="email">Email Address</span> *</label>
+            <input id="email" name="email" type="email" required placeholder="name@example.com">
           </div>
           <div class="field">
-            <label for="phone"><span data-i18n="phone">Phone / WhatsApp Number</span></label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="03XXXXXXXXX">
+            <label for="phone"><span data-i18n="phone">Phone / WhatsApp</span></label>
+            <input id="phone" name="phone" type="tel" placeholder="03XXXXXXXXX">
           </div>
           <div class="field">
             <label for="dob"><span data-i18n="dob">Date of Birth</span></label>
             <input id="dob" name="dob" type="date">
           </div>
-          <div class="field">
-            <label for="gender"><span data-i18n="gender">Gender</span></label>
-            <select id="gender" name="gender">
-              <option value="">Prefer not to say</option>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="non_binary">Non-binary</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="assessmentPurpose"><span data-i18n="context">Context</span></label>
+          <div class="field full">
+            <label for="assessmentPurpose"><span data-i18n="context">What brings you to explore this today?</span></label>
             <select id="assessmentPurpose" name="assessmentPurpose">
-              <option value="Personal Exploration">Personal Self-Discovery</option>
-              <option value="Clinical Intake">Initial Clinical Consultation</option>
-              <option value="Follow-up Review">Follow-up Evaluation</option>
+              <option value="Self-Discovery">Personal Self-Discovery & Trait Exploration</option>
+              <option value="Clinical Consultation">Preparing for a Clinical Consultation</option>
+              <option value="Follow-up">Therapy Follow-up & Review</option>
             </select>
           </div>
         </div>
-
-        <div class="button-row" style="justify-content:flex-end;">
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
           <button type="button" class="btn btn-secondary" onclick="showWelcome()" data-i18n="backBtn">Back</button>
-          <button type="submit" class="btn btn-primary" data-i18n="continueBtn">Start Questions →</button>
+          <button type="submit" class="btn btn-primary" data-i18n="continueBtn">Continue to First Instrument →</button>
         </div>
       </form>
     </div>
@@ -516,102 +406,90 @@
 
   <!-- Assessment Questions Screen -->
   <section id="assessmentScreen" class="hidden">
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--slate-600);margin-bottom:6px;">
-        <span id="testStepLabel">Instrument 1 of 4</span>
-        <span id="testCompletionLabel">0%</span>
+    <div class="journey-bar">
+      <div class="journey-meta">
+        <span id="journeySectionLabel">Section 1 of 4</span>
+        <span id="journeyPacingLabel">Question 1 of 50 • ~3 mins</span>
       </div>
-      <div style="height:8px;background:var(--slate-200);border-radius:99px;overflow:hidden;">
-        <div id="testProgressBar" style="height:100%;width:0%;background:var(--primary);transition:width 0.3s ease;"></div>
+      <div class="track-outer">
+        <div id="journeyTrackFill" class="track-fill"></div>
       </div>
     </div>
 
     <div class="card">
-      <div style="margin-bottom:24px;">
-        <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;" id="instrumentSubLabel">QUESTIONNAIRE</div>
-        <h2 style="margin:4px 0 8px;" id="instrumentTitle">Assessment</h2>
-        <p style="color:var(--slate-600);font-size:14px;margin:0;" id="instrumentDesc"></p>
+      <div style="margin-bottom:20px;">
+        <span style="font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;" id="instSubLabel">SECTION 1</span>
+        <h2 style="margin:4px 0 6px;" id="instTitle">Instrument</h2>
+        <p style="font-size:13px;color:var(--slate-600);margin:0;" id="instDesc"></p>
       </div>
-
-      <div id="questionsList"></div>
+      <div id="questionsContainer"></div>
     </div>
 
-    <div class="assessment-toolbar">
-      <button type="button" class="btn btn-secondary" id="prevBtn" onclick="prevInstrument()">← Back</button>
-      <span style="font-size:13px;color:var(--slate-600);font-weight:600;" id="toolbarTracker">Part 1</span>
-      <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextInstrument()">Next Section →</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+      <button type="button" class="btn btn-secondary" id="prevSectionBtn" onclick="prevInstrument()">← Previous</button>
+      <button type="button" class="btn btn-primary" id="nextSectionBtn" onclick="nextInstrument()">Next Section →</button>
     </div>
   </section>
 
-  <!-- Visual Report Screen (Layman Friendly) -->
+  <!-- Visual Layman Report -->
   <section id="reportScreen" class="hidden">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
         <div>
-          <span class="report-badge badge-typical" id="overallBadge">SCREENING COMPLETE</span>
-          <h1 style="margin:8px 0 4px;" data-i18n="reportTitle">Your Personal Traits Profile</h1>
-          <p style="color:var(--slate-600);font-size:14px;margin:0;">Ref: <strong id="reportRefId">-</strong> | Participant: <span id="reportClientName">-</span></p>
+          <span class="quest-badge" style="background:#ecfdf5;color:#047857;">Battery Completed</span>
+          <h1 style="margin:6px 0 2px;" data-i18n="reportTitle">Your Traits Spectrum Profile</h1>
+          <p style="font-size:13px;color:var(--slate-600);margin:0;">Ref: <strong id="reportRefId">-</strong> | For: <span id="reportClientName">-</span></p>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="window.print()" style="padding:8px 14px;font-size:13px;">🖨 Print / Save PDF</button>
+        <button type="button" class="btn btn-secondary" onclick="window.print()" style="font-size:12px;padding:8px 14px;">🖨 Print / PDF</button>
       </div>
 
-      <div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:12px;padding:16px;margin:20px 0;font-size:14px;line-height:1.6;" id="reportIntroText">
-        This profile summarizes your responses across 4 key dimensions. Remember: autistic traits exist along a continuous spectrum. High scores represent areas of divergence or specialized processing, while lower scores reflect conventional cognitive alignment.
+      <div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:12px;padding:16px;margin:20px 0;font-size:14px;" id="reportIntroText">
+        Autistic traits exist along a continuous spectrum. Rather than a pass/fail grade, this report maps your personal traits across four distinct areas of daily living.
       </div>
 
-      <h3 style="margin-top:28px;" data-i18n="dimensionsHeader">Trait Dimensions & Daily Life Impact</h3>
-      <div class="spectrum-panel" id="spectrumPanel">
-        <!-- Generated Dynamically -->
-      </div>
+      <div id="laymanSpectrumPanel" style="display:grid;gap:14px;margin-bottom:24px;"></div>
 
-      <!-- Practitioner & Consultation Touchpoint -->
-      <div class="clinician-card">
-        <div class="clinician-avatar">JG</div>
-        <div style="flex:1;">
-          <h4 style="margin:0 0 4px;font-size:16px;">Muhammad Junaid Ghazali</h4>
+      <!-- Counselor Pakistan Touchpoint -->
+      <div style="background:#f0fdfa;border:1px solid #ccfbf1;border-radius:14px;padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+        <div>
+          <h4 style="margin:0 0 4px;">Muhammad Junaid Ghazali (Counselor Pakistan)</h4>
           <p style="margin:0;font-size:13px;color:var(--slate-600);">
-            Licensed Clinical Psychologist (M.Phil) • Member British Psychological Society (GMBPsS)<br>
-            Practice: <em>Counselor Pakistan</em> (Serving Islamabad, Rawalpindi & Online)
+            Licensed Clinical Psychologist (M.Phil) • GMBPsS (British Psychological Society Member)
           </p>
         </div>
-        <a id="whatsappConsultBtn" href="#" target="_blank" class="btn btn-whatsapp">
-          💬 Discuss via WhatsApp
+        <a id="waDirectBtn" href="#" target="_blank" class="btn btn-whatsapp">
+          💬 Schedule Consultation via WhatsApp
         </a>
-      </div>
-
-      <div class="button-row" style="margin-top:28px;">
-        <button type="button" class="btn btn-secondary" onclick="showWelcome()" data-i18n="homeBtn">Return to Home</button>
       </div>
     </div>
   </section>
 
-  <!-- Clinician Portal Screen -->
+  <!-- Clinician Portal Login -->
   <section id="clinicianLoginScreen" class="hidden">
-    <div class="card" style="max-width:420px;margin:40px auto;text-align:center;">
-      <h2>Clinician Registry</h2>
-      <p style="color:var(--slate-600);font-size:13px;">Enter your practice administrative PIN</p>
+    <div class="card" style="max-width:400px;margin:40px auto;text-align:center;">
+      <h3>Clinician Access</h3>
       <form id="clinicianLoginForm" style="text-align:left;">
-        <div class="field" style="margin-bottom:14px;">
-          <label for="clinicianPin">Access PIN</label>
-          <input id="clinicianPin" type="password" inputmode="numeric" required>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="clinicianPin">Practice Administrative PIN</label>
+          <input id="clinicianPin" type="password" required inputmode="numeric">
         </div>
-        <div id="loginError" class="notice danger hidden" style="color:var(--rose);font-size:13px;">Invalid administrative PIN.</div>
-        <div class="button-row">
+        <div id="loginError" style="color:var(--rose);font-size:13px;margin-bottom:10px;" class="hidden">Invalid PIN.</div>
+        <div style="display:flex;gap:8px;">
           <button type="button" class="btn btn-secondary" onclick="showWelcome()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Open Portal</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">Unlock Dashboard</button>
         </div>
       </form>
     </div>
   </section>
 
-  <!-- Clinician Dashboard Screen -->
+  <!-- Clinician Dashboard -->
   <section id="clinicianDashboardScreen" class="hidden">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <div>
-        <h2 style="margin:0;">Client Registry & Scores</h2>
-        <span style="font-size:13px;color:var(--slate-600);">Practitioner dashboard for Muhammad Junaid Ghazali</span>
+        <h2 style="margin:0;">Clinical Assessment Registry</h2>
+        <span style="font-size:13px;color:var(--slate-600);">Practice Portal • Muhammad Junaid Ghazali</span>
       </div>
-      <button class="btn btn-secondary" onclick="clinicianLogout()">Lock</button>
+      <button class="btn btn-secondary" onclick="clinicianLogout()">Lock Portal</button>
     </div>
 
     <div class="card">
@@ -619,106 +497,108 @@
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
             <tr style="text-align:left;border-bottom:2px solid var(--slate-200);color:var(--slate-600);">
-              <th style="padding:8px;">Date</th>
-              <th style="padding:8px;">ID</th>
-              <th style="padding:8px;">AQ</th>
-              <th style="padding:8px;">RAADS</th>
-              <th style="padding:8px;">CAT-Q</th>
-              <th style="padding:8px;">CATI</th>
-              <th style="padding:8px;">Action</th>
+              <th style="padding:10px 8px;">Date</th>
+              <th style="padding:10px 8px;">Assessment ID</th>
+              <th style="padding:10px 8px;">AQ (≥26)</th>
+              <th style="padding:10px 8px;">RAADS (≥65)</th>
+              <th style="padding:10px 8px;">CAT-Q (≥100)</th>
+              <th style="padding:10px 8px;">CATI</th>
+              <th style="padding:10px 8px;">Clinical Actions</th>
             </tr>
           </thead>
-          <tbody id="registryTableBody"></tbody>
+          <tbody id="clinicianTableBody"></tbody>
         </table>
       </div>
     </div>
   </section>
 </main>
 
+<!-- Mindful Rest Break Modal (Gamified Waypoint) -->
+<div id="restBreakModal" class="modal hidden">
+  <div class="modal-content" style="max-width:440px;text-align:center;">
+    <div style="font-size:36px;margin-bottom:8px;">🍵</div>
+    <h3 style="margin:0 0 8px;">Waypoint Checkpoint</h3>
+    <p style="font-size:14px;color:var(--slate-600);margin-bottom:20px;">
+      You have completed a major milestone of the assessment. Answering self-reflective questions takes cognitive energy. Feel free to stretch, take a sip of water, or rest your eyes for 30 seconds.
+    </p>
+    <button type="button" class="btn btn-primary" style="width:100%;" onclick="closeRestBreak()">I'm Ready to Continue →</button>
+  </div>
+</div>
+
+<!-- Detailed Clinician Case Modal -->
+<div id="clinicianDetailModal" class="modal hidden" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div>
+        <h3 style="margin:0;">Comprehensive Client Exploration</h3>
+        <span style="font-size:12px;color:var(--slate-600);" id="modalClientMeta">Loading record...</span>
+      </div>
+      <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('triage')">🎯 Triage & Action Plan</button>
+      <button class="tab-btn" onclick="switchTab('battery')">📊 Individual Instruments</button>
+      <button class="tab-btn" onclick="switchTab('background')">👤 Intake & History</button>
+      <button class="tab-btn" onclick="switchTab('notes')">📝 Clinical Notes</button>
+    </div>
+
+    <div id="tabContentTriage"></div>
+    <div id="tabContentBattery" class="hidden"></div>
+    <div id="tabContentBackground" class="hidden"></div>
+    <div id="tabContentNotes" class="hidden"></div>
+  </div>
+</div>
+
 <div id="loadingOverlay" class="loading-overlay hidden">
   <div style="text-align:center;">
-    <div class="spinner"></div>
-    <div id="loadingMsg" style="font-weight:600;font-size:14px;color:var(--slate-800);">Loading...</div>
+    <div style="font-size:32px;margin-bottom:8px;">⌛</div>
+    <div id="loadingMsg" style="font-weight:600;font-size:14px;">Loading...</div>
   </div>
 </div>
 
 <script>
-/* ==========================================================
-   CONFIGURATION & CLINIC DETAILS
-========================================================== */
 const CONFIG = {
   API_URL: "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec",
-  PRACTICE_PHONE: "923355594054", // Official practice WhatsApp
+  PRACTICE_PHONE: "923355594054",
   PRACTITIONER_NAME: "Muhammad Junaid Ghazali"
 };
 
-/* ==========================================================
-   STATE & TRANSLATION ENGINE (ROMAN URDU & ENGLISH)
-========================================================== */
 let currentLanguage = 'en';
+let calmMode = false;
 
 const TRANSLATIONS = {
   en: {
-    badge: "EVIDENCE-BASED ADULT SCREENING",
-    heroTitle: "Understanding Your Neurodivergent & Autistic Traits",
-    heroLead: "Explore how your mind interacts with the world. This assessment evaluates communication preferences, deep focus, social camouflaging, and sensory perception through four internationally established psychometric instruments.",
-    metaTime: "Takes ~12-15 minutes",
-    metaPrivacy: "Confidential & Clinician-Reviewed",
-    metaAffirmative: "Neuro-Affirmative & Non-Judgemental",
-    heroNotice: "<strong>Important Notice:</strong> This questionnaire provides dimensional screening insights and is not an automated medical diagnosis. It acts as an informed starting point for discussion with a qualified psychologist.",
-    startBtn: "Begin Assessment →",
-    intakeTitle: "Participant Details",
-    intakeDesc: "Please share your basic details before we begin the questions. Required fields are marked with an asterisk (*).",
+    heroTitle: "Exploring Your Personal Cognitive Profile",
+    heroLead: "This assessment is an exploratory space designed to map your natural traits: from communication preferences and deep passions to sensory sensitivities and social masking. There are no right or wrong answers.",
+    heroNotice: "Friendly Reminder: Neurodivergence is not a deficit. This questionnaire illuminates your unique cognitive wiring to help guide supportive clinical discussions.",
+    startBtn: "Begin Assessment Journey →",
+    intakeTitle: "Welcome. Tell us a bit about you",
+    intakeDesc: "Your information is kept confidential and shared only with your clinician.",
     fullName: "Full Name",
     email: "Email Address",
-    phone: "Phone / WhatsApp Number",
+    phone: "Phone / WhatsApp",
     dob: "Date of Birth",
-    gender: "Gender",
-    context: "Context",
+    context: "What brings you to explore this today?",
     backBtn: "Back",
-    continueBtn: "Start Questions →",
-    reportTitle: "Your Personal Traits Profile",
-    dimensionsHeader: "Trait Dimensions & Daily Life Impact",
-    homeBtn: "Return to Home",
-    socialTitle: "Social Interaction & Reciprocity",
-    socialDesc: "How naturally conversational pacing, body language, and small talk feel, versus requiring conscious analysis.",
-    sensoryTitle: "Sensory Processing & Sensitivity",
-    sensoryDesc: "Sensitivity to environmental stimuli such as bright lighting, sudden sounds, textures, or crowded environments.",
-    camoTitle: "Camouflaging & Social Masking",
-    camoDesc: "The conscious mental effort used to rehearse facial expressions, script conversations, or 'act typical' to fit in.",
-    routineTitle: "Focus, Routine & Cognitive Flow",
-    routineDesc: "Comfort in predictable routines, discomfort with unexpected change, and capacity for prolonged, immersive interests."
+    continueBtn: "Continue to First Instrument →",
+    reportTitle: "Your Traits Spectrum Profile"
   },
   ur: {
-    badge: "MUSTANAD AUR SAFE SCREENING",
-    heroTitle: "Apnay Zehni Rujhanaat Aur Autistic Traits Ko Samajhein",
-    heroLead: "Yeh assessment aapki guftagu ke andaaz, gehri tawajjah, samaj mein fit honay ki koshish (masking), aur hissi hassasiyat (sensory feelings) ko 4 international tests ke zariye wazeh karti hai.",
-    metaTime: "Taqreeban 12-15 minute",
-    metaPrivacy: "Mukammal mehfooz aur confidential",
-    metaAffirmative: "Dostana aur bina kisi tanqeed ke",
-    heroNotice: "<strong>Zaroori Baat:</strong> Yeh assessment koi medical ya psychiatric diagnosis nahi hai, balkay yeh aapki zehni salahiyaton aur rawaiyon ko behtar samajhnay aur psychologist se mashwaray ke liye aik mufeed zariya hai.",
+    heroTitle: "Apnay Zehni Rujhanaat Aur Shakhsiyat Ka Jaiza",
+    heroLead: "Yeh assessment aapki guftagu ke andaaz, gehri dilchaspion, samaj mein fit honay ki koshish (masking), aur hissi hassasiyat (sensory feelings) ko wazeh karne ke liye banai gayi hai.",
+    heroNotice: "Zaroori Baat: Zehni ikhtilaf (Neurodivergence) koi khami nahi hai. Yeh test aapki qudrati salahiyaton ko samajhnay aur psychologist se mashwaray ke liye aik mufeed bunyad faraham karta hai.",
     startBtn: "Assessment Shuru Karein →",
-    intakeTitle: "Aapki Bunyadi Maloomat",
-    intakeDesc: "Sawaalat shuru karne se pehle baraye meherbani apni bunyadi maloomat darj karein. Sitare (*) walay khanay zaroori hain.",
+    intakeTitle: "Khush Amdeed. Apnay baray mein thora batayein",
+    intakeDesc: "Aapki tamam maloomat mukammal tor par safe aur confidential rakhi jati hain.",
     fullName: "Pura Naam",
     email: "Email Address",
-    phone: "Phone / WhatsApp Number",
+    phone: "Phone / WhatsApp",
     dob: "Tareekh-e-Pedaish",
-    gender: "Jins (Gender)",
-    context: "Wajah / Context",
+    context: "Aap yeh assessment kis wajah se kar rahay hain?",
     backBtn: "Peechay",
-    continueBtn: "Sawaalat Par Jayein →",
-    reportTitle: "Aapki Shakhsiyat Aur Traits Ka Khulasa",
-    dimensionsHeader: "Bunyadi Phelu Aur Rozmarrah Zindagi Par Asar",
-    homeBtn: "Wapas Home Par Jayein",
-    socialTitle: "Ijtamai Milansari (Social Interaction)",
-    socialDesc: "Doston ya mehfilon mein guftagu ka bahao, logon ke chehre ke ta'asurat samajhna, aur social ta'aluqaat mein aasaani ya thakawat.",
-    sensoryTitle: "Hissi Hassasiyat (Sensory Processing)",
-    sensoryDesc: "Tez roshni, achanak awazein, kapray ki chubhney wali silayi ya bheer wali jaghon se zehni dabao ya overload mehsoos hona.",
-    camoTitle: "Masking Aur Samajhdaari Ka Dikhawa (Camouflaging)",
-    camoDesc: "Doosron mein ghulnay milnay ke liye pehle se baatein zehan mein tayar karna aur apnay qudrati andaaz ko chupa kar thakawat mehsoos karna.",
-    routineTitle: "Routine Aur Gehri Dilchaspi (Focus & Flow)",
-    routineDesc: "Rozmarrah ke kamo ko aik he tarteeb se karne ki khuwaish, achanak tabdeeli par pareshani, aur pasandeda cheezon par ghanton magan rehna."
+    continueBtn: "Agay Barhein →",
+    reportTitle: "Aapki Shakhsiyat Ka Visual Spectrum"
   }
 };
 
@@ -730,7 +610,8 @@ const APP = {
   clientId: null,
   assessmentId: null,
   startedAt: null,
-  scores: null
+  calculatedData: null,
+  activeDetailRecord: null
 };
 
 function $(id) { return document.getElementById(id); }
@@ -747,19 +628,21 @@ function showScreen(id) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function toggleCalmMode() {
+  calmMode = !calmMode;
+  document.body.classList.toggle("calm-mode", calmMode);
+  $("calmModeLabel").textContent = calmMode ? "Sensory Calm: On" : "Sensory Calm: Off";
+}
+
 function toggleLanguage() {
   currentLanguage = currentLanguage === 'en' ? 'ur' : 'en';
   $("langLabel").textContent = currentLanguage === 'en' ? 'Roman Urdu' : 'English';
-  applyLanguage();
-  if (APP.scores) renderVisualReport(APP.scores);
-}
-
-function applyLanguage() {
   const dict = TRANSLATIONS[currentLanguage];
   document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (dict[key]) el.innerHTML = dict[key];
+    const k = el.getAttribute("data-i18n");
+    if (dict[k]) el.innerHTML = dict[k];
   });
+  if (APP.calculatedData) renderLaymanReport(APP.calculatedData);
 }
 
 function showWelcome() { showScreen("welcomeScreen"); }
@@ -775,7 +658,7 @@ async function loadTestBattery() {
       .map(([id, t]) => Object.assign({ id, testId: id }, t));
     return APP.tests.length > 0;
   } catch (err) {
-    console.error("Failed to load Tests_V2.json", err);
+    console.error("Could not fetch Tests_V2.json", err);
     return false;
   }
 }
@@ -788,15 +671,14 @@ $("intakeForm").addEventListener("submit", async function(e) {
     email: (f.get("email") || "").trim(),
     phone: (f.get("phone") || "").trim(),
     dob: f.get("dob") || "",
-    gender: f.get("gender") || "",
-    assessmentPurpose: f.get("assessmentPurpose") || "Personal Exploration"
+    assessmentPurpose: f.get("assessmentPurpose") || "Self-Discovery"
   };
 
-  showLoading("Preparing questions...");
-  const loaded = await loadTestBattery();
-  if (!loaded) {
+  showLoading("Preparing your assessment journey...");
+  const ok = await loadTestBattery();
+  if (!ok) {
     hideLoading();
-    alert("Could not load questionnaire specifications. Please ensure Tests_V2.json is in your site folder.");
+    alert("Could not load questionnaire battery. Ensure Tests_V2.json is in the site folder.");
     return;
   }
 
@@ -805,31 +687,25 @@ $("intakeForm").addEventListener("submit", async function(e) {
   APP.startedAt = new Date().toISOString();
 
   hideLoading();
-  startAssessment();
-});
-
-function startAssessment() {
   APP.currentTestIndex = 0;
   renderCurrentInstrument();
   showScreen("assessmentScreen");
-}
+});
 
 function renderCurrentInstrument() {
   const test = APP.tests[APP.currentTestIndex];
   if (!test) return;
 
-  const totalInstruments = APP.tests.length;
-  $("instrumentSubLabel").textContent = `SECTION ${APP.currentTestIndex + 1} OF ${totalInstruments}`;
-  $("instrumentTitle").textContent = test.title;
-  $("instrumentDesc").textContent = test.role || "Please select the choice that best aligns with your usual experience.";
+  const total = APP.tests.length;
+  $("instSubLabel").textContent = `INSTRUMENT ${APP.currentTestIndex + 1} OF ${total}`;
+  $("instTitle").textContent = test.title;
+  $("instDesc").textContent = test.role || "Please choose the response that best matches your usual lived experience.";
 
-  $("testStepLabel").textContent = `Section ${APP.currentTestIndex + 1} of ${totalInstruments}`;
-  $("toolbarTracker").textContent = `Section ${APP.currentTestIndex + 1} of ${totalInstruments}`;
+  $("journeySectionLabel").textContent = `Section ${APP.currentTestIndex + 1} of ${total}: ${test.id}`;
+  $("prevSectionBtn").disabled = APP.currentTestIndex === 0;
+  $("nextSectionBtn").textContent = APP.currentTestIndex === total - 1 ? "Complete Battery & View Profile →" : "Next Section →";
 
-  $("prevBtn").disabled = APP.currentTestIndex === 0;
-  $("nextBtn").textContent = APP.currentTestIndex === totalInstruments - 1 ? "Submit & View Report →" : "Next Section →";
-
-  const container = $("questionsList");
+  const container = $("questionsContainer");
   container.innerHTML = "";
 
   const options = test.responseOptions || test._meta?.responseOptions || [
@@ -843,15 +719,15 @@ function renderCurrentInstrument() {
 
     const header = document.createElement("div");
     header.className = "question-header";
-    header.innerHTML = `<div class="question-number">${idx + 1}</div><div class="question-text">${escapeHtml(q.text)}</div>`;
+    header.innerHTML = `<div class="q-num">${idx + 1}</div><div class="q-text">${escapeHtml(q.text)}</div>`;
     card.appendChild(header);
 
-    const optsGrid = document.createElement("div");
-    optsGrid.className = "options-grid";
+    const grid = document.createElement("div");
+    grid.className = "options-grid";
 
     options.forEach((opt, optIdx) => {
       const chip = document.createElement("div");
-      chip.className = "option-chip";
+      chip.className = "opt-chip";
       const inputId = `${qKey}_${optIdx}`;
 
       const radio = document.createElement("input");
@@ -863,35 +739,37 @@ function renderCurrentInstrument() {
 
       radio.addEventListener("change", () => {
         APP.responses[qKey] = optIdx;
-        updateGlobalProgress();
+        updateJourneyProgress();
       });
 
       const label = document.createElement("label");
       label.htmlFor = inputId;
-      label.innerHTML = `<span class="chip-dot"></span><span>${escapeHtml(opt.label || opt)}</span>`;
+      label.textContent = opt.label || opt;
 
       chip.appendChild(radio);
       chip.appendChild(label);
-      optsGrid.appendChild(chip);
+      grid.appendChild(chip);
     });
 
-    card.appendChild(optsGrid);
+    card.appendChild(grid);
     container.appendChild(card);
   });
 
-  updateGlobalProgress();
+  updateJourneyProgress();
 }
 
-function updateGlobalProgress() {
+function updateJourneyProgress() {
   let total = 0;
   APP.tests.forEach(t => total += (t.questions || []).length);
   const answered = Object.keys(APP.responses).length;
   const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
-  $("testProgressBar").style.width = `${pct}%`;
-  $("testCompletionLabel").textContent = `${pct}% answered`;
+
+  $("journeyTrackFill").style.width = `${pct}%`;
+  const currentTestQuestions = (APP.tests[APP.currentTestIndex].questions || []).length;
+  $("journeyPacingLabel").textContent = `${answered} of ${total} total questions answered (${pct}%)`;
 }
 
-function validateCurrentInstrument() {
+function nextInstrument() {
   const test = APP.tests[APP.currentTestIndex];
   const missing = [];
   (test.questions || []).forEach((q, idx) => {
@@ -899,20 +777,31 @@ function validateCurrentInstrument() {
   });
 
   if (missing.length > 0) {
-    alert(`Please complete all questions before moving forward.\nUnanswered items: ${missing.slice(0, 6).join(", ")}${missing.length > 6 ? '...' : ''}`);
-    return false;
+    alert(`Baraye meherbani tamam sawaalat mukammal karein.\nUnanswered items: ${missing.slice(0, 6).join(", ")}`);
+    return;
   }
-  return true;
+
+  // Trigger gentle rest break waypoint after finishing instrument 2
+  if (APP.currentTestIndex === 1) {
+    $("restBreakModal").classList.remove("hidden");
+    return;
+  }
+
+  proceedNext();
 }
 
-function nextInstrument() {
-  if (!validateCurrentInstrument()) return;
+function closeRestBreak() {
+  $("restBreakModal").classList.add("hidden");
+  proceedNext();
+}
+
+function proceedNext() {
   if (APP.currentTestIndex < APP.tests.length - 1) {
     APP.currentTestIndex++;
     renderCurrentInstrument();
     window.scrollTo({ top: 0, behavior: "smooth" });
   } else {
-    finalizeAssessment();
+    finishAssessment();
   }
 }
 
@@ -924,18 +813,14 @@ function prevInstrument() {
   }
 }
 
-/* ==========================================================
-   VISUAL SCORING & REPORT GENERATION
-========================================================== */
-async function finalizeAssessment() {
-  showLoading("Generating your profile & scoring dimensions...");
+async function finishAssessment() {
+  showLoading("Synthesizing your cognitive spectrum profile...");
 
-  // Client-side scoring engine calculates authoritative visual percentages
   const engine = window.assessmentEngine || new AutismAssessmentEngine();
   const calculated = engine.calculateScores(APP.responses, APP.tests);
-  APP.scores = calculated;
+  APP.calculatedData = calculated;
 
-  // Background sync with Google Apps Script
+  // Background cloud recording
   try {
     fetch(CONFIG.API_URL, {
       method: "POST",
@@ -948,122 +833,53 @@ async function finalizeAssessment() {
         responses: APP.responses,
         startedAt: APP.startedAt
       })
-    }).catch(e => console.warn("Background cloud backup pending:", e));
+    }).catch(err => console.warn("Cloud recording queue:", err));
   } catch(e) {}
 
   hideLoading();
-  renderVisualReport(calculated);
+  renderLaymanReport(calculated);
   showScreen("reportScreen");
 }
 
-function renderVisualReport(scores) {
+function renderLaymanReport(data) {
   $("reportRefId").textContent = APP.assessmentId;
   $("reportClientName").textContent = APP.intake.fullName || "Participant";
 
-  const metrics = scores.normalizedMetrics || {};
-
-  // Construct 4 layman-friendly consolidated spectrum dimensions
-  const dims = [
-    {
-      key: 'social',
-      titleEn: TRANSLATIONS.en.socialTitle,
-      titleUr: TRANSLATIONS.ur.socialTitle,
-      descEn: TRANSLATIONS.en.socialDesc,
-      descUr: TRANSLATIONS.ur.socialDesc,
-      score: Math.round(
-        ((metrics.AQ?.subscales?.socialSkill || 0) +
-         (metrics.RAADS?.subscales?.socialRelatedness || 0) +
-         (metrics.CATI?.subscales?.socialInteractions || 0)) / 3
-      ),
-      color: "#0d9488"
-    },
-    {
-      key: 'sensory',
-      titleEn: TRANSLATIONS.en.sensoryTitle,
-      titleUr: TRANSLATIONS.ur.sensoryTitle,
-      descEn: TRANSLATIONS.en.sensoryDesc,
-      descUr: TRANSLATIONS.ur.sensoryDesc,
-      score: Math.round(
-        ((metrics.RAADS?.subscales?.sensoryMotor || 0) +
-         (metrics.CATI?.subscales?.sensorySensitivity || 0)) / 2
-      ),
-      color: "#6366f1"
-    },
-    {
-      key: 'camo',
-      titleEn: TRANSLATIONS.en.camoTitle,
-      titleUr: TRANSLATIONS.ur.camoTitle,
-      descEn: TRANSLATIONS.en.camoDesc,
-      descUr: TRANSLATIONS.ur.camoDesc,
-      score: Math.round(
-        ((metrics.CATQ?.subscales?.masking || 0) +
-         (metrics.CATQ?.subscales?.compensation || 0) +
-         (metrics.CATI?.subscales?.socialCamouflage || 0)) / 3
-      ),
-      color: "#d97706"
-    },
-    {
-      key: 'routine',
-      titleEn: TRANSLATIONS.en.routineTitle,
-      titleUr: TRANSLATIONS.ur.routineTitle,
-      descEn: TRANSLATIONS.en.routineDesc,
-      descUr: TRANSLATIONS.ur.routineDesc,
-      score: Math.round(
-        ((metrics.AQ?.subscales?.attentionSwitching || 0) +
-         (metrics.RAADS?.subscales?.circumscribedInterests || 0) +
-         (metrics.CATI?.subscales?.cognitiveInflexibility || 0)) / 3
-      ),
-      color: "#0284c7"
-    }
-  ];
-
-  const panel = $("spectrumPanel");
+  const panel = $("laymanSpectrumPanel");
   panel.innerHTML = "";
 
-  dims.forEach(d => {
-    const title = currentLanguage === 'ur' ? d.titleUr : d.titleEn;
-    const desc = currentLanguage === 'ur' ? d.descUr : d.descEn;
+  (data.clinicalPriorities || []).forEach(item => {
+    const card = document.createElement("div");
+    card.className = "triage-card";
 
-    let tier = "Mild / Typical Expression";
-    let badgeClass = "badge-typical";
-    if (d.score >= 60) {
-      tier = currentLanguage === 'ur' ? "Numayan / Elevated Trait" : "Elevated Expression";
-      badgeClass = "badge-elevated";
-    } else if (d.score >= 40) {
-      tier = currentLanguage === 'ur' ? "Darmiana / Emerging Trait" : "Moderate Expression";
-      badgeClass = "badge-moderate";
-    } else {
-      tier = currentLanguage === 'ur' ? "Mamool Ke Mutabiq" : "Typical / Low Expression";
-    }
+    let priorityBadge = "priority-low";
+    if (item.priority === "High Priority") priorityBadge = "priority-high";
+    else if (item.priority === "Moderate Focus") priorityBadge = "priority-mod";
 
-    const row = document.createElement("div");
-    row.className = "trait-row";
-    row.innerHTML = `
-      <div class="trait-top">
-        <span class="trait-title">${escapeHtml(title)}</span>
-        <span class="report-badge ${badgeClass}">${tier}</span>
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:700;font-size:15px;">${escapeHtml(item.domain)}</span>
+        <span class="priority-badge ${priorityBadge}">${item.priority}</span>
       </div>
-      <div class="trait-bar-track">
-        <div class="trait-bar-fill" style="width:${Math.max(8, d.score)}%;background:${d.color};"></div>
+      <div style="height:8px;background:var(--slate-200);border-radius:99px;overflow:hidden;margin:8px 0;">
+        <div style="height:100%;width:${Math.max(10, item.averagePercent)}%;background:var(--primary);"></div>
       </div>
-      <div class="trait-desc">${escapeHtml(desc)}</div>
+      <div style="font-size:13px;color:var(--slate-600);line-height:1.5;">${escapeHtml(item.clinicalSignificance)}</div>
     `;
-    panel.appendChild(row);
+    panel.appendChild(card);
   });
 
-  // Setup WhatsApp Consultation Link targeting the practice
   const waMsg = encodeURIComponent(
-    `Hello ${CONFIG.PRACTITIONER_NAME}, I completed the Neurodiversity screening assessment.\n` +
+    `Hello ${CONFIG.PRACTITIONER_NAME}, I completed the Neurodiversity screening battery.\n` +
     `Ref ID: ${APP.assessmentId}\n` +
     `Participant: ${APP.intake.fullName || 'Anonymous'}\n` +
-    `Summary: Social (${dims[0].score}%), Sensory (${dims[1].score}%), Camouflaging (${dims[2].score}%), Routine (${dims[3].score}%).\n` +
     `I would like to schedule a clinical consultation.`
   );
-  $("whatsappConsultBtn").href = `https://wa.me/${CONFIG.PRACTICE_PHONE}?text=${waMsg}`;
+  $("waDirectBtn").href = `https://wa.me/${CONFIG.PRACTICE_PHONE}?text=${waMsg}`;
 }
 
 /* ==========================================================
-   CLINICIAN DASHBOARD & REGISTRY
+   CLINICIAN EXPLORATION & DETAILED DRILLDOWN
 ========================================================== */
 function showClinicianLogin() {
   $("clinicianPin").value = "";
@@ -1074,7 +890,7 @@ function showClinicianLogin() {
 $("clinicianLoginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const pin = $("clinicianPin").value.trim();
-  showLoading("Authenticating...");
+  showLoading("Authenticating clinician...");
   try {
     const res = await fetch(CONFIG.API_URL, {
       method: "POST",
@@ -1084,23 +900,24 @@ $("clinicianLoginForm").addEventListener("submit", async function(e) {
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
 
+    APP.clinicianSession = data.sessionToken;
     hideLoading();
     showScreen("clinicianDashboardScreen");
-    loadRegistry(data.sessionToken);
+    loadClinicianDashboard();
   } catch (err) {
     hideLoading();
     $("loginError").classList.remove("hidden");
   }
 });
 
-async function loadRegistry(token) {
+async function loadClinicianDashboard() {
   const res = await fetch(CONFIG.API_URL, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ action: "getDashboard", sessionToken: token })
+    body: JSON.stringify({ action: "getDashboard", sessionToken: APP.clinicianSession })
   });
   const data = await res.json();
-  const tbody = $("registryTableBody");
+  const tbody = $("clinicianTableBody");
   tbody.innerHTML = "";
 
   (data.recentAssessments || []).forEach(r => {
@@ -1109,26 +926,200 @@ async function loadRegistry(token) {
     tr.innerHTML = `
       <td style="padding:10px 8px;">${(r.date || '').slice(0, 10)}</td>
       <td style="padding:10px 8px;"><strong>${escapeHtml(r.assessmentId)}</strong></td>
-      <td style="padding:10px 8px;">${r.AQ || 0}</td>
-      <td style="padding:10px 8px;">${r.RAADS || 0}</td>
-      <td style="padding:10px 8px;">${r.CATQ || 0}</td>
+      <td style="padding:10px 8px;">${r.AQ || 0} ${r.AQ >= 26 ? '🚩' : ''}</td>
+      <td style="padding:10px 8px;">${r.RAADS || 0} ${r.RAADS >= 65 ? '🚩' : ''}</td>
+      <td style="padding:10px 8px;">${r.CATQ || 0} ${r.CATQ >= 100 ? '🚩' : ''}</td>
       <td style="padding:10px 8px;">${r.CATI || 0}</td>
-      <td style="padding:10px 8px;"><span class="report-badge badge-typical">${escapeHtml(r.status || 'Received')}</span></td>
+      <td style="padding:10px 8px;">
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="openClinicianDetail('${escapeHtml(r.assessmentId)}')">Explore Profile →</button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function clinicianLogout() {
-  showWelcome();
+async function openClinicianDetail(assessmentId) {
+  showLoading("Retrieving multi-instrument clinical records...");
+  try {
+    const res = await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "getAssessment",
+        sessionToken: APP.clinicianSession,
+        assessmentId
+      })
+    });
+    const data = await res.json();
+    hideLoading();
+
+    APP.activeDetailRecord = data;
+    renderClinicianModal(data);
+    $("clinicianDetailModal").classList.remove("hidden");
+  } catch (err) {
+    hideLoading();
+    alert("Could not load case details.");
+  }
 }
+
+function renderClinicianModal(data) {
+  const asm = data.assessment || {};
+  const client = data.client || {};
+  $("modalClientMeta").textContent = `${client.name || 'Anonymous'} • ID: ${asm.clientId || '-'} • Ref: ${asm.assessmentId || '-'}`;
+
+  // Tab 1: Cross-Battery Triage & Action Plan
+  const engine = window.assessmentEngine || new AutismAssessmentEngine();
+  const raw = {
+    AQ: { total: data.scores?.["AQ-50 Total"] || 0 },
+    RAADS: { total: data.scores?.["RAADS-R Total"] || 0 },
+    CATQ: { total: data.scores?.["CAT-Q Total"] || 0 },
+    CATI: { total: data.scores?.["CATI Total"] || 0 }
+  };
+  const synthesizedPriorities = engine.generateClinicalPriorities(raw, data.metrics || {});
+
+  let triageHtml = '<div style="display:grid;gap:14px;">';
+  synthesizedPriorities.forEach(p => {
+    let pClass = p.priority === "High Priority" ? "priority-high" : (p.priority === "Moderate Focus" ? "priority-mod" : "priority-low");
+    triageHtml += `
+      <div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:12px;padding:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h4 style="margin:0;font-size:15px;">${escapeHtml(p.domain)}</h4>
+          <span class="priority-badge ${pClass}">${p.priority} (${p.averagePercent}%)</span>
+        </div>
+        <p style="font-size:13px;color:var(--slate-600);margin:8px 0;">${escapeHtml(p.clinicalSignificance)}</p>
+
+        <div style="margin:10px 0;background:white;padding:10px;border-radius:8px;border:1px solid #e2e8f0;">
+          <strong style="font-size:12px;color:var(--slate-800);">Recommended Session Explorations:</strong>
+          <ul style="margin:6px 0 0 18px;padding:0;font-size:13px;color:var(--slate-600);">
+            ${p.sessionPrompts.map(pr => `<li>${escapeHtml(pr)}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  });
+  triageHtml += '</div>';
+  $("tabContentTriage").innerHTML = triageHtml;
+
+  // Tab 2: Individual Instruments Breakdown
+  let batteryHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">';
+  const meta = engine.instrumentMetadata;
+  const metrics = data.metrics || {};
+
+  Object.keys(meta).forEach(testKey => {
+    const info = meta[testKey];
+    const testMetric = metrics[testKey] || { subscales: {} };
+    const rawVal = data.scores?.[`${info.shortTitle} Total`] || 0;
+    const isElevated = info.cutoff && rawVal >= info.cutoff;
+
+    batteryHtml += `
+      <div style="background:white;border:1.5px solid ${isElevated ? '#fca5a5' : '#cbd5e1'};border-radius:12px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:14px;">${info.shortTitle}</strong>
+          ${isElevated ? '<span class="priority-badge priority-high">Cutoff Met</span>' : '<span class="priority-badge priority-low">Below Cutoff</span>'}
+        </div>
+        <div style="font-size:24px;font-weight:800;margin:6px 0;">${rawVal} <span style="font-size:13px;color:var(--slate-600);font-weight:400;">/ ${info.max}</span></div>
+        <div style="font-size:11px;color:var(--slate-600);margin-bottom:12px;">Cutoff benchmark: ${info.cutoff ? `≥ ${info.cutoff}` : 'Dimensional inventory'}</div>
+
+        <div style="border-top:1px solid var(--slate-100);padding-top:8px;">
+          <strong style="font-size:11px;text-transform:uppercase;color:var(--slate-600);">Subscales:</strong>
+          ${Object.entries(testMetric.subscales || {}).map(([sub, pct]) => `
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;">
+              <span>${sub}</span>
+              <strong>${pct}%</strong>
+            </div>
+            <div style="height:4px;background:var(--slate-100);border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:var(--primary);"></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+  batteryHtml += '</div>';
+  $("tabContentBattery").innerHTML = batteryHtml;
+
+  // Tab 3: Background & Context
+  $("tabContentBackground").innerHTML = `
+    <div class="form-grid" style="font-size:14px;">
+      <div><strong>Full Name:</strong> ${escapeHtml(client.name || '-')}</div>
+      <div><strong>Email:</strong> ${escapeHtml(client.email || '-')}</div>
+      <div><strong>Phone:</strong> ${escapeHtml(client.phone || '-')}</div>
+      <div><strong>Date of Birth:</strong> ${escapeHtml(client.dob || '-')}</div>
+      <div><strong>Context:</strong> ${escapeHtml(asm.context || '-')}</div>
+      <div><strong>Duration Taken:</strong> ${Math.round(asm.durationSeconds / 60)} minutes</div>
+    </div>
+  `;
+
+  // Tab 4: Notes
+  renderNotesTab(data.notes || []);
+}
+
+function renderNotesTab(notes) {
+  let html = '<div style="display:grid;gap:10px;margin-bottom:16px;">';
+  if (notes.length) {
+    notes.forEach(n => {
+      html += `
+        <div style="background:var(--slate-50);border:1px solid var(--slate-200);padding:12px;border-radius:10px;font-size:13px;">
+          <div style="font-size:11px;color:var(--slate-600);margin-bottom:4px;">${n.createdAt.slice(0, 16)} • ${n.noteType}</div>
+          <div>${escapeHtml(n.note)}</div>
+        </div>
+      `;
+    });
+  } else {
+    html += '<p style="color:var(--slate-600);font-size:13px;">No clinical notes attached to this participant yet.</p>';
+  }
+  html += `</div>
+    <textarea id="modalNoteText" placeholder="Record therapeutic observations or session priority notes..." style="min-height:80px;margin-bottom:8px;"></textarea>
+    <button class="btn btn-primary" onclick="saveActiveNote()">Attach Note</button>
+  `;
+  $("tabContentNotes").innerHTML = html;
+}
+
+async function saveActiveNote() {
+  const note = $("modalNoteText").value.trim();
+  if (!note || !APP.activeDetailRecord) return;
+  showLoading("Filing clinical note...");
+  try {
+    const asm = APP.activeDetailRecord.assessment;
+    await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "saveClinicalNote",
+        sessionToken: APP.clinicianSession,
+        assessmentId: asm.assessmentId,
+        clientId: asm.clientId,
+        note
+      })
+    });
+    hideLoading();
+    openClinicianDetail(asm.assessmentId);
+  } catch (err) {
+    hideLoading();
+    alert("Could not save note.");
+  }
+}
+
+function switchTab(tab) {
+  const tabs = ['triage', 'battery', 'background', 'notes'];
+  document.querySelectorAll(".tab-btn").forEach((b, idx) => {
+    b.classList.toggle("active", tabs[idx] === tab);
+  });
+  $("tabContentTriage").classList.toggle("hidden", tab !== 'triage');
+  $("tabContentBattery").classList.toggle("hidden", tab !== 'battery');
+  $("tabContentBackground").classList.toggle("hidden", tab !== 'background');
+  $("tabContentNotes").classList.toggle("hidden", tab !== 'notes');
+}
+
+function closeDetailModal() { $("clinicianDetailModal").classList.add("hidden"); }
+function closeModal(e) { if (e.target === $("clinicianDetailModal")) closeDetailModal(); }
+function clinicianLogout() { showWelcome(); }
 
 function escapeHtml(str) {
   return String(str == null ? "" : str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  applyLanguage();
   loadTestBattery();
 });
 </script>
