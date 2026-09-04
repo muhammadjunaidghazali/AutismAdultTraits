@@ -3,200 +3,414 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clinical Psychometric Assessment Platform</title>
-  <meta name="description" content="Clinical psychometric assessment platform">
-  <meta name="theme-color" content="#0f172a">
+  <title>Adult Neurodiversity & Autistic Trait Screening | Muhammad Junaid Ghazali</title>
+  <meta name="description" content="Visual, empathetic adult autistic traits screening suite with English and Roman Urdu support.">
+  <meta name="theme-color" content="#0d9488">
 
+  <!-- Core Psychometric Engines -->
   <script src="./Scoring_V2.js"></script>
+
+  <!-- Clean Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary: #0f172a;
-      --background: #f8fafc;
-      --surface: #ffffff;
-      --border: #e2e8f0;
-      --text: #0f172a;
-      --muted: #64748b;
-      --success: #15803d;
-      --warning: #b45309;
-      --danger: #b91c1c;
-      --radius: 14px;
-      --shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --primary-light: #ccfbf1;
+      --secondary: #1e293b;
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-600: #475569;
+      --slate-800: #0f172a;
+      --accent: #6366f1;
+      --amber: #d97706;
+      --rose: #e11d48;
+      --emerald: #059669;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
     }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--background);
-      color: var(--text);
-      line-height: 1.6;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #f8fafc;
+      color: var(--slate-800);
+      line-height: 1.65;
     }
+
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
     .hidden { display: none !important; }
 
+    /* Header & Branding */
     .site-header {
-      background: var(--secondary);
-      color: white;
+      background: #ffffff;
+      border-bottom: 1px solid var(--slate-200);
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      box-shadow: var(--shadow-sm);
     }
     .header-inner {
-      max-width: 1100px;
+      max-width: 1040px;
       margin: auto;
       padding: 14px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
     .brand-mark {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: var(--primary); display: grid; place-items: center;
-      font-weight: 700; font-size: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0d9488, #0284c7);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
     }
-    .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
-    .brand-title { font-size: 15px; font-weight: 700; }
-    .brand-subtitle { font-size: 12px; opacity: 0.7; }
-    .header-status { font-size: 12px; opacity: 0.85; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-title { font-size: 15px; font-weight: 700; color: var(--slate-800); }
+    .brand-subtitle { font-size: 12px; color: var(--slate-600); }
 
-    main { max-width: 950px; margin: 0 auto; padding: 30px 18px 60px; }
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lang-btn {
+      background: var(--slate-100);
+      border: 1px solid var(--slate-200);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-800);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lang-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 18px 80px;
+    }
+
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px;
-      margin-bottom: 20px;
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px;
+      margin-bottom: 24px;
     }
-    .hero { text-align: center; padding: 45px 24px; }
-    .hero-icon {
-      width: 65px; height: 65px; margin: 0 auto 16px; border-radius: 16px;
-      display: grid; place-items: center; background: #dbeafe;
-      color: var(--primary); font-size: 30px; font-weight: bold;
+
+    /* Hero & Trust Badges */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 16px;
     }
-    h1 { font-size: clamp(26px, 4vw, 36px); margin: 0 0 12px; }
-    h2 { font-size: 22px; margin-top: 0; }
-    h3 { font-size: 18px; margin-top: 0; }
-    .lead { max-width: 680px; margin: 0 auto 20px; color: var(--muted); font-size: 15px; }
+    h1 {
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 12px;
+      color: var(--slate-800);
+    }
+    .lead {
+      font-size: 16px;
+      color: var(--slate-600);
+      margin-bottom: 24px;
+    }
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--slate-600);
+    }
 
-    .notice { border-radius: 10px; padding: 14px 16px; margin: 16px 0; font-size: 14px; }
-    .notice.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
-    .notice.warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
-    .notice.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-    .notice.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
-
-    .button-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; }
+    /* Buttons */
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
     .btn {
-      border: 0; border-radius: 8px; padding: 11px 20px;
-      font-weight: 600; font-size: 14px; transition: 0.15s ease;
-      min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 22px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .btn:hover { transform: translateY(-1px); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25); }
     .btn-primary:hover { background: var(--primary-dark); }
-    .btn-secondary { background: #e2e8f0; color: var(--secondary); }
-    .btn-danger { background: #fee2e2; color: var(--danger); }
+    .btn-secondary { background: var(--slate-100); color: var(--slate-800); border: 1px solid var(--slate-200); }
+    .btn-secondary:hover { background: var(--slate-200); }
+    .btn-whatsapp { background: #25d366; color: white; font-weight: 700; text-decoration: none; }
+    .btn-whatsapp:hover { background: #1ebd58; }
 
-    .progress-wrapper { margin-bottom: 20px; }
-    .progress-meta { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--muted); font-size: 13px; }
-    .progress-track { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
-    .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.25s ease; }
-
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field.full { grid-column: 1 / -1; }
-    label { font-size: 13px; font-weight: 600; }
-    .required { color: var(--danger); }
-    input, select, textarea {
-      width: 100%; border: 1px solid #cbd5e1; background: white;
-      border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
-    }
-    textarea { resize: vertical; min-height: 90px; }
-    .help { font-size: 12px; color: var(--muted); }
-
+    /* Question Cards & Responsive Options */
     .question-card {
-      background: white; border: 1px solid var(--border);
-      border-radius: 12px; padding: 18px; margin-bottom: 14px;
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 18px;
+      transition: border-color 0.2s;
     }
-    .question-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+    .question-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
     .question-number {
-      width: 26px; height: 26px; border-radius: 50%; background: #eff6ff;
-      color: var(--primary); display: grid; place-items: center;
-      font-weight: 700; font-size: 12px; flex-shrink: 0; margin-top: 2px;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
     }
-    .question-text { font-size: 15px; font-weight: 600; line-height: 1.4; }
-    .options { display: grid; gap: 8px; }
-    .option { position: relative; }
-    .option input { position: absolute; opacity: 0; pointer-events: none; }
-    .option label {
-      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-      border: 1px solid #dbe2ea; border-radius: 8px; cursor: pointer;
-      font-size: 14px; transition: 0.15s ease;
+    .question-text {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.45;
     }
-    .option label:hover { background: #f8fafc; border-color: #93c5fd; }
-    .option input:checked + label { background: #eff6ff; border-color: var(--primary); color: #1e40af; font-weight: 500; }
-    .option-dot {
-      width: 16px; height: 16px; border-radius: 50%;
-      border: 2px solid #94a3b8; flex-shrink: 0;
+    .options-grid {
+      display: grid;
+      gap: 10px;
     }
-    .option input:checked + label .option-dot {
-      border-color: var(--primary); background: var(--primary);
+    .option-chip {
+      position: relative;
+    }
+    .option-chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .option-chip label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      background: #ffffff;
+      transition: all 0.15s ease;
+    }
+    .option-chip label:hover {
+      background: var(--slate-50);
+      border-color: #99f6e4;
+    }
+    .option-chip input:checked + label {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+    .chip-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #94a3b8;
+      flex-shrink: 0;
+    }
+    .option-chip input:checked + label .chip-dot {
+      border-color: var(--primary);
+      background: var(--primary);
       box-shadow: inset 0 0 0 3px white;
     }
 
+    /* Visual Reports & Layman Gauges */
+    .report-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-moderate { background: #fef3c7; color: #b45309; }
+    .badge-elevated { background: #fee2e2; color: #b91c1c; }
+    .badge-typical { background: #ecfdf5; color: #047857; }
+
+    .spectrum-panel {
+      display: grid;
+      gap: 18px;
+      margin: 24px 0;
+    }
+    .trait-row {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .trait-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .trait-title {
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .trait-bar-track {
+      height: 10px;
+      background: var(--slate-200);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .trait-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .trait-desc {
+      font-size: 13px;
+      color: var(--slate-600);
+      line-height: 1.5;
+    }
+
+    /* Clinician Card Footer */
+    .clinician-card {
+      background: linear-gradient(135deg, #f0fdfa, #f8fafc);
+      border: 1px solid #ccfbf1;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 25px;
+    }
+    .clinician-avatar {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* Floating Navigation Toolbar */
     .assessment-toolbar {
-      position: sticky; bottom: 15px; z-index: 100;
-      background: rgba(255,255,255,0.96); backdrop-filter: blur(8px);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 10px 16px; box-shadow: var(--shadow);
+      position: sticky;
+      bottom: 16px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .toolbar-inner { display: flex; align-items: center; justify-content: space-between; }
-    .toolbar-center { font-size: 13px; color: var(--muted); }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-    .stat { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-    .stat-label { color: var(--muted); font-size: 12px; }
-    .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; }
-
-    .table-wrapper { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
-    tr:hover td { background: #f8fafc; }
-
-    .modal {
-      position: fixed; inset: 0; background: rgba(15,23,42,0.5);
-      display: grid; place-items: center; padding: 20px; z-index: 3000;
-    }
-    .modal-content {
-      width: min(850px, 100%); max-height: 90vh; overflow-y: auto;
-      background: white; border-radius: 14px; padding: 24px;
-    }
+    /* Loading Overlay */
     .loading-overlay {
-      position: fixed; inset: 0; background: rgba(255,255,255,0.85);
-      z-index: 5000; display: grid; place-items: center;
+      position: fixed; inset: 0;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(4px);
+      z-index: 5000;
+      display: grid;
+      place-items: center;
     }
     .spinner {
-      width: 32px; height: 32px; border: 3px solid #dbeafe;
-      border-top-color: var(--primary); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin: 0 auto 10px;
+      width: 38px;
+      height: 38px;
+      border: 3.5px solid var(--primary-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin-bottom: 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    @media (max-width: 650px) {
+    /* Form Fields */
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    input, select, textarea {
+      width: 100%; border: 1px solid #cbd5e1; background: white;
+      border-radius: 8px; padding: 11px 13px; font-size: 14px; outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+    .required { color: var(--rose); }
+
+    @media (max-width: 680px) {
       .form-grid { grid-template-columns: 1fr; }
-      .field.full { grid-column: auto; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .clinician-card { flex-direction: column; text-align: center; }
+      .meta-pills { justify-content: center; }
     }
   </style>
 </head>
@@ -204,32 +418,44 @@
 
 <header class="site-header">
   <div class="header-inner">
-    <div class="brand">
-      <div class="brand-mark">P</div>
+    <a href="#" class="brand" onclick="showWelcome()">
+      <div class="brand-mark">Ψ</div>
       <div class="brand-text">
-        <span class="brand-title">Psychometric Assessment</span>
-        <span class="brand-subtitle">Clinical Screening Suite</span>
+        <span class="brand-title">Muhammad Junaid Ghazali</span>
+        <span class="brand-subtitle">Counselor & Psychologist Pakistan</span>
       </div>
+    </a>
+    <div class="header-controls">
+      <button type="button" class="lang-btn" onclick="toggleLanguage()">
+        <span id="langIcon">🌐</span> <span id="langLabel">Roman Urdu</span>
+      </button>
+      <button type="button" class="btn btn-secondary" style="padding:7px 12px;font-size:12px;" onclick="showClinicianLogin()">Portal</button>
     </div>
-    <div class="header-status" id="connectionStatus">Ready</div>
   </div>
 </header>
 
 <main>
   <!-- Welcome Screen -->
   <section id="welcomeScreen">
-    <div class="card hero">
-      <div class="hero-icon">P</div>
-      <h1>Adult Autistic Trait Battery</h1>
-      <p class="lead">
-        This battery explores self-reported characteristics related to social interaction, communication, focus, sensory processing, and camouflaging strategies.
+    <div class="card">
+      <span class="hero-badge" data-i18n="badge">EVIDENCE-BASED ADULT SCREENING</span>
+      <h1 data-i18n="heroTitle">Understanding Your Neurodivergent & Autistic Traits</h1>
+      <p class="lead" data-i18n="heroLead">
+        Explore how your mind interacts with the world. This assessment evaluates communication preferences, deep focus, social camouflaging, and sensory perception through four internationally established psychometric instruments.
       </p>
-      <div class="notice info">
-        This screening battery is not a standalone diagnosis. Your responses will be reviewed by a clinician as part of a comprehensive assessment.
+
+      <div class="meta-pills">
+        <div class="meta-pill">⏱ <span data-i18n="metaTime">Takes ~12-15 minutes</span></div>
+        <div class="meta-pill">🔒 <span data-i18n="metaPrivacy">Confidential & Clinician-Reviewed</span></div>
+        <div class="meta-pill">🧠 <span data-i18n="metaAffirmative">Neuro-Affirmative & Non-Judgemental</span></div>
       </div>
+
+      <div style="background:#f0fdfa;border:1px solid #ccfbf1;border-radius:12px;padding:16px;margin:20px 0;font-size:14px;color:#0f766e;" data-i18n="heroNotice">
+        <strong>Important Notice:</strong> This questionnaire provides dimensional screening insights and is not an automated medical diagnosis. It acts as an informed starting point for discussion with a qualified psychologist.
+      </div>
+
       <div class="button-row">
-        <button type="button" class="btn btn-primary" onclick="showIntake()">Begin Assessment</button>
-        <button type="button" class="btn btn-secondary" onclick="showClinicianLogin()">Clinician Portal</button>
+        <button type="button" class="btn btn-primary" onclick="showIntake()" data-i18n="startBtn">Begin Assessment →</button>
       </div>
     </div>
   </section>
@@ -237,28 +463,31 @@
   <!-- Intake Screen -->
   <section id="intakeScreen" class="hidden">
     <div class="card">
-      <h2>Client Information</h2>
-      <p class="help">Please enter your basic information before beginning the questionnaires.</p>
+      <h2 data-i18n="intakeTitle">Participant Details</h2>
+      <p style="color:var(--slate-600);font-size:14px;" data-i18n="intakeDesc">
+        Please share your basic details before we begin the questions. Required fields are marked with an asterisk (*).
+      </p>
+
       <form id="intakeForm">
         <div class="form-grid">
           <div class="field">
-            <label for="fullName">Full Name <span class="required">*</span></label>
-            <input id="fullName" name="fullName" type="text" autocomplete="name" required>
+            <label for="fullName"><span data-i18n="fullName">Full Name</span> <span class="required">*</span></label>
+            <input id="fullName" name="fullName" type="text" autocomplete="name" required placeholder="e.g. Ahmad Khan">
           </div>
           <div class="field">
-            <label for="email">Email Address <span class="required">*</span></label>
-            <input id="email" name="email" type="email" autocomplete="email" required>
+            <label for="email"><span data-i18n="email">Email Address</span> <span class="required">*</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" required placeholder="name@example.com">
           </div>
           <div class="field">
-            <label for="phone">Phone / WhatsApp</label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel">
+            <label for="phone"><span data-i18n="phone">Phone / WhatsApp Number</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="03XXXXXXXXX">
           </div>
           <div class="field">
-            <label for="dob">Date of Birth</label>
+            <label for="dob"><span data-i18n="dob">Date of Birth</span></label>
             <input id="dob" name="dob" type="date">
           </div>
           <div class="field">
-            <label for="gender">Gender</label>
+            <label for="gender"><span data-i18n="gender">Gender</span></label>
             <select id="gender" name="gender">
               <option value="">Prefer not to say</option>
               <option value="female">Female</option>
@@ -268,80 +497,108 @@
             </select>
           </div>
           <div class="field">
-            <label for="assessmentPurpose">Context</label>
+            <label for="assessmentPurpose"><span data-i18n="context">Context</span></label>
             <select id="assessmentPurpose" name="assessmentPurpose">
-              <option value="Intake Screening">Initial Intake</option>
-              <option value="Ongoing Care">Ongoing Evaluation</option>
-              <option value="Follow-up">Follow-up</option>
+              <option value="Personal Exploration">Personal Self-Discovery</option>
+              <option value="Clinical Intake">Initial Clinical Consultation</option>
+              <option value="Follow-up Review">Follow-up Evaluation</option>
             </select>
           </div>
         </div>
-        <div class="button-row">
-          <button type="button" class="btn btn-secondary" onclick="showWelcome()">Back</button>
-          <button type="submit" class="btn btn-primary">Continue to Assessment</button>
+
+        <div class="button-row" style="justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="showWelcome()" data-i18n="backBtn">Back</button>
+          <button type="submit" class="btn btn-primary" data-i18n="continueBtn">Start Questions →</button>
         </div>
       </form>
     </div>
   </section>
 
-  <!-- Assessment Screen -->
+  <!-- Assessment Questions Screen -->
   <section id="assessmentScreen" class="hidden">
-    <div class="progress-wrapper">
-      <div class="progress-meta">
-        <span id="testProgressLabel">Instrument 1</span>
-        <span id="completionLabel">0%</span>
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--slate-600);margin-bottom:6px;">
+        <span id="testStepLabel">Instrument 1 of 4</span>
+        <span id="testCompletionLabel">0%</span>
       </div>
-      <div class="progress-track">
-        <div id="progressBar" class="progress-bar"></div>
+      <div style="height:8px;background:var(--slate-200);border-radius:99px;overflow:hidden;">
+        <div id="testProgressBar" style="height:100%;width:0%;background:var(--primary);transition:width 0.3s ease;"></div>
       </div>
     </div>
 
     <div class="card">
-      <div style="margin-bottom: 20px;">
-        <span id="testNumber" style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;">Test 1</span>
-        <h2 id="testTitle" style="margin:4px 0 6px;">Questionnaire</h2>
-        <p id="testDescription" class="help"></p>
+      <div style="margin-bottom:24px;">
+        <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;" id="instrumentSubLabel">QUESTIONNAIRE</div>
+        <h2 style="margin:4px 0 8px;" id="instrumentTitle">Assessment</h2>
+        <p style="color:var(--slate-600);font-size:14px;margin:0;" id="instrumentDesc"></p>
       </div>
-      <div id="questionsContainer"></div>
+
+      <div id="questionsList"></div>
     </div>
 
     <div class="assessment-toolbar">
-      <div class="toolbar-inner">
-        <button type="button" class="btn btn-secondary" id="previousButton" onclick="previousTest()">Previous</button>
-        <div id="toolbarProgress" class="toolbar-center">Instrument 1 of 4</div>
-        <button type="button" class="btn btn-primary" id="nextButton" onclick="nextTest()">Next</button>
+      <button type="button" class="btn btn-secondary" id="prevBtn" onclick="prevInstrument()">← Back</button>
+      <span style="font-size:13px;color:var(--slate-600);font-weight:600;" id="toolbarTracker">Part 1</span>
+      <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextInstrument()">Next Section →</button>
+    </div>
+  </section>
+
+  <!-- Visual Report Screen (Layman Friendly) -->
+  <section id="reportScreen" class="hidden">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <span class="report-badge badge-typical" id="overallBadge">SCREENING COMPLETE</span>
+          <h1 style="margin:8px 0 4px;" data-i18n="reportTitle">Your Personal Traits Profile</h1>
+          <p style="color:var(--slate-600);font-size:14px;margin:0;">Ref: <strong id="reportRefId">-</strong> | Participant: <span id="reportClientName">-</span></p>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="window.print()" style="padding:8px 14px;font-size:13px;">🖨 Print / Save PDF</button>
+      </div>
+
+      <div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:12px;padding:16px;margin:20px 0;font-size:14px;line-height:1.6;" id="reportIntroText">
+        This profile summarizes your responses across 4 key dimensions. Remember: autistic traits exist along a continuous spectrum. High scores represent areas of divergence or specialized processing, while lower scores reflect conventional cognitive alignment.
+      </div>
+
+      <h3 style="margin-top:28px;" data-i18n="dimensionsHeader">Trait Dimensions & Daily Life Impact</h3>
+      <div class="spectrum-panel" id="spectrumPanel">
+        <!-- Generated Dynamically -->
+      </div>
+
+      <!-- Practitioner & Consultation Touchpoint -->
+      <div class="clinician-card">
+        <div class="clinician-avatar">JG</div>
+        <div style="flex:1;">
+          <h4 style="margin:0 0 4px;font-size:16px;">Muhammad Junaid Ghazali</h4>
+          <p style="margin:0;font-size:13px;color:var(--slate-600);">
+            Licensed Clinical Psychologist (M.Phil) • Member British Psychological Society (GMBPsS)<br>
+            Practice: <em>Counselor Pakistan</em> (Serving Islamabad, Rawalpindi & Online)
+          </p>
+        </div>
+        <a id="whatsappConsultBtn" href="#" target="_blank" class="btn btn-whatsapp">
+          💬 Discuss via WhatsApp
+        </a>
+      </div>
+
+      <div class="button-row" style="margin-top:28px;">
+        <button type="button" class="btn btn-secondary" onclick="showWelcome()" data-i18n="homeBtn">Return to Home</button>
       </div>
     </div>
   </section>
 
-  <!-- Thank You Screen -->
-  <section id="thankYouScreen" class="hidden">
-    <div class="card hero">
-      <div class="hero-icon" style="background:#dcfce7;color:var(--success);">✓</div>
-      <h1>Assessment Submitted</h1>
-      <p class="lead">Thank you. Your responses have been safely submitted for clinical scoring and review.</p>
-      <p class="help">Assessment Reference: <strong id="assessmentReference">-</strong></p>
-      <div class="button-row">
-        <button type="button" class="btn btn-secondary" onclick="showWelcome()">Return to Home</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Clinician Login Screen -->
+  <!-- Clinician Portal Screen -->
   <section id="clinicianLoginScreen" class="hidden">
     <div class="card" style="max-width:420px;margin:40px auto;text-align:center;">
-      <div class="hero-icon" style="background:#f1f5f9;color:var(--secondary);">🔒</div>
-      <h2>Clinician Portal</h2>
-      <p class="help">Authorized practitioners only</p>
+      <h2>Clinician Registry</h2>
+      <p style="color:var(--slate-600);font-size:13px;">Enter your practice administrative PIN</p>
       <form id="clinicianLoginForm" style="text-align:left;">
-        <div class="field" style="margin-bottom:15px;">
+        <div class="field" style="margin-bottom:14px;">
           <label for="clinicianPin">Access PIN</label>
           <input id="clinicianPin" type="password" inputmode="numeric" required>
         </div>
-        <div id="loginError" class="notice danger hidden">Invalid PIN or access locked.</div>
+        <div id="loginError" class="notice danger hidden" style="color:var(--rose);font-size:13px;">Invalid administrative PIN.</div>
         <div class="button-row">
           <button type="button" class="btn btn-secondary" onclick="showWelcome()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Sign In</button>
+          <button type="submit" class="btn btn-primary">Open Portal</button>
         </div>
       </form>
     </div>
@@ -351,41 +608,27 @@
   <section id="clinicianDashboardScreen" class="hidden">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div>
-        <h2 style="margin:0;">Clinician Dashboard</h2>
-        <span class="help">Screening registry and clinical records</span>
+        <h2 style="margin:0;">Client Registry & Scores</h2>
+        <span style="font-size:13px;color:var(--slate-600);">Practitioner dashboard for Muhammad Junaid Ghazali</span>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary" onclick="loadDashboard()">Refresh</button>
-        <button class="btn btn-danger" onclick="clinicianLogout()">Lock</button>
-      </div>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat"><div class="stat-label">Total Clients</div><div id="statClients" class="stat-value">-</div></div>
-      <div class="stat"><div class="stat-label">Assessments</div><div id="statAssessments" class="stat-value">-</div></div>
-      <div class="stat"><div class="stat-label">Completed</div><div id="statCompleted" class="stat-value">-</div></div>
-      <div class="stat"><div class="stat-label">Action Flagged</div><div id="statFollowups" class="stat-value">-</div></div>
+      <button class="btn btn-secondary" onclick="clinicianLogout()">Lock</button>
     </div>
 
     <div class="card">
-      <h3>Recent Submissions</h3>
-      <div class="table-wrapper">
-        <table>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
-            <tr>
-              <th>Date</th>
-              <th>Assessment ID</th>
-              <th>Context</th>
-              <th>AQ</th>
-              <th>RAADS-R</th>
-              <th>CAT-Q</th>
-              <th>CATI</th>
-              <th>Action</th>
+            <tr style="text-align:left;border-bottom:2px solid var(--slate-200);color:var(--slate-600);">
+              <th style="padding:8px;">Date</th>
+              <th style="padding:8px;">ID</th>
+              <th style="padding:8px;">AQ</th>
+              <th style="padding:8px;">RAADS</th>
+              <th style="padding:8px;">CAT-Q</th>
+              <th style="padding:8px;">CATI</th>
+              <th style="padding:8px;">Action</th>
             </tr>
           </thead>
-          <tbody id="assessmentTableBody">
-            <tr><td colspan="8" style="text-align:center;">Loading...</td></tr>
-          </tbody>
+          <tbody id="registryTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -395,25 +638,88 @@
 <div id="loadingOverlay" class="loading-overlay hidden">
   <div style="text-align:center;">
     <div class="spinner"></div>
-    <span id="loadingMessage" style="font-size:14px;font-weight:600;">Processing...</span>
-  </div>
-</div>
-
-<div id="detailModal" class="modal hidden" onclick="closeModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-      <h3 style="margin:0;">Clinical Assessment Record</h3>
-      <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
-    </div>
-    <div id="detailContent"></div>
+    <div id="loadingMsg" style="font-weight:600;font-size:14px;color:var(--slate-800);">Loading...</div>
   </div>
 </div>
 
 <script>
+/* ==========================================================
+   CONFIGURATION & CLINIC DETAILS
+========================================================== */
 const CONFIG = {
-  // Replace with your Google Apps Script Web App exec URL
   API_URL: "https://script.google.com/macros/s/AKfycbwDORC7NB5MGwneZb9-PFm3ivOTep5Be8OM9YbRcquPq8KHfDNqcPUKmdMUJtFcSRws_Q/exec",
-  AUTOSAVE_INTERVAL: 25000
+  PRACTICE_PHONE: "923355594054", // Official practice WhatsApp
+  PRACTITIONER_NAME: "Muhammad Junaid Ghazali"
+};
+
+/* ==========================================================
+   STATE & TRANSLATION ENGINE (ROMAN URDU & ENGLISH)
+========================================================== */
+let currentLanguage = 'en';
+
+const TRANSLATIONS = {
+  en: {
+    badge: "EVIDENCE-BASED ADULT SCREENING",
+    heroTitle: "Understanding Your Neurodivergent & Autistic Traits",
+    heroLead: "Explore how your mind interacts with the world. This assessment evaluates communication preferences, deep focus, social camouflaging, and sensory perception through four internationally established psychometric instruments.",
+    metaTime: "Takes ~12-15 minutes",
+    metaPrivacy: "Confidential & Clinician-Reviewed",
+    metaAffirmative: "Neuro-Affirmative & Non-Judgemental",
+    heroNotice: "<strong>Important Notice:</strong> This questionnaire provides dimensional screening insights and is not an automated medical diagnosis. It acts as an informed starting point for discussion with a qualified psychologist.",
+    startBtn: "Begin Assessment →",
+    intakeTitle: "Participant Details",
+    intakeDesc: "Please share your basic details before we begin the questions. Required fields are marked with an asterisk (*).",
+    fullName: "Full Name",
+    email: "Email Address",
+    phone: "Phone / WhatsApp Number",
+    dob: "Date of Birth",
+    gender: "Gender",
+    context: "Context",
+    backBtn: "Back",
+    continueBtn: "Start Questions →",
+    reportTitle: "Your Personal Traits Profile",
+    dimensionsHeader: "Trait Dimensions & Daily Life Impact",
+    homeBtn: "Return to Home",
+    socialTitle: "Social Interaction & Reciprocity",
+    socialDesc: "How naturally conversational pacing, body language, and small talk feel, versus requiring conscious analysis.",
+    sensoryTitle: "Sensory Processing & Sensitivity",
+    sensoryDesc: "Sensitivity to environmental stimuli such as bright lighting, sudden sounds, textures, or crowded environments.",
+    camoTitle: "Camouflaging & Social Masking",
+    camoDesc: "The conscious mental effort used to rehearse facial expressions, script conversations, or 'act typical' to fit in.",
+    routineTitle: "Focus, Routine & Cognitive Flow",
+    routineDesc: "Comfort in predictable routines, discomfort with unexpected change, and capacity for prolonged, immersive interests."
+  },
+  ur: {
+    badge: "MUSTANAD AUR SAFE SCREENING",
+    heroTitle: "Apnay Zehni Rujhanaat Aur Autistic Traits Ko Samajhein",
+    heroLead: "Yeh assessment aapki guftagu ke andaaz, gehri tawajjah, samaj mein fit honay ki koshish (masking), aur hissi hassasiyat (sensory feelings) ko 4 international tests ke zariye wazeh karti hai.",
+    metaTime: "Taqreeban 12-15 minute",
+    metaPrivacy: "Mukammal mehfooz aur confidential",
+    metaAffirmative: "Dostana aur bina kisi tanqeed ke",
+    heroNotice: "<strong>Zaroori Baat:</strong> Yeh assessment koi medical ya psychiatric diagnosis nahi hai, balkay yeh aapki zehni salahiyaton aur rawaiyon ko behtar samajhnay aur psychologist se mashwaray ke liye aik mufeed zariya hai.",
+    startBtn: "Assessment Shuru Karein →",
+    intakeTitle: "Aapki Bunyadi Maloomat",
+    intakeDesc: "Sawaalat shuru karne se pehle baraye meherbani apni bunyadi maloomat darj karein. Sitare (*) walay khanay zaroori hain.",
+    fullName: "Pura Naam",
+    email: "Email Address",
+    phone: "Phone / WhatsApp Number",
+    dob: "Tareekh-e-Pedaish",
+    gender: "Jins (Gender)",
+    context: "Wajah / Context",
+    backBtn: "Peechay",
+    continueBtn: "Sawaalat Par Jayein →",
+    reportTitle: "Aapki Shakhsiyat Aur Traits Ka Khulasa",
+    dimensionsHeader: "Bunyadi Phelu Aur Rozmarrah Zindagi Par Asar",
+    homeBtn: "Wapas Home Par Jayein",
+    socialTitle: "Ijtamai Milansari (Social Interaction)",
+    socialDesc: "Doston ya mehfilon mein guftagu ka bahao, logon ke chehre ke ta'asurat samajhna, aur social ta'aluqaat mein aasaani ya thakawat.",
+    sensoryTitle: "Hissi Hassasiyat (Sensory Processing)",
+    sensoryDesc: "Tez roshni, achanak awazein, kapray ki chubhney wali silayi ya bheer wali jaghon se zehni dabao ya overload mehsoos hona.",
+    camoTitle: "Masking Aur Samajhdaari Ka Dikhawa (Camouflaging)",
+    camoDesc: "Doosron mein ghulnay milnay ke liye pehle se baatein zehan mein tayar karna aur apnay qudrati andaaz ko chupa kar thakawat mehsoos karna.",
+    routineTitle: "Routine Aur Gehri Dilchaspi (Focus & Flow)",
+    routineDesc: "Rozmarrah ke kamo ko aik he tarteeb se karne ki khuwaish, achanak tabdeeli par pareshani, aur pasandeda cheezon par ghanton magan rehna."
+  }
 };
 
 const APP = {
@@ -424,163 +730,129 @@ const APP = {
   clientId: null,
   assessmentId: null,
   startedAt: null,
-  clinicianSession: null,
-  autosaveTimer: null,
-  submitting: false
+  scores: null
 };
 
 function $(id) { return document.getElementById(id); }
 
 function showLoading(msg) {
-  $("loadingMessage").textContent = msg || "Processing...";
+  $("loadingMsg").textContent = msg || "Loading...";
   $("loadingOverlay").classList.remove("hidden");
 }
-
-function hideLoading() {
-  $("loadingOverlay").classList.add("hidden");
-}
+function hideLoading() { $("loadingOverlay").classList.add("hidden"); }
 
 function showScreen(id) {
-  document.querySelectorAll("main > section").forEach(function(s) { s.classList.add("hidden"); });
+  document.querySelectorAll("main > section").forEach(s => s.classList.add("hidden"));
   $(id).classList.remove("hidden");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function setStatus(text) {
-  $("connectionStatus").textContent = text;
+function toggleLanguage() {
+  currentLanguage = currentLanguage === 'en' ? 'ur' : 'en';
+  $("langLabel").textContent = currentLanguage === 'en' ? 'Roman Urdu' : 'English';
+  applyLanguage();
+  if (APP.scores) renderVisualReport(APP.scores);
 }
 
-async function apiRequest(action, payload) {
-  const body = Object.assign({ action: action }, payload || {});
-  const res = await fetch(CONFIG.API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(body)
+function applyLanguage() {
+  const dict = TRANSLATIONS[currentLanguage];
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.innerHTML = dict[key];
   });
-  if (!res.ok) throw new Error("Network response error: " + res.status);
-  const data = await res.json();
-  if (data && data.success === false) {
-    throw new Error(data.message || "Server rejected request.");
-  }
-  return data;
 }
 
 function showWelcome() { showScreen("welcomeScreen"); }
-
-function showIntake() {
-  APP.responses = {};
-  APP.currentTestIndex = 0;
-  APP.submitting = false;
-  showScreen("intakeScreen");
-  $("fullName").focus();
-}
+function showIntake() { showScreen("intakeScreen"); $("fullName").focus(); }
 
 async function loadTestBattery() {
-  if (APP.tests && APP.tests.length > 0) return true;
-
+  if (APP.tests.length > 0) return true;
   try {
     const res = await fetch("./Tests_V2.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("Could not fetch Tests_V2.json (HTTP " + res.status + ")");
-    const battery = await res.json();
-    window.TEST_BATTERY = battery;
-
-    APP.tests = Object.entries(battery)
-      .filter(([key]) => key !== "_meta")
-      .map(([id, test]) => Object.assign({ id: id, testId: id }, test));
-
+    const data = await res.json();
+    APP.tests = Object.entries(data)
+      .filter(([k]) => k !== "_meta")
+      .map(([id, t]) => Object.assign({ id, testId: id }, t));
     return APP.tests.length > 0;
   } catch (err) {
-    console.warn("Direct fetch for Tests_V2.json failed, checking window globals:", err);
-    if (window.TEST_BATTERY || window.TestsV2) {
-      const battery = window.TEST_BATTERY || window.TestsV2;
-      APP.tests = Object.entries(battery)
-        .filter(([key]) => key !== "_meta")
-        .map(([id, test]) => Object.assign({ id: id, testId: id }, test));
-      return APP.tests.length > 0;
-    }
+    console.error("Failed to load Tests_V2.json", err);
     return false;
   }
 }
 
-$("intakeForm").addEventListener("submit", async function (e) {
+$("intakeForm").addEventListener("submit", async function(e) {
   e.preventDefault();
-  const formData = new FormData(this);
+  const f = new FormData(this);
   APP.intake = {
-    fullName: (formData.get("fullName") || "").trim(),
-    email: (formData.get("email") || "").trim(),
-    phone: (formData.get("phone") || "").trim(),
-    dob: formData.get("dob") || "",
-    gender: formData.get("gender") || "",
-    assessmentPurpose: formData.get("assessmentPurpose") || "Intake Screening"
+    fullName: (f.get("fullName") || "").trim(),
+    email: (f.get("email") || "").trim(),
+    phone: (f.get("phone") || "").trim(),
+    dob: f.get("dob") || "",
+    gender: f.get("gender") || "",
+    assessmentPurpose: f.get("assessmentPurpose") || "Personal Exploration"
   };
 
-  showLoading("Loading questionnaire battery...");
+  showLoading("Preparing questions...");
   const loaded = await loadTestBattery();
   if (!loaded) {
     hideLoading();
-    alert("Could not load Tests_V2.json.\n\nMake sure Tests_V2.json is in the same folder and served via a local or remote web server (such as GitHub Pages or python -m http.server).");
+    alert("Could not load questionnaire specifications. Please ensure Tests_V2.json is in your site folder.");
     return;
   }
 
-  showLoading("Setting up your session...");
-  try {
-    const result = await apiRequest("startAssessment", { intake: APP.intake });
-    APP.clientId = result.clientId;
-    APP.assessmentId = result.assessmentId;
-    APP.startedAt = new Date().toISOString();
-    hideLoading();
-    startAssessment();
-  } catch (err) {
-    hideLoading();
-    APP.clientId = "CLI-" + Date.now();
-    APP.assessmentId = "ASM-" + Date.now();
-    APP.startedAt = new Date().toISOString();
-    startAssessment();
-  }
+  APP.clientId = "CLI-" + Math.floor(100000 + Math.random() * 900000);
+  APP.assessmentId = "ASM-" + Math.floor(100000 + Math.random() * 900000);
+  APP.startedAt = new Date().toISOString();
+
+  hideLoading();
+  startAssessment();
 });
 
 function startAssessment() {
   APP.currentTestIndex = 0;
-  renderCurrentTest();
+  renderCurrentInstrument();
   showScreen("assessmentScreen");
-  startAutosave();
 }
 
-function renderCurrentTest() {
+function renderCurrentInstrument() {
   const test = APP.tests[APP.currentTestIndex];
   if (!test) return;
 
-  $("testNumber").textContent = "Instrument " + (APP.currentTestIndex + 1) + " of " + APP.tests.length;
-  $("testTitle").textContent = test.title || test.id;
-  $("testDescription").textContent = test.description || "";
-  $("toolbarProgress").textContent = "Test " + (APP.currentTestIndex + 1) + " of " + APP.tests.length;
-  $("previousButton").disabled = APP.currentTestIndex === 0;
-  $("nextButton").textContent = APP.currentTestIndex === APP.tests.length - 1 ? "Review & Submit" : "Next";
+  const totalInstruments = APP.tests.length;
+  $("instrumentSubLabel").textContent = `SECTION ${APP.currentTestIndex + 1} OF ${totalInstruments}`;
+  $("instrumentTitle").textContent = test.title;
+  $("instrumentDesc").textContent = test.role || "Please select the choice that best aligns with your usual experience.";
 
-  const container = $("questionsContainer");
+  $("testStepLabel").textContent = `Section ${APP.currentTestIndex + 1} of ${totalInstruments}`;
+  $("toolbarTracker").textContent = `Section ${APP.currentTestIndex + 1} of ${totalInstruments}`;
+
+  $("prevBtn").disabled = APP.currentTestIndex === 0;
+  $("nextBtn").textContent = APP.currentTestIndex === totalInstruments - 1 ? "Submit & View Report →" : "Next Section →";
+
+  const container = $("questionsList");
   container.innerHTML = "";
 
-  const optionsList = test.responseOptions || test._meta?.responseOptions || [
+  const options = test.responseOptions || test._meta?.responseOptions || [
     { label: "Disagree", value: 0 }, { label: "Agree", value: 1 }
   ];
 
-  (test.questions || []).forEach(function (q, idx) {
-    const qKey = test.id + "_" + q.id;
+  (test.questions || []).forEach((q, idx) => {
+    const qKey = `${test.id}_${q.id}`;
     const card = document.createElement("div");
     card.className = "question-card";
 
     const header = document.createElement("div");
     header.className = "question-header";
-    header.innerHTML = '<div class="question-number">' + (idx + 1) + '</div><div class="question-text">' + escapeHtml(q.text) + '</div>';
+    header.innerHTML = `<div class="question-number">${idx + 1}</div><div class="question-text">${escapeHtml(q.text)}</div>`;
     card.appendChild(header);
 
-    const optsContainer = document.createElement("div");
-    optsContainer.className = "options";
+    const optsGrid = document.createElement("div");
+    optsGrid.className = "options-grid";
 
-    optionsList.forEach(function (opt, optIdx) {
-      const optWrap = document.createElement("div");
-      optWrap.className = "option";
-      const inputId = qKey + "_" + optIdx;
+    options.forEach((opt, optIdx) => {
+      const chip = document.createElement("div");
+      chip.className = "option-chip";
+      const inputId = `${qKey}_${optIdx}`;
 
       const radio = document.createElement("input");
       radio.type = "radio";
@@ -589,264 +861,265 @@ function renderCurrentTest() {
       radio.value = optIdx;
       if (APP.responses[qKey] === optIdx) radio.checked = true;
 
-      radio.addEventListener("change", function () {
+      radio.addEventListener("change", () => {
         APP.responses[qKey] = optIdx;
-        updateProgress();
+        updateGlobalProgress();
       });
 
       const label = document.createElement("label");
       label.htmlFor = inputId;
-      label.innerHTML = '<span class="option-dot"></span><span>' + escapeHtml(opt.label || opt) + '</span>';
+      label.innerHTML = `<span class="chip-dot"></span><span>${escapeHtml(opt.label || opt)}</span>`;
 
-      optWrap.appendChild(radio);
-      optWrap.appendChild(label);
-      optsContainer.appendChild(optWrap);
+      chip.appendChild(radio);
+      chip.appendChild(label);
+      optsGrid.appendChild(chip);
     });
 
-    card.appendChild(optsContainer);
+    card.appendChild(optsGrid);
     container.appendChild(card);
   });
 
-  updateProgress();
+  updateGlobalProgress();
 }
 
-function updateProgress() {
+function updateGlobalProgress() {
   let total = 0;
-  APP.tests.forEach(function (t) { total += (t.questions || []).length; });
+  APP.tests.forEach(t => total += (t.questions || []).length);
   const answered = Object.keys(APP.responses).length;
   const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
-
-  $("progressBar").style.width = pct + "%";
-  $("completionLabel").textContent = pct + "% completed";
-  $("testProgressLabel").textContent = answered + " of " + total + " answered";
+  $("testProgressBar").style.width = `${pct}%`;
+  $("testCompletionLabel").textContent = `${pct}% answered`;
 }
 
-function validateCurrentTest() {
+function validateCurrentInstrument() {
   const test = APP.tests[APP.currentTestIndex];
   const missing = [];
-  (test.questions || []).forEach(function (q, idx) {
-    if (APP.responses[test.id + "_" + q.id] === undefined) missing.push(idx + 1);
+  (test.questions || []).forEach((q, idx) => {
+    if (APP.responses[`${test.id}_${q.id}`] === undefined) missing.push(idx + 1);
   });
+
   if (missing.length > 0) {
-    alert("Please answer all questions before proceeding.\nMissing: " + missing.slice(0, 8).join(", ") + (missing.length > 8 ? "..." : ""));
+    alert(`Please complete all questions before moving forward.\nUnanswered items: ${missing.slice(0, 6).join(", ")}${missing.length > 6 ? '...' : ''}`);
     return false;
   }
   return true;
 }
 
-function nextTest() {
-  if (!validateCurrentTest()) return;
+function nextInstrument() {
+  if (!validateCurrentInstrument()) return;
   if (APP.currentTestIndex < APP.tests.length - 1) {
     APP.currentTestIndex++;
-    renderCurrentTest();
+    renderCurrentInstrument();
     window.scrollTo({ top: 0, behavior: "smooth" });
   } else {
-    submitFinalAssessment();
+    finalizeAssessment();
   }
 }
 
-function previousTest() {
+function prevInstrument() {
   if (APP.currentTestIndex > 0) {
     APP.currentTestIndex--;
-    renderCurrentTest();
+    renderCurrentInstrument();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
 
-async function submitFinalAssessment() {
-  if (APP.submitting) return;
-  if (!confirm("Submit your assessment responses for clinical review?")) return;
+/* ==========================================================
+   VISUAL SCORING & REPORT GENERATION
+========================================================== */
+async function finalizeAssessment() {
+  showLoading("Generating your profile & scoring dimensions...");
 
-  APP.submitting = true;
-  stopAutosave();
-  showLoading("Submitting assessment...");
+  // Client-side scoring engine calculates authoritative visual percentages
+  const engine = window.assessmentEngine || new AutismAssessmentEngine();
+  const calculated = engine.calculateScores(APP.responses, APP.tests);
+  APP.scores = calculated;
 
+  // Background sync with Google Apps Script
   try {
-    const payload = {
-      clientId: APP.clientId,
-      assessmentId: APP.assessmentId,
-      intake: APP.intake,
-      responses: APP.responses,
-      startedAt: APP.startedAt
-    };
-    const result = await apiRequest("submitAssessment", payload);
-    hideLoading();
-    $("assessmentReference").textContent = result.assessmentId || APP.assessmentId;
-    showScreen("thankYouScreen");
-  } catch (err) {
-    hideLoading();
-    APP.submitting = false;
-    alert("Submission could not be completed. Please check your connection and try again.");
-  }
-}
-
-function startAutosave() {
-  stopAutosave();
-  APP.autosaveTimer = setInterval(async function () {
-    if (!APP.assessmentId || APP.submitting) return;
-    try {
-      await apiRequest("autosave", {
+    fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "submitAssessment",
+        clientId: APP.clientId,
         assessmentId: APP.assessmentId,
-        responses: APP.responses
-      });
-      setStatus("Autosaved");
-    } catch (e) {
-      setStatus("Offline");
+        intake: APP.intake,
+        responses: APP.responses,
+        startedAt: APP.startedAt
+      })
+    }).catch(e => console.warn("Background cloud backup pending:", e));
+  } catch(e) {}
+
+  hideLoading();
+  renderVisualReport(calculated);
+  showScreen("reportScreen");
+}
+
+function renderVisualReport(scores) {
+  $("reportRefId").textContent = APP.assessmentId;
+  $("reportClientName").textContent = APP.intake.fullName || "Participant";
+
+  const metrics = scores.normalizedMetrics || {};
+
+  // Construct 4 layman-friendly consolidated spectrum dimensions
+  const dims = [
+    {
+      key: 'social',
+      titleEn: TRANSLATIONS.en.socialTitle,
+      titleUr: TRANSLATIONS.ur.socialTitle,
+      descEn: TRANSLATIONS.en.socialDesc,
+      descUr: TRANSLATIONS.ur.socialDesc,
+      score: Math.round(
+        ((metrics.AQ?.subscales?.socialSkill || 0) +
+         (metrics.RAADS?.subscales?.socialRelatedness || 0) +
+         (metrics.CATI?.subscales?.socialInteractions || 0)) / 3
+      ),
+      color: "#0d9488"
+    },
+    {
+      key: 'sensory',
+      titleEn: TRANSLATIONS.en.sensoryTitle,
+      titleUr: TRANSLATIONS.ur.sensoryTitle,
+      descEn: TRANSLATIONS.en.sensoryDesc,
+      descUr: TRANSLATIONS.ur.sensoryDesc,
+      score: Math.round(
+        ((metrics.RAADS?.subscales?.sensoryMotor || 0) +
+         (metrics.CATI?.subscales?.sensorySensitivity || 0)) / 2
+      ),
+      color: "#6366f1"
+    },
+    {
+      key: 'camo',
+      titleEn: TRANSLATIONS.en.camoTitle,
+      titleUr: TRANSLATIONS.ur.camoTitle,
+      descEn: TRANSLATIONS.en.camoDesc,
+      descUr: TRANSLATIONS.ur.camoDesc,
+      score: Math.round(
+        ((metrics.CATQ?.subscales?.masking || 0) +
+         (metrics.CATQ?.subscales?.compensation || 0) +
+         (metrics.CATI?.subscales?.socialCamouflage || 0)) / 3
+      ),
+      color: "#d97706"
+    },
+    {
+      key: 'routine',
+      titleEn: TRANSLATIONS.en.routineTitle,
+      titleUr: TRANSLATIONS.ur.routineTitle,
+      descEn: TRANSLATIONS.en.routineDesc,
+      descUr: TRANSLATIONS.ur.routineDesc,
+      score: Math.round(
+        ((metrics.AQ?.subscales?.attentionSwitching || 0) +
+         (metrics.RAADS?.subscales?.circumscribedInterests || 0) +
+         (metrics.CATI?.subscales?.cognitiveInflexibility || 0)) / 3
+      ),
+      color: "#0284c7"
     }
-  }, CONFIG.AUTOSAVE_INTERVAL);
+  ];
+
+  const panel = $("spectrumPanel");
+  panel.innerHTML = "";
+
+  dims.forEach(d => {
+    const title = currentLanguage === 'ur' ? d.titleUr : d.titleEn;
+    const desc = currentLanguage === 'ur' ? d.descUr : d.descEn;
+
+    let tier = "Mild / Typical Expression";
+    let badgeClass = "badge-typical";
+    if (d.score >= 60) {
+      tier = currentLanguage === 'ur' ? "Numayan / Elevated Trait" : "Elevated Expression";
+      badgeClass = "badge-elevated";
+    } else if (d.score >= 40) {
+      tier = currentLanguage === 'ur' ? "Darmiana / Emerging Trait" : "Moderate Expression";
+      badgeClass = "badge-moderate";
+    } else {
+      tier = currentLanguage === 'ur' ? "Mamool Ke Mutabiq" : "Typical / Low Expression";
+    }
+
+    const row = document.createElement("div");
+    row.className = "trait-row";
+    row.innerHTML = `
+      <div class="trait-top">
+        <span class="trait-title">${escapeHtml(title)}</span>
+        <span class="report-badge ${badgeClass}">${tier}</span>
+      </div>
+      <div class="trait-bar-track">
+        <div class="trait-bar-fill" style="width:${Math.max(8, d.score)}%;background:${d.color};"></div>
+      </div>
+      <div class="trait-desc">${escapeHtml(desc)}</div>
+    `;
+    panel.appendChild(row);
+  });
+
+  // Setup WhatsApp Consultation Link targeting the practice
+  const waMsg = encodeURIComponent(
+    `Hello ${CONFIG.PRACTITIONER_NAME}, I completed the Neurodiversity screening assessment.\n` +
+    `Ref ID: ${APP.assessmentId}\n` +
+    `Participant: ${APP.intake.fullName || 'Anonymous'}\n` +
+    `Summary: Social (${dims[0].score}%), Sensory (${dims[1].score}%), Camouflaging (${dims[2].score}%), Routine (${dims[3].score}%).\n` +
+    `I would like to schedule a clinical consultation.`
+  );
+  $("whatsappConsultBtn").href = `https://wa.me/${CONFIG.PRACTICE_PHONE}?text=${waMsg}`;
 }
 
-function stopAutosave() {
-  if (APP.autosaveTimer) {
-    clearInterval(APP.autosaveTimer);
-    APP.autosaveTimer = null;
-  }
-}
-
+/* ==========================================================
+   CLINICIAN DASHBOARD & REGISTRY
+========================================================== */
 function showClinicianLogin() {
   $("clinicianPin").value = "";
   $("loginError").classList.add("hidden");
   showScreen("clinicianLoginScreen");
 }
 
-$("clinicianLoginForm").addEventListener("submit", async function (e) {
+$("clinicianLoginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const pin = $("clinicianPin").value.trim();
   showLoading("Authenticating...");
   try {
-    const res = await apiRequest("clinicianLogin", { pin: pin });
-    APP.clinicianSession = res.sessionToken;
+    const res = await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "clinicianLogin", pin })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
     hideLoading();
     showScreen("clinicianDashboardScreen");
-    loadDashboard();
+    loadRegistry(data.sessionToken);
   } catch (err) {
     hideLoading();
     $("loginError").classList.remove("hidden");
   }
 });
 
-async function loadDashboard() {
-  if (!APP.clinicianSession) return showClinicianLogin();
-  showLoading("Loading records...");
-  try {
-    const data = await apiRequest("getDashboard", { sessionToken: APP.clinicianSession });
-    hideLoading();
-    $("statClients").textContent = data.clientCount || 0;
-    $("statAssessments").textContent = data.assessmentCount || 0;
-    $("statCompleted").textContent = data.completedCount || 0;
-    $("statFollowups").textContent = data.followupCount || 0;
-
-    const tbody = $("assessmentTableBody");
-    tbody.innerHTML = "";
-    const rows = data.recentAssessments || [];
-    if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No records recorded yet.</td></tr>';
-      return;
-    }
-
-    rows.forEach(function (r) {
-      const tr = document.createElement("tr");
-      tr.innerHTML =
-        '<td>' + escapeHtml((r.date || '').slice(0, 10)) + '</td>' +
-        '<td><strong>' + escapeHtml(r.assessmentId) + '</strong></td>' +
-        '<td>' + escapeHtml(r.context) + '</td>' +
-        '<td>' + (r.AQ || 0) + '</td>' +
-        '<td>' + (r.RAADS || 0) + '</td>' +
-        '<td>' + (r.CATQ || 0) + '</td>' +
-        '<td>' + (r.CATI || 0) + '</td>' +
-        '<td><button class="btn btn-secondary" style="padding:4px 10px;min-height:auto;" onclick="openAssessment(\'' + escapeHtml(r.assessmentId) + '\')">View</button></td>';
-      tbody.appendChild(tr);
-    });
-  } catch (err) {
-    hideLoading();
-    alert("Could not load records.");
-  }
-}
-
-async function openAssessment(id) {
-  showLoading("Retrieving assessment details...");
-  try {
-    const data = await apiRequest("getAssessment", {
-      sessionToken: APP.clinicianSession,
-      assessmentId: id
-    });
-    hideLoading();
-    renderAssessmentDetail(data);
-    $("detailModal").classList.remove("hidden");
-  } catch (err) {
-    hideLoading();
-    alert("Failed to load assessment record.");
-  }
-}
-
-function renderAssessmentDetail(data) {
-  const asm = data.assessment || {};
-  const client = data.client || {};
-  const scores = data.scores || {};
-
-  let html = '<div style="margin-bottom:15px;"><strong>Client:</strong> ' + escapeHtml(client.name || 'Unspecified') +
-             ' &nbsp;|&nbsp; <strong>ID:</strong> ' + escapeHtml(asm.clientId || '') +
-             ' &nbsp;|&nbsp; <strong>Completed:</strong> ' + escapeHtml((asm.completedAt || asm.date || '').slice(0, 10)) + '</div>';
-
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px;">';
-  Object.keys(scores).forEach(function (k) {
-    html += '<div style="border:1px solid var(--border);padding:10px;border-radius:8px;text-align:center;">' +
-            '<div style="font-size:11px;color:var(--muted);">' + escapeHtml(k) + '</div>' +
-            '<div style="font-size:20px;font-weight:700;">' + scores[k] + '</div></div>';
+async function loadRegistry(token) {
+  const res = await fetch(CONFIG.API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action: "getDashboard", sessionToken: token })
   });
-  html += '</div>';
+  const data = await res.json();
+  const tbody = $("registryTableBody");
+  tbody.innerHTML = "";
 
-  if (asm.screeningStatus) {
-    html += '<div class="notice info" style="margin-bottom:15px;"><strong>Screening Flags:</strong> ' + escapeHtml(asm.screeningStatus) + '</div>';
-  }
-
-  html += '<div style="margin-top:20px;"><h4>Clinical Notes</h4>';
-  const notes = data.notes || [];
-  if (notes.length) {
-    notes.forEach(function (n) {
-      html += '<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px;border-radius:8px;margin-bottom:8px;font-size:13px;">' +
-              '<div style="color:var(--muted);font-size:11px;">' + escapeHtml(n.createdAt.slice(0, 16)) + ' - ' + escapeHtml(n.noteType) + '</div>' +
-              '<div>' + escapeHtml(n.note) + '</div></div>';
-    });
-  } else {
-    html += '<p class="help">No notes attached to this record.</p>';
-  }
-
-  html += '<div style="margin-top:12px;">' +
-          '<textarea id="newNoteText" placeholder="Add a clinician note..." style="min-height:70px;margin-bottom:8px;"></textarea>' +
-          '<button class="btn btn-primary" style="padding:6px 14px;min-height:auto;" onclick="saveNote(\'' + escapeHtml(asm.assessmentId) + '\',\'' + escapeHtml(asm.clientId) + '\')">Attach Note</button>' +
-          '</div></div>';
-
-  $("detailContent").innerHTML = html;
+  (data.recentAssessments || []).forEach(r => {
+    const tr = document.createElement("tr");
+    tr.style.borderBottom = "1px solid var(--slate-200)";
+    tr.innerHTML = `
+      <td style="padding:10px 8px;">${(r.date || '').slice(0, 10)}</td>
+      <td style="padding:10px 8px;"><strong>${escapeHtml(r.assessmentId)}</strong></td>
+      <td style="padding:10px 8px;">${r.AQ || 0}</td>
+      <td style="padding:10px 8px;">${r.RAADS || 0}</td>
+      <td style="padding:10px 8px;">${r.CATQ || 0}</td>
+      <td style="padding:10px 8px;">${r.CATI || 0}</td>
+      <td style="padding:10px 8px;"><span class="report-badge badge-typical">${escapeHtml(r.status || 'Received')}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
-
-async function saveNote(assessmentId, clientId) {
-  const text = $("newNoteText").value.trim();
-  if (!text) return;
-  showLoading("Saving note...");
-  try {
-    await apiRequest("saveClinicalNote", {
-      sessionToken: APP.clinicianSession,
-      assessmentId: assessmentId,
-      clientId: clientId,
-      note: text
-    });
-    hideLoading();
-    openAssessment(assessmentId);
-  } catch (err) {
-    hideLoading();
-    alert("Could not save clinical note.");
-  }
-}
-
-function closeDetailModal() { $("detailModal").classList.add("hidden"); }
-function closeModal(e) { if (e.target === $("detailModal")) closeDetailModal(); }
 
 function clinicianLogout() {
-  if (APP.clinicianSession) {
-    apiRequest("logout", { sessionToken: APP.clinicianSession }).catch(function () {});
-    APP.clinicianSession = null;
-  }
   showWelcome();
 }
 
@@ -854,8 +1127,8 @@ function escapeHtml(str) {
   return String(str == null ? "" : str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  setStatus("Ready");
+document.addEventListener("DOMContentLoaded", () => {
+  applyLanguage();
   loadTestBattery();
 });
 </script>
