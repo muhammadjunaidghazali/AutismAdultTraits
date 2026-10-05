@@ -674,6 +674,69 @@ const APP = {
   activeDetailRecord: null
 };
 
+// --- STATE PERSISTENCE ---
+const STORAGE_KEY = "mjg_assessment_progress";
+
+function saveProgress() {
+  const state = {
+    currentTestIndex: APP.currentTestIndex,
+    responses: APP.responses,
+    intake: APP.intake,
+    clientId: APP.clientId,
+    assessmentId: APP.assessmentId,
+    startedAt: APP.startedAt,
+    currentScreen: document.querySelector("main > section:not(.hidden)").id
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function clearProgress() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+function checkSavedProgress() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const state = JSON.parse(saved);
+      // Only show resume if they actually started answering or passed intake
+      if (state.assessmentId) {
+        const welcomeCard = document.querySelector("#welcomeScreen .card");
+        let resumeBtn = document.getElementById("resumeBtn");
+        
+        if (!resumeBtn) {
+          resumeBtn = document.createElement("button");
+          resumeBtn.id = "resumeBtn";
+          resumeBtn.type = "button";
+          resumeBtn.className = "btn btn-secondary";
+          resumeBtn.style.marginTop = "12px";
+          resumeBtn.style.width = "100%";
+          resumeBtn.innerHTML = "🔄 Resume Previous Assessment";
+          resumeBtn.onclick = () => {
+            APP.currentTestIndex = state.currentTestIndex || 0;
+            APP.responses = state.responses || {};
+            APP.intake = state.intake || {};
+            APP.clientId = state.clientId;
+            APP.assessmentId = state.assessmentId;
+            APP.startedAt = state.startedAt;
+            
+            renderCurrentInstrument();
+            showScreen("assessmentScreen");
+            showToast("Progress restored successfully.");
+          };
+          
+          // Insert the resume button right below the Start button
+          const startBtn = welcomeCard.querySelector(".btn-primary");
+          startBtn.style.width = "100%"; 
+          startBtn.parentNode.insertBefore(resumeBtn, startBtn.nextSibling);
+        }
+      }
+    } catch (e) {
+      console.error("Could not parse saved progress.", e);
+    }
+  }
+}
+
 // Utilities
 const $ = (id) => document.getElementById(id);
 
@@ -727,7 +790,12 @@ document.addEventListener('keydown', (e) => {
 });
 
 function showWelcome() { showScreen("welcomeScreen"); }
-function showIntake() { showScreen("intakeScreen"); $("fullName").focus(); }
+
+function showIntake() { 
+  clearProgress(); // Ensure a fresh start if they deliberately ignore the "Resume" button
+  showScreen("intakeScreen"); 
+  $("fullName").focus(); 
+}
 
 async function loadTestBattery() {
   if (APP.tests.length > 0) return true;
@@ -766,6 +834,8 @@ $("intakeForm").addEventListener("submit", async function(e) {
   APP.clientId = "CLI-" + Math.floor(100000 + Math.random() * 900000);
   APP.assessmentId = "ASM-" + Math.floor(100000 + Math.random() * 900000);
   APP.startedAt = new Date().toISOString();
+
+  saveProgress(); // State Persistence
 
   hideLoading();
   APP.currentTestIndex = 0;
@@ -823,6 +893,7 @@ function renderCurrentInstrument() {
       radio.addEventListener("change", () => {
         APP.responses[qKey] = optIdx;
         updateJourneyProgress();
+        saveProgress(); // State Persistence
       });
 
       const label = document.createElement("label");
@@ -891,6 +962,7 @@ function proceedNext() {
     APP.currentTestIndex++;
     renderCurrentInstrument();
     window.scrollTo({ top: 0, behavior: "smooth" });
+    saveProgress(); // State Persistence
   } else {
     finishAssessment();
   }
@@ -901,6 +973,7 @@ function prevInstrument() {
     APP.currentTestIndex--;
     renderCurrentInstrument();
     window.scrollTo({ top: 0, behavior: "smooth" });
+    saveProgress(); // State Persistence
   }
 }
 
@@ -938,6 +1011,8 @@ async function finishAssessment() {
   hideLoading();
   renderLaymanReport(calculated);
   showScreen("reportScreen");
+  
+  clearProgress(); // Clears cache once successfully completed
 }
 
 function renderLaymanReport(data) {
@@ -1225,7 +1300,19 @@ function escapeHtml(str) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadTestBattery();
+  loadTestBattery().then(() => {
+    checkSavedProgress(); // Checks for save data once tests are loaded
+  });
+});
+
+// Protect against accidental tab close/refresh
+window.addEventListener("beforeunload", (e) => {
+  const currentScreen = document.querySelector("main > section:not(.hidden)")?.id;
+  // Only warn if they are in the middle of the assessment screen and have answered at least one question
+  if (currentScreen === "assessmentScreen" && Object.keys(APP.responses).length > 0) {
+    e.preventDefault();
+    e.returnValue = ""; // Required by modern browsers to show the default warning prompt
+  }
 });
 </script>
 </body>
