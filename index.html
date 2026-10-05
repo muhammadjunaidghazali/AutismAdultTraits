@@ -7,6 +7,7 @@
   <meta name="description" content="Friendly, gamified, and clinician-reviewed psychometric battery for adult neurodivergence.">
   <meta name="theme-color" content="#0d9488">
 
+  <!-- External Script Dependencies -->
   <script src="./Scoring_V2.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,7 +38,7 @@
     body.calm-mode {
       --primary: #475569;
       --primary-dark: #334155;
-      --primary-light: #f1f5f9;
+      --primary-light: #e2e8f0;
       --anim-speed: 0s;
       background: #fdfbf7;
     }
@@ -57,7 +58,7 @@
     }
 
     button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
+    button { cursor: pointer; transition: all var(--anim-speed) ease; }
     .hidden { display: none !important; }
 
     /* Header */
@@ -95,11 +96,13 @@
       font-weight: 800;
       font-size: 19px;
     }
+    body.calm-mode .brand-mark { background: var(--primary); }
+    
     .brand-text { display: flex; flex-direction: column; }
     .brand-title { font-size: 14px; font-weight: 700; }
     .brand-subtitle { font-size: 11px; color: var(--slate-600); }
 
-    .header-controls { display: flex; align-items: center; gap: 8px; }
+    .header-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .pill-btn {
       background: var(--slate-100);
       border: 1px solid var(--slate-200);
@@ -152,6 +155,8 @@
       border-radius: 99px;
       transition: width var(--anim-speed) ease;
     }
+    body.calm-mode .track-fill { background: var(--primary); }
+
     .quest-badge {
       display: inline-flex;
       align-items: center;
@@ -177,11 +182,13 @@
       justify-content: center;
       gap: 8px;
     }
+    .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
     .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
     .btn-secondary { background: var(--slate-100); color: var(--slate-800); border: 1px solid var(--slate-200); }
     .btn-secondary:hover { background: var(--slate-200); }
     .btn-whatsapp { background: #25d366; color: white; text-decoration: none; }
+    .btn-whatsapp:hover { background: #1ebc5b; transform: translateY(-1px); }
 
     /* Questions */
     .question-card {
@@ -190,7 +197,9 @@
       border-radius: var(--radius-md);
       padding: 20px;
       margin-bottom: 16px;
+      transition: border-color var(--anim-speed) ease;
     }
+    .question-card:hover { border-color: var(--primary-light); }
     .question-header {
       display: flex;
       gap: 12px;
@@ -211,7 +220,7 @@
     .q-text { font-size: 15px; font-weight: 600; }
     .options-grid { display: grid; gap: 8px; }
     .opt-chip { position: relative; }
-    .opt-chip input { position: absolute; opacity: 0; }
+    .opt-chip input { position: absolute; opacity: 0; width: 0; height: 0; }
     .opt-chip label {
       display: flex;
       align-items: center;
@@ -221,8 +230,10 @@
       border-radius: 10px;
       cursor: pointer;
       font-size: 14px;
+      transition: all var(--anim-speed) ease;
     }
-    .opt-chip label:hover { background: var(--slate-50); }
+    .opt-chip label:hover { background: var(--slate-50); border-color: #cbd5e1; }
+    .opt-chip input:focus-visible + label { outline: 2px solid var(--primary); outline-offset: 2px; }
     .opt-chip input:checked + label {
       background: var(--primary-light);
       border-color: var(--primary);
@@ -237,6 +248,7 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
+      white-space: nowrap;
     }
     .priority-high { background: #fee2e2; color: #991b1b; }
     .priority-mod { background: #fef3c7; color: #92400e; }
@@ -249,13 +261,26 @@
       padding: 18px;
       margin-bottom: 16px;
     }
+    
+    .instrument-card {
+      background: white;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .instrument-card.elevated { border-color: #fca5a5; }
 
-    /* Clinician Detail Modal */
+    /* Modals */
     .modal {
       position: fixed; inset: 0;
       background: rgba(15, 23, 42, 0.6);
       display: grid; place-items: center;
       padding: 16px; z-index: 3000;
+      opacity: 0; visibility: hidden;
+      transition: opacity var(--anim-speed) ease, visibility var(--anim-speed) ease;
+    }
+    .modal:not(.hidden) {
+      opacity: 1; visibility: visible; display: grid !important;
     }
     .modal-content {
       width: min(920px, 100%);
@@ -264,7 +289,11 @@
       background: white;
       border-radius: var(--radius-lg);
       padding: 26px;
+      transform: scale(0.95);
+      transition: transform var(--anim-speed) ease;
     }
+    .modal:not(.hidden) .modal-content { transform: scale(1); }
+
     .tab-bar {
       display: flex;
       gap: 8px;
@@ -283,32 +312,57 @@
       border-radius: 8px;
       white-space: nowrap;
     }
-    .tab-btn.active {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-    }
+    .tab-btn.active { background: var(--primary-light); color: var(--primary-dark); }
 
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 14px; font-weight: 600; color: var(--slate-800); }
     input, select, textarea {
       width: 100%; border: 1px solid #cbd5e1; background: white;
       border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none;
+      transition: border-color 0.2s;
     }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 
+    /* Loading Overlay & Spinner */
     .loading-overlay {
       position: fixed; inset: 0;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.9);
       z-index: 5000; display: grid; place-items: center;
     }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--slate-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast Notifications */
+    #toastContainer {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .toast {
+      background: var(--secondary); color: white;
+      padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideUp 0.3s ease forwards;
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
   </style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="header-inner">
-    <a href="#" class="brand" onclick="showWelcome()">
-      <div class="brand-mark">Ψ</div>
+    <a href="#" class="brand" onclick="showWelcome()" aria-label="Return to home">
+      <div class="brand-mark" aria-hidden="true">Ψ</div>
       <div class="brand-text">
         <span class="brand-title">Muhammad Junaid Ghazali</span>
         <span class="brand-subtitle">Counselor & Clinical Psychologist</span>
@@ -316,10 +370,10 @@
     </a>
     <div class="header-controls">
       <button type="button" class="pill-btn" onclick="toggleCalmMode()" title="Reduces animations and color saturation">
-        🍃 <span id="calmModeLabel">Sensory Calm: Off</span>
+        <span aria-hidden="true">🍃</span> <span id="calmModeLabel">Sensory Calm: Off</span>
       </button>
       <button type="button" class="pill-btn" onclick="toggleLanguage()">
-        🌐 <span id="langLabel">Roman Urdu</span>
+        <span aria-hidden="true">🌐</span> <span id="langLabel">Roman Urdu</span>
       </button>
       <button type="button" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="showClinicianLogin()">Portal</button>
     </div>
@@ -330,7 +384,7 @@
   <!-- Welcome Screen -->
   <section id="welcomeScreen">
     <div class="card">
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <span class="quest-badge">🌱 Neuro-Affirmative Assessment</span>
         <span class="quest-badge" style="background:#eff6ff;color:#1e40af;border-color:#bfdbfe;">4 Comprehensive Instruments</span>
       </div>
@@ -373,19 +427,19 @@
         <div class="form-grid">
           <div class="field">
             <label for="fullName"><span data-i18n="fullName">Full Name</span> *</label>
-            <input id="fullName" name="fullName" type="text" required placeholder="e.g. Usman Ali">
+            <input id="fullName" name="fullName" type="text" required placeholder="e.g. Usman Ali" autocomplete="name">
           </div>
           <div class="field">
             <label for="email"><span data-i18n="email">Email Address</span> *</label>
-            <input id="email" name="email" type="email" required placeholder="name@example.com">
+            <input id="email" name="email" type="email" required placeholder="name@example.com" autocomplete="email">
           </div>
           <div class="field">
             <label for="phone"><span data-i18n="phone">Phone / WhatsApp</span></label>
-            <input id="phone" name="phone" type="tel" placeholder="03XXXXXXXXX">
+            <input id="phone" name="phone" type="tel" placeholder="03XXXXXXXXX" autocomplete="tel">
           </div>
           <div class="field">
             <label for="dob"><span data-i18n="dob">Date of Birth</span></label>
-            <input id="dob" name="dob" type="date">
+            <input id="dob" name="dob" type="date" autocomplete="bday">
           </div>
           <div class="field full">
             <label for="assessmentPurpose"><span data-i18n="context">What brings you to explore this today?</span></label>
@@ -492,18 +546,18 @@
       <button class="btn btn-secondary" onclick="clinicianLogout()">Lock Portal</button>
     </div>
 
-    <div class="card">
+    <div class="card" style="padding:0; overflow:hidden;">
       <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead>
-            <tr style="text-align:left;border-bottom:2px solid var(--slate-200);color:var(--slate-600);">
-              <th style="padding:10px 8px;">Date</th>
-              <th style="padding:10px 8px;">Assessment ID</th>
-              <th style="padding:10px 8px;">AQ (≥26)</th>
-              <th style="padding:10px 8px;">RAADS (≥65)</th>
-              <th style="padding:10px 8px;">CAT-Q (≥100)</th>
-              <th style="padding:10px 8px;">CATI</th>
-              <th style="padding:10px 8px;">Clinical Actions</th>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left;">
+          <thead style="background:var(--slate-50);border-bottom:1px solid var(--slate-200);">
+            <tr style="color:var(--slate-600);">
+              <th style="padding:14px 16px; font-weight:600;">Date</th>
+              <th style="padding:14px 16px; font-weight:600;">Assessment ID</th>
+              <th style="padding:14px 16px; font-weight:600;">AQ (≥26)</th>
+              <th style="padding:14px 16px; font-weight:600;">RAADS (≥65)</th>
+              <th style="padding:14px 16px; font-weight:600;">CAT-Q (≥100)</th>
+              <th style="padding:14px 16px; font-weight:600;">CATI</th>
+              <th style="padding:14px 16px; font-weight:600; text-align:right;">Actions</th>
             </tr>
           </thead>
           <tbody id="clinicianTableBody"></tbody>
@@ -514,10 +568,10 @@
 </main>
 
 <!-- Mindful Rest Break Modal (Gamified Waypoint) -->
-<div id="restBreakModal" class="modal hidden">
+<div id="restBreakModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="restBreakTitle">
   <div class="modal-content" style="max-width:440px;text-align:center;">
-    <div style="font-size:36px;margin-bottom:8px;">🍵</div>
-    <h3 style="margin:0 0 8px;">Waypoint Checkpoint</h3>
+    <div style="font-size:36px;margin-bottom:8px;" aria-hidden="true">🍵</div>
+    <h3 id="restBreakTitle" style="margin:0 0 8px;">Waypoint Checkpoint</h3>
     <p style="font-size:14px;color:var(--slate-600);margin-bottom:20px;">
       You have completed a major milestone of the assessment. Answering self-reflective questions takes cognitive energy. Feel free to stretch, take a sip of water, or rest your eyes for 30 seconds.
     </p>
@@ -526,11 +580,11 @@
 </div>
 
 <!-- Detailed Clinician Case Modal -->
-<div id="clinicianDetailModal" class="modal hidden" onclick="closeModal(event)">
+<div id="clinicianDetailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="clinicianModalTitle" onclick="closeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
       <div>
-        <h3 style="margin:0;">Comprehensive Client Exploration</h3>
+        <h3 id="clinicianModalTitle" style="margin:0;">Comprehensive Client Exploration</h3>
         <span style="font-size:12px;color:var(--slate-600);" id="modalClientMeta">Loading record...</span>
       </div>
       <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
@@ -550,12 +604,16 @@
   </div>
 </div>
 
+<!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay hidden">
   <div style="text-align:center;">
-    <div style="font-size:32px;margin-bottom:8px;">⌛</div>
-    <div id="loadingMsg" style="font-weight:600;font-size:14px;">Loading...</div>
+    <div class="spinner"></div>
+    <div id="loadingMsg" style="font-weight:600;font-size:14px;color:var(--slate-800);">Loading...</div>
   </div>
 </div>
+
+<!-- Global Toast Container -->
+<div id="toastContainer"></div>
 
 <script>
 const CONFIG = {
@@ -582,7 +640,8 @@ const TRANSLATIONS = {
     context: "What brings you to explore this today?",
     backBtn: "Back",
     continueBtn: "Continue to First Instrument →",
-    reportTitle: "Your Traits Spectrum Profile"
+    reportTitle: "Your Traits Spectrum Profile",
+    validationMsg: "Please answer all questions before proceeding.\nUnanswered items: "
   },
   ur: {
     heroTitle: "Apnay Zehni Rujhanaat Aur Shakhsiyat Ka Jaiza",
@@ -598,7 +657,8 @@ const TRANSLATIONS = {
     context: "Aap yeh assessment kis wajah se kar rahay hain?",
     backBtn: "Peechay",
     continueBtn: "Agay Barhein →",
-    reportTitle: "Aapki Shakhsiyat Ka Visual Spectrum"
+    reportTitle: "Aapki Shakhsiyat Ka Visual Spectrum",
+    validationMsg: "Baraye meherbani aagay barhne se pehle tamam sawaalat mukammal karein.\nReh jane walay sawal: "
   }
 };
 
@@ -614,7 +674,20 @@ const APP = {
   activeDetailRecord: null
 };
 
-function $(id) { return document.getElementById(id); }
+// Utilities
+const $ = (id) => document.getElementById(id);
+
+function showToast(message) {
+  const container = $("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
 
 function showLoading(msg) {
   $("loadingMsg").textContent = msg || "Loading...";
@@ -644,6 +717,14 @@ function toggleLanguage() {
   });
   if (APP.calculatedData) renderLaymanReport(APP.calculatedData);
 }
+
+// Global Escape Key Listener for Modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (!$("clinicianDetailModal").classList.contains("hidden")) closeDetailModal();
+    if (!$("restBreakModal").classList.contains("hidden")) closeRestBreak();
+  }
+});
 
 function showWelcome() { showScreen("welcomeScreen"); }
 function showIntake() { showScreen("intakeScreen"); $("fullName").focus(); }
@@ -678,7 +759,7 @@ $("intakeForm").addEventListener("submit", async function(e) {
   const ok = await loadTestBattery();
   if (!ok) {
     hideLoading();
-    alert("Could not load questionnaire battery. Ensure Tests_V2.json is in the site folder.");
+    showToast("Could not load questionnaire battery. Ensure Tests_V2.json is accessible.");
     return;
   }
 
@@ -719,11 +800,13 @@ function renderCurrentInstrument() {
 
     const header = document.createElement("div");
     header.className = "question-header";
-    header.innerHTML = `<div class="q-num">${idx + 1}</div><div class="q-text">${escapeHtml(q.text)}</div>`;
+    header.innerHTML = `<div class="q-num" aria-hidden="true">${idx + 1}</div><div class="q-text" id="label_${qKey}">${escapeHtml(q.text)}</div>`;
     card.appendChild(header);
 
     const grid = document.createElement("div");
     grid.className = "options-grid";
+    grid.setAttribute("role", "radiogroup");
+    grid.setAttribute("aria-labelledby", `label_${qKey}`);
 
     options.forEach((opt, optIdx) => {
       const chip = document.createElement("div");
@@ -765,7 +848,6 @@ function updateJourneyProgress() {
   const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
 
   $("journeyTrackFill").style.width = `${pct}%`;
-  const currentTestQuestions = (APP.tests[APP.currentTestIndex].questions || []).length;
   $("journeyPacingLabel").textContent = `${answered} of ${total} total questions answered (${pct}%)`;
 }
 
@@ -777,7 +859,16 @@ function nextInstrument() {
   });
 
   if (missing.length > 0) {
-    alert(`Baraye meherbani tamam sawaalat mukammal karein.\nUnanswered items: ${missing.slice(0, 6).join(", ")}`);
+    const msg = TRANSLATIONS[currentLanguage].validationMsg + missing.slice(0, 6).join(", ");
+    showToast(msg);
+    // Scroll to first unanswered question smoothly
+    const firstMissingId = `${test.id}_${test.questions[missing[0] - 1].id}`;
+    const missingElement = document.querySelector(`input[name="${firstMissingId}"]`)?.closest('.question-card');
+    if (missingElement) {
+        missingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        missingElement.style.borderColor = 'var(--rose)';
+        setTimeout(() => missingElement.style.borderColor = '', 1500);
+    }
     return;
   }
 
@@ -816,7 +907,15 @@ function prevInstrument() {
 async function finishAssessment() {
   showLoading("Synthesizing your cognitive spectrum profile...");
 
-  const engine = window.assessmentEngine || new AutismAssessmentEngine();
+  // Fallback if Scoring_V2.js isn't fully loading
+  const engine = window.assessmentEngine || (window.AutismAssessmentEngine ? new AutismAssessmentEngine() : null);
+  
+  if (!engine) {
+      hideLoading();
+      showToast("Error: Scoring Engine not found. Please contact support.");
+      return;
+  }
+
   const calculated = engine.calculateScores(APP.responses, APP.tests);
   APP.calculatedData = calculated;
 
@@ -885,6 +984,7 @@ function showClinicianLogin() {
   $("clinicianPin").value = "";
   $("loginError").classList.add("hidden");
   showScreen("clinicianLoginScreen");
+  setTimeout(() => $("clinicianPin").focus(), 100);
 }
 
 $("clinicianLoginForm").addEventListener("submit", async function(e) {
@@ -924,14 +1024,14 @@ async function loadClinicianDashboard() {
     const tr = document.createElement("tr");
     tr.style.borderBottom = "1px solid var(--slate-200)";
     tr.innerHTML = `
-      <td style="padding:10px 8px;">${(r.date || '').slice(0, 10)}</td>
-      <td style="padding:10px 8px;"><strong>${escapeHtml(r.assessmentId)}</strong></td>
-      <td style="padding:10px 8px;">${r.AQ || 0} ${r.AQ >= 26 ? '🚩' : ''}</td>
-      <td style="padding:10px 8px;">${r.RAADS || 0} ${r.RAADS >= 65 ? '🚩' : ''}</td>
-      <td style="padding:10px 8px;">${r.CATQ || 0} ${r.CATQ >= 100 ? '🚩' : ''}</td>
-      <td style="padding:10px 8px;">${r.CATI || 0}</td>
-      <td style="padding:10px 8px;">
-        <button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="openClinicianDetail('${escapeHtml(r.assessmentId)}')">Explore Profile →</button>
+      <td style="padding:14px 16px;">${(r.date || '').slice(0, 10)}</td>
+      <td style="padding:14px 16px;"><strong>${escapeHtml(r.assessmentId)}</strong></td>
+      <td style="padding:14px 16px;">${r.AQ || 0} ${r.AQ >= 26 ? '<span title="Elevated" aria-label="Elevated">🚩</span>' : ''}</td>
+      <td style="padding:14px 16px;">${r.RAADS || 0} ${r.RAADS >= 65 ? '<span title="Elevated" aria-label="Elevated">🚩</span>' : ''}</td>
+      <td style="padding:14px 16px;">${r.CATQ || 0} ${r.CATQ >= 100 ? '<span title="Elevated" aria-label="Elevated">🚩</span>' : ''}</td>
+      <td style="padding:14px 16px;">${r.CATI || 0}</td>
+      <td style="padding:14px 16px; text-align:right;">
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="openClinicianDetail('${escapeHtml(r.assessmentId)}')">Explore Profile →</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -958,7 +1058,7 @@ async function openClinicianDetail(assessmentId) {
     $("clinicianDetailModal").classList.remove("hidden");
   } catch (err) {
     hideLoading();
-    alert("Could not load case details.");
+    showToast("Could not load case details.");
   }
 }
 
@@ -967,8 +1067,9 @@ function renderClinicianModal(data) {
   const client = data.client || {};
   $("modalClientMeta").textContent = `${client.name || 'Anonymous'} • ID: ${asm.clientId || '-'} • Ref: ${asm.assessmentId || '-'}`;
 
-  // Tab 1: Cross-Battery Triage & Action Plan
-  const engine = window.assessmentEngine || new AutismAssessmentEngine();
+  const engine = window.assessmentEngine || (window.AutismAssessmentEngine ? new AutismAssessmentEngine() : null);
+  if(!engine) return;
+
   const raw = {
     AQ: { total: data.scores?.["AQ-50 Total"] || 0 },
     RAADS: { total: data.scores?.["RAADS-R Total"] || 0 },
@@ -977,18 +1078,19 @@ function renderClinicianModal(data) {
   };
   const synthesizedPriorities = engine.generateClinicalPriorities(raw, data.metrics || {});
 
+  // Tab 1: Cross-Battery Triage & Action Plan
   let triageHtml = '<div style="display:grid;gap:14px;">';
   synthesizedPriorities.forEach(p => {
     let pClass = p.priority === "High Priority" ? "priority-high" : (p.priority === "Moderate Focus" ? "priority-mod" : "priority-low");
     triageHtml += `
-      <div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:12px;padding:18px;">
+      <div class="triage-card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <h4 style="margin:0;font-size:15px;">${escapeHtml(p.domain)}</h4>
           <span class="priority-badge ${pClass}">${p.priority} (${p.averagePercent}%)</span>
         </div>
         <p style="font-size:13px;color:var(--slate-600);margin:8px 0;">${escapeHtml(p.clinicalSignificance)}</p>
 
-        <div style="margin:10px 0;background:white;padding:10px;border-radius:8px;border:1px solid #e2e8f0;">
+        <div style="margin:10px 0;background:white;padding:12px;border-radius:8px;border:1px solid var(--slate-200);">
           <strong style="font-size:12px;color:var(--slate-800);">Recommended Session Explorations:</strong>
           <ul style="margin:6px 0 0 18px;padding:0;font-size:13px;color:var(--slate-600);">
             ${p.sessionPrompts.map(pr => `<li>${escapeHtml(pr)}</li>`).join('')}
@@ -1012,7 +1114,7 @@ function renderClinicianModal(data) {
     const isElevated = info.cutoff && rawVal >= info.cutoff;
 
     batteryHtml += `
-      <div style="background:white;border:1.5px solid ${isElevated ? '#fca5a5' : '#cbd5e1'};border-radius:12px;padding:16px;">
+      <div class="instrument-card ${isElevated ? 'elevated' : ''}">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <strong style="font-size:14px;">${info.shortTitle}</strong>
           ${isElevated ? '<span class="priority-badge priority-high">Cutoff Met</span>' : '<span class="priority-badge priority-low">Below Cutoff</span>'}
@@ -1040,13 +1142,13 @@ function renderClinicianModal(data) {
 
   // Tab 3: Background & Context
   $("tabContentBackground").innerHTML = `
-    <div class="form-grid" style="font-size:14px;">
-      <div><strong>Full Name:</strong> ${escapeHtml(client.name || '-')}</div>
-      <div><strong>Email:</strong> ${escapeHtml(client.email || '-')}</div>
-      <div><strong>Phone:</strong> ${escapeHtml(client.phone || '-')}</div>
-      <div><strong>Date of Birth:</strong> ${escapeHtml(client.dob || '-')}</div>
-      <div><strong>Context:</strong> ${escapeHtml(asm.context || '-')}</div>
-      <div><strong>Duration Taken:</strong> ${Math.round(asm.durationSeconds / 60)} minutes</div>
+    <div class="form-grid" style="font-size:14px;background:var(--slate-50);padding:20px;border-radius:12px;border:1px solid var(--slate-200);">
+      <div><strong style="display:block;font-size:12px;color:var(--slate-600);">Full Name</strong> ${escapeHtml(client.name || '-')}</div>
+      <div><strong style="display:block;font-size:12px;color:var(--slate-600);">Email</strong> ${escapeHtml(client.email || '-')}</div>
+      <div><strong style="display:block;font-size:12px;color:var(--slate-600);">Phone</strong> ${escapeHtml(client.phone || '-')}</div>
+      <div><strong style="display:block;font-size:12px;color:var(--slate-600);">Date of Birth</strong> ${escapeHtml(client.dob || '-')}</div>
+      <div class="field full"><strong style="display:block;font-size:12px;color:var(--slate-600);">Context</strong> ${escapeHtml(asm.context || '-')}</div>
+      <div><strong style="display:block;font-size:12px;color:var(--slate-600);">Duration Taken</strong> ${Math.round(asm.durationSeconds / 60)} minutes</div>
     </div>
   `;
 
@@ -1066,11 +1168,13 @@ function renderNotesTab(notes) {
       `;
     });
   } else {
-    html += '<p style="color:var(--slate-600);font-size:13px;">No clinical notes attached to this participant yet.</p>';
+    html += '<p style="color:var(--slate-600);font-size:13px;padding:12px;background:var(--slate-50);border-radius:8px;">No clinical notes attached to this participant yet.</p>';
   }
   html += `</div>
-    <textarea id="modalNoteText" placeholder="Record therapeutic observations or session priority notes..." style="min-height:80px;margin-bottom:8px;"></textarea>
-    <button class="btn btn-primary" onclick="saveActiveNote()">Attach Note</button>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <textarea id="modalNoteText" placeholder="Record therapeutic observations or session priority notes..." style="min-height:80px;"></textarea>
+      <button class="btn btn-primary" style="align-self:flex-start;" onclick="saveActiveNote()">Attach Note</button>
+    </div>
   `;
   $("tabContentNotes").innerHTML = html;
 }
@@ -1093,10 +1197,11 @@ async function saveActiveNote() {
       })
     });
     hideLoading();
+    showToast("Note attached successfully.");
     openClinicianDetail(asm.assessmentId);
   } catch (err) {
     hideLoading();
-    alert("Could not save note.");
+    showToast("Could not save note. Please check your connection.");
   }
 }
 
@@ -1113,7 +1218,7 @@ function switchTab(tab) {
 
 function closeDetailModal() { $("clinicianDetailModal").classList.add("hidden"); }
 function closeModal(e) { if (e.target === $("clinicianDetailModal")) closeDetailModal(); }
-function clinicianLogout() { showWelcome(); }
+function clinicianLogout() { showWelcome(); showToast("Logged out of portal securely."); }
 
 function escapeHtml(str) {
   return String(str == null ? "" : str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
